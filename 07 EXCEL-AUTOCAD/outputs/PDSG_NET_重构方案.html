@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PDSG .NET 重构方案</title>
+<style>
+:root{--bg:#f7f8fa;--card:#fff;--ink:#1f2329;--mute:#6b7280;--line:#e5e7eb;--accent:#2563eb;--green:#16a34a;--yellow:#d97706;--red:#dc2626;--blue:#2563eb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei",system-ui,sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 24px 80px}
+header{background:linear-gradient(135deg,#1e3a8a,#2563eb 60%,#0ea5e9);color:#fff;border-radius:16px;padding:36px;box-shadow:0 8px 24px rgba(37,99,235,.25)}
+header h1{margin:0 0 8px;font-size:26px}
+header .sub{opacity:.9;font-size:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;margin:20px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+h2{font-size:20px;margin:0 0 12px;border-left:5px solid var(--accent);padding-left:12px}
+h3{font-size:16px;margin:18px 0 8px;color:#0f172a}
+table{border-collapse:collapse;width:100%;margin:10px 0}
+th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;font-size:13px}
+th{background:#f1f5f9;font-weight:600}
+.ok{color:var(--green);font-weight:bold}
+.warn{color:var(--yellow);font-weight:bold}
+.bad{color:var(--red);font-weight:bold}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.tag-green{background:#dcfce7;color:#16a34a}
+.tag-red{background:#fee2e2;color:#dc2626}
+.tag-yellow{background:#fef3c7;color:#d97706}
+.tag-blue{background:#dbeafe;color:#2563eb}
+pre{background:#0f172a;color:#e2e8f0;padding:16px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5}
+code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:13px}
+.tree{font-family:Consolas,monospace;font-size:13px;line-height:1.6;background:#f8fafc;padding:16px;border-radius:8px;border:1px solid var(--line)}
+.step{display:flex;gap:12px;margin:12px 0;align-items:flex-start}
+.step-num{background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex-shrink:0}
+.step-body{flex:1}
+.verdict{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #16a34a;border-radius:12px;padding:20px;margin:20px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>PDSG .NET 重构方案</h1>
+  <div class="sub">配电柜系统图自动生成程序 — 从 Python+COM 迁移到 C#/.NET 8 + AutoCAD 托管API</div>
+</header>
+
+<!-- ========== 环境检查 ========== -->
+<section>
+<h2>一、开发环境检查</h2>
+<table>
+<tr><th>依赖项</th><th>状态</th><th>说明</th></tr>
+<tr><td>AutoCAD 2022</td><td class="ok">✅ 已安装</td><td>C:\Program Files\Autodesk\AutoCAD 2022</td></tr>
+<tr><td>acdbmgd.dll (6.3MB)</td><td class="ok">✅ 存在</td><td>AutoCAD .NET 托管数据库API — 绘图核心</td></tr>
+<tr><td>acmgd.dll (3.0MB)</td><td class="ok">✅ 存在</td><td>AutoCAD .NET 托管接口API</td></tr>
+<tr><td>accoremgd.dll (0.9MB)</td><td class="ok">✅ 存在</td><td>AutoCAD .NET 核心服务API</td></tr>
+<tr><td>.NET Runtime 8.0.6</td><td class="ok">✅ 已安装</td><td>运行时就绪</td></tr>
+<tr><td>WindowsDesktop Runtime 8.0</td><td class="ok">✅ 已安装</td><td>WPF/WinForms 运行时就绪</td></tr>
+<tr><td>.NET SDK 8.0</td><td class="bad">❌ 未安装</td><td>无法编译项目 — <b>必须安装</b></td></tr>
+<tr><td>MSBuild</td><td class="bad">❌ 未安装</td><td>随SDK一起安装</td></tr>
+<tr><td>NuGet</td><td class="bad">❌ 未安装</td><td>随SDK一起安装</td></tr>
+<tr><td>Visual Studio 2022</td><td class="warn">⚠️ 仅Build Tools</td><td>需确认C#工作负载是否安装</td></tr>
+</table>
+
+<h3>环境搭建步骤</h3>
+<div class="step"><div class="step-num">1</div><div class="step-body"><b>安装 .NET 8.0 SDK</b><br>下载: <code>https://dotnet.microsoft.com/download/dotnet/8.0</code> → Windows x64 → SDK<br>安装后验证: <code>dotnet --list-sdks</code></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body"><b>安装 Visual Studio 2022 Community</b>（可选但推荐）<br>勾选 <b>".NET 桌面开发"</b> 工作负载，含C#、WPF、IntelliSense</div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body"><b>验证环境</b><br><code>dotnet new console -n TestPdsg -f net8.0-windows</code><br><code>cd TestPdsg && dotnet build</code><br>输出 "Build succeeded" 即可</div></div>
+</section>
+
+<!-- ========== 技术选型 ========== -->
+<section>
+<h2>二、技术选型对比</h2>
+<table>
+<tr><th>维度</th><th>Python+COM（现状）</th><th>C#/.NET（推荐）</th><th>C++/ObjectARX</th><th>LISP</th></tr>
+<tr><td>学习曲线</td><td>⭐⭐</td><td><span class="tag tag-blue">⭐⭐ 中等</span></td><td>⭐⭐⭐ 最陡</td><td>⭐ 最低</td></tr>
+<tr><td>开发速度</td><td>⭐⭐</td><td><span class="tag tag-green">⭐⭐⭐ 快</span></td><td>⭐ 慢</td><td>⭐⭐⭐ 快</td></tr>
+<tr><td>稳定性</td><td><span class="tag tag-red">差(COM卡死)</span></td><td><span class="tag tag-green">高</span></td><td><span class="tag tag-green">最高</span></td><td><span class="tag tag-yellow">中等</span></td></tr>
+<tr><td>性能</td><td>⭐ 差</td><td>⭐⭐ 好</td><td><span class="tag tag-green">⭐⭐⭐ 最优</span></td><td>⭐ 差</td></tr>
+<tr><td>维护性</td><td>⭐⭐</td><td><span class="tag tag-green">⭐⭐⭐ OOP+强类型</span></td><td>⭐⭐</td><td>⭐ 差</td></tr>
+<tr><td>UI能力</td><td>tkinter(简陋)</td><td><span class="tag tag-green">WPF(专业级)</span></td><td>MFC</td><td>DCL(过时)</td></tr>
+<tr><td>Excel库</td><td>openpyxl</td><td><span class="tag tag-green">ClosedXML(NuGet)</span></td><td>xlnt(需编译)</td><td>无</td></tr>
+<tr><td>AutoCAD交互</td><td>COM跨进程(RPC)</td><td><span class="tag tag-green">托管API(同进程)</span></td><td>原生AcDb</td><td>命令封装</td></tr>
+<tr><td>COM卡死风险</td><td><span class="tag tag-red">高(6类根因)</span></td><td><span class="tag tag-green">无(无COM)</span></td><td><span class="tag tag-green">无</span></td><td><span class="tag tag-green">无</span></td></tr>
+</table>
+
+<div class="verdict">
+<b>结论：</b>C#/.NET 是最佳选择。<br>
+• AutoCAD 2022 自带 acdbmgd.dll，.NET API 与 C++ API 同级完整<br>
+• ClosedXML 读 Excel 比 openpyxl 更稳定，NuGet 一键引入<br>
+• WPF 做 GUI 专业度远超 tkinter<br>
+• 托管API 运行在 AutoCAD 进程内，彻底消除 COM 跨进程卡死
+</div>
+</section>
+
+<!-- ========== 项目结构 ========== -->
+<section>
+<h2>三、.NET 项目结构</h2>
+<div class="tree">
+PDSG.Net/<br>
+├── PDSG.sln<br>
+│<br>
+├── src/<br>
+│   ├── PDSG.Core/                    # 核心逻辑(纯.NET，不依赖AutoCAD)<br>
+│   │   ├── Models/<br>
+│   │   │   ├── CircuitRecord.cs      # 回路记录<br>
+│   │   │   ├── AppConfig.cs          # 配置模型<br>
+│   │   │   ├── BlockDefinition.cs    # 图块定义<br>
+│   │   │   ├── LayoutResult.cs       # 布局结果<br>
+│   │   │   └── Enums.cs              # LoadType/ExcelFormat等枚举<br>
+│   │   ├── Excel/<br>
+│   │   │   └── ExcelReader.cs        # ClosedXML读取<br>
+│   │   ├── Config/<br>
+│   │   │   └── ConfigLoader.cs       # YamlDotNet解析<br>
+│   │   ├── Mapping/<br>
+│   │   │   └── BlockMapper.cs        # 图块映射<br>
+│   │   ├── Attributes/<br>
+│   │   │   └── AttributeBuilder.cs   # 属性构建<br>
+│   │   ├── Layout/<br>
+│   │   │   └── LayoutEngine.cs       # 布局计算<br>
+│   │   ├── Report/<br>
+│   │   │   └── ReportGenerator.cs    # HTML报告<br>
+│   │   └── Exceptions/<br>
+│   │       └── PdsgException.cs      # 自定义异常<br>
+│   │<br>
+│   ├── PDSG.AutoCAD/                 # AutoCAD插件(依赖acdbmgd.dll)<br>
+│   │   ├── Commands/<br>
+│   │   │   ├── PdsgGenerate.cs       # [CommandMethod("PDSG")]<br>
+│   │   │   ├── PdsgDryRun.cs         # [CommandMethod("PDSG_DRY")]<br>
+│   │   │   └── PdsgConfig.cs         # [CommandMethod("PDSG_CFG")]<br>
+│   │   ├── Drawing/<br>
+│   │   │   ├── CadDrawer.cs          # 绘图引擎(替代cad_drawer.py)<br>
+│   │   │   ├── BlockInserter.cs      # 图块插入<br>
+│   │   │   └── BusLineDrawer.cs      # 母线绘制<br>
+│   │   └── PdsgPlugin.cs             # IExtensionApplication<br>
+│   │<br>
+│   └── PDSG.Desktop/                 # 独立桌面应用(可选)<br>
+│       ├── MainWindow.xaml<br>
+│       └── ViewModels/<br>
+│<br>
+├── blocks/                           # 图块库DWG+YAML<br>
+├── templates/                        # 报告模板<br>
+├── config.yaml                       # 配置文件<br>
+└── tests/<br>
+    └── PDSG.Core.Tests/              # 单元测试(xUnit)
+</div>
+</section>
+
+<!-- ========== 模块映射 ========== -->
+<section>
+<h2>四、Python → C# 模块映射</h2>
+<table>
+<tr><th>Python 源文件</th><th>行数</th><th>C# 目标</th><th>NuGet 依赖</th><th>迁移难度</th></tr>
+<tr><td>data_model.py</td><td>404</td><td>Models/ 6个类文件</td><td>—</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>errors.py</td><td>41</td><td>Exceptions/PdsgException.cs</td><td>—</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>config_loader.py</td><td>181</td><td>Config/ConfigLoader.cs</td><td>YamlDotNet</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>excel_reader.py</td><td>785</td><td>Excel/ExcelReader.cs</td><td>ClosedXML</td><td><span class="tag tag-yellow">中等</span></td></tr>
+<tr><td>block_mapper.py</td><td>132</td><td>Mapping/BlockMapper.cs</td><td>—</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>attribute_builder.py</td><td>100</td><td>Attributes/AttributeBuilder.cs</td><td>—</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>layout_engine.py</td><td>275</td><td>Layout/LayoutEngine.cs</td><td>—</td><td><span class="tag tag-yellow">中等</span></td></tr>
+<tr><td>block_library.py</td><td>112</td><td>Mapping/BlockLibrary.cs</td><td>YamlDotNet</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>reporter.py</td><td>199</td><td>Report/ReportGenerator.cs</td><td>—</td><td><span class="tag tag-green">简单</span></td></tr>
+<tr><td>cad_drawer.py</td><td>836</td><td>Drawing/CadDrawer.cs</td><td>acdbmgd.dll</td><td><span class="tag tag-red">重写</span></td></tr>
+<tr><td>gui.py</td><td>1086</td><td>Desktop/MainWindow.xaml</td><td>WPF</td><td><span class="tag tag-red">重写</span></td></tr>
+<tr><td>main.py</td><td>264</td><td>Commands/*.cs</td><td>—</td><td><span class="tag tag-yellow">中等</span></td></tr>
+<tr><td><b>合计</b></td><td><b>~3500</b></td><td><b>~15个C#文件</b></td><td><b>3个NuGet包</b></td><td><b>预估3-4周</b></td></tr>
+</table>
+</section>
+
+<!-- ========== 核心重写: CAD绘图 ========== -->
+<section>
+<h2>五、核心重写：AutoCAD 绘图层</h2>
+<p>这是唯一需要完全重写的模块。Python 通过 COM 跨进程调用 AutoCAD，C# 通过托管 API 直接在进程内操作数据库。</p>
+
+<h3>Python COM → C# 托管 API 映射</h3>
+<table>
+<tr><th>Python COM 操作</th><th>C# 托管 API</th><th>说明</th></tr>
+<tr><td>comtypes.client.GetActiveObject(progid)</td><td>Autodesk.AutoCAD.ApplicationServices.Application</td><td>获取AutoCAD实例</td></tr>
+<tr><td>app.ActiveDocument</td><td>Application.DocumentManager.MdiActiveDocument</td><td>当前文档</td></tr>
+<tr><td>doc.ModelSpace</td><td>doc.Database.CurrentSpaceId</td><td>模型空间</td></tr>
+<tr><td>modelSpace.AddLine(start, end)</td><td>new AcDbLine(start, end) + btr.AppendEntity()</td><td>画线</td></tr>
+<tr><td>modelSpace.InsertBlock(pt, name, ...)</td><td>new AcDbBlockReference(pt, name) + btr.AppendEntity()</td><td>插入图块</td></tr>
+<tr><td>ent.SetAttribute(tag, value)</td><td>ref.AttributeCollection + new AcDbAttribute()</td><td>写属性</td></tr>
+<tr><td>doc.SaveAs(path)</td><td>doc.Database.SaveAs(path, DwgVersion)</td><td>保存DWG</td></tr>
+<tr><td>time.sleep(2) + _com_retry</td><td>Transaction 自动管理，无需sleep</td><td>消除所有等待</td></tr>
+<tr><td>_clean_model_space 20轮循环</td><td>Database.Erase() 一次完成</td><td>消除索引重排问题</td></tr>
+<tr><td>SendCommand("_.LINE ...")</td><td>直接调用 AcDbLine 构造函数</td><td>消除命令注入风险</td></tr>
+</table>
+
+<h3>CadDrawer.cs 核心骨架</h3>
+<pre>
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+
+public class CadDrawer : IDisposable
+{
+    private Document _doc;
+    private Database _db;
+    private bool _disposed;
+
+    public void Connect()
+    {
+        _doc = Application.DocumentManager.MdiActiveDocument;
+        _db = _doc.Database;
+    }
+
+    public void Draw(LayoutResult layout)
+    {
+        using (Transaction tr = _db.TransactionManager.StartTransaction())
+        {
+            BlockTable bt = tr.GetObject(_db.BlockTableId, OpenMode.ForRead) as BlockTable;
+            BlockTableRecord btr = tr.GetObject(
+                _db.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+
+            // 插入所有回路图块
+            foreach (var p in layout.Placements)
+            {
+                InsertBlock(btr, bt, tr, p);
+            }
+
+            // 绘制母线
+            DrawBusLine(btr, tr, layout.BusLine);
+
+            tr.Commit();  // 原子提交，无索引重排
+        }
+    }
+
+    private void InsertBlock(BlockTableRecord btr, BlockTable bt,
+                             Transaction tr, Placement p)
+    {
+        if (!bt.Has(p.BlockName)) return;
+
+        var blkRef = new BlockReference(
+            new Point3d(p.X, p.Y, 0), bt[p.BlockName]);
+        btr.AppendEntity(blkRef);
+        tr.AddNewlyCreatedDBObject(blkRef, true);
+
+        // 写入属性
+        foreach (var attr in p.Attributes)
+        {
+            var attDef = GetAttributeDefinition(bt, tr, p.BlockName, attr.Key);
+            if (attDef == null) continue;
+
+            var attRef = new AttributeReference();
+            attRef.SetAttributeFromBlock(attDef, blkRef.BlockTransform);
+            attRef.TextString = attr.Value;
+            blkRef.AttributeCollection.Append(attRef);
+            tr.AddNewlyCreatedDBObject(attRef, true);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (!_disposed) { _disposed = true; }
+    }
+}
+</pre>
+
+<h3>消除的 6 类 COM 卡死问题</h3>
+<table>
+<tr><th>COM 问题</th><th>Python 症状</th><th>.NET 解决方案</th></tr>
+<tr><td>RPC_E_CALL_REJECTED</td><td>_com_retry 重试3次 + sleep</td><td>无跨进程调用，彻底消除</td></tr>
+<tr><td>time.sleep 硬编码</td><td>18处 sleep(1~2秒)</td><td>Transaction 原子操作，无需等待</td></tr>
+<tr><td>STA 线程地狱</td><td>_ensure_sta_com 复杂初始化</td><td>托管API自动处理线程</td></tr>
+<tr><td>实体删除索引重排</td><td>_clean_model_space 20轮循环</td><td>Database.Erase() 一次完成</td></tr>
+<tr><td>文件锁/保存失败</td><td>save_as 备用路径兜底</td><td>进程内操作，无文件锁</td></tr>
+<tr><td>SendCommand 注入</td><td>字符串拼接命令</td><td>直接调用API，无命令注入</td></tr>
+</table>
+</section>
+
+<!-- ========== NuGet 依赖 ========== -->
+<section>
+<h2>六、NuGet 包依赖</h2>
+<pre>
+&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net8.0-windows&lt;/TargetFramework&gt;
+    &lt;UseWPF&gt;true&lt;/UseWPF&gt;
+  &lt;/PropertyGroup&gt;
+
+  &lt;ItemGroup&gt;
+    &lt;!-- Excel读取 --&gt;
+    &lt;PackageReference Include="ClosedXML" Version="0.102.3" /&gt;
+
+    &lt;!-- YAML配置 --&gt;
+    &lt;PackageReference Include="YamlDotNet" Version="16.1.3" /&gt;
+
+    &lt;!-- HTML报告(Jinja2风格) --&gt;
+    &lt;PackageReference Include="Scriban" Version="3.1.7" /&gt;
+
+    &lt;!-- AutoCAD 2022 托管API(本地引用) --&gt;
+    &lt;Reference Include="acdbmgd"&gt;
+      &lt;HintPath&gt;C:\Program Files\Autodesk\AutoCAD 2022\acdbmgd.dll&lt;/HintPath&gt;
+      &lt;Private&gt;false&lt;/Private&gt;
+    &lt;/Reference&gt;
+    &lt;Reference Include="acmgd"&gt;
+      &lt;HintPath&gt;C:\Program Files\Autodesk\AutoCAD 2022\acmgd.dll&lt;/HintPath&gt;
+      &lt;Private&gt;false&lt;/Private&gt;
+    &lt;/Reference&gt;
+    &lt;Reference Include="accoremgd"&gt;
+      &lt;HintPath&gt;C:\Program Files\Autodesk\AutoCAD 2022\accoremgd.dll&lt;/HintPath&gt;
+      &lt;Private&gt;false&lt;/Private&gt;
+    &lt;/Reference&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Project&gt;
+</pre>
+</section>
+
+<!-- ========== 开发路线 ========== -->
+<section>
+<h2>七、四阶段开发路线</h2>
+
+<div class="step"><div class="step-num">P1</div><div class="step-body">
+<b>基础骨架（第1周）</b><br>
+• 创建解决方案和三个项目(Core/AutoCAD/Desktop)<br>
+• 迁移 Models、Exceptions、Config 模块<br>
+• 验证 YamlDotNet 读取 config.yaml<br>
+• 验证 ClosedXML 读取 Excel 回路表<br>
+• 里程碑：能读取配置和Excel并打印到控制台
+</div></div>
+
+<div class="step"><div class="step-num">P2</div><div class="step-body">
+<b>纯逻辑移植（第2周）</b><br>
+• 移植 BlockMapper、AttributeBuilder、LayoutEngine<br>
+• 编写 xUnit 单元测试覆盖所有纯逻辑<br>
+• 里程碑：输入Excel → 输出Placement列表（dry-run验证）
+</div></div>
+
+<div class="step"><div class="step-num">P3</div><div class="step-body">
+<b>AutoCAD绘图引擎（第3周，核心战场）</b><br>
+• 实现 CadDrawer.cs（Transaction + BlockReference + Attribute）<br>
+• 实现 BusLineDrawer（母线绘制）<br>
+• 注册 PDSG / PDSG_DRY / PDSG_CFG 命令<br>
+• 里程碑：在AutoCAD中输入PDSG命令即可生成完整系统图
+</div></div>
+
+<div class="step"><div class="step-num">P4</div><div class="step-body">
+<b>UI + 报告 + 收尾（第4周）</b><br>
+• WPF 主界面（文件选择、配置预览、执行按钮、日志窗口）<br>
+• Scriban 报告模板渲染<br>
+• 打包发布（单文件exe或安装程序）<br>
+• 里程碑：完整可用的 PDSG.NET v2.0
+</div></div>
+</section>
+
+<!-- ========== 风险 ========== -->
+<section>
+<h2>八、风险与对策</h2>
+<table>
+<tr><th>风险</th><th>等级</th><th>对策</th></tr>
+<tr><td>AutoCAD 版本绑定</td><td><span class="tag tag-yellow">中</span></td><td>仅支持 2022+，config.yaml 中 progids 保留兼容</td></tr>
+<tr><td>Excel 格式兼容</td><td><span class="tag tag-yellow">中</span></td><td>ClosedXML 与 openpyxl 行为基本一致，逐行对比测试</td></tr>
+<tr><td>图块库 DWG 兼容</td><td><span class="tag tag-green">低</span></td><td>DWG 格式不变，.NET API 读写与 COM 完全兼容</td></tr>
+<tr><td>布局算法精度</td><td><span class="tag tag-yellow">中</span></td><td>用相同 Excel 输入对比 Python 版和 .NET 版输出坐标</td></tr>
+<tr><td>团队学习成本</td><td><span class="tag tag-blue">低</span></td><td>C# 语法清晰，AutoCAD .NET 文档比 COM 好 10 倍</td></tr>
+</table>
+</section>
+
+<!-- ========== 测试策略 ========== -->
+<section>
+<h2>九、测试策略</h2>
+<table>
+<tr><th>测试层级</th><th>范围</th><th>工具</th><th>目标覆盖率</th></tr>
+<tr><td>单元测试</td><td>Excel解析、映射规则、布局计算、属性构建</td><td>xUnit + Moq</td><td>≥80%</td></tr>
+<tr><td>集成测试</td><td>读Excel→映射→布局→输出坐标</td><td>xUnit + 真实Excel文件</td><td>核心流程100%</td></tr>
+<tr><td>对比测试</td><td>同一Excel输入，对比Python版和.NET版输出</td><td>自动化脚本</td><td>坐标差异&lt;0.1mm</td></tr>
+<tr><td>AutoCAD测试</td><td>在AutoCAD中执行PDSG命令验证输出DWG</td><td>手动 + 截图对比</td><td>主要场景覆盖</td></tr>
+</table>
+</section>
+
+<!-- ========== 总结 ========== -->
+<section>
+<h2>十、总结</h2>
+<table>
+<tr><th>指标</th><th>Python+COM（现状）</th><th>C#/.NET（目标）</th></tr>
+<tr><td>COM卡死概率</td><td class="bad">高（每次运行都有风险）</td><td class="ok">零（无COM调用）</td></tr>
+<tr><td>运行速度</td><td>~15秒（含sleep等待）</td><td>~3秒（无等待）</td></tr>
+<tr><td>代码行数</td><td>~3500行Python</td><td>~2500行C#（更简洁）</td></tr>
+<tr><td>测试覆盖</td><td class="bad">0%</td><td class="ok">≥80%（目标）</td></tr>
+<tr><td>GUI品质</td><td>tkinter（简陋）</td><td>WPF（专业级）</td></tr>
+<tr><td>部署方式</td><td>Python环境+pip安装</td><td>单文件exe / 安装包</td></tr>
+<tr><td>开发周期</td><td>—</td><td>4周（1人）</td></tr>
+</table>
+</section>
+
+</div>
+</body>
+</html>

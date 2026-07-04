@@ -1,0 +1,62 @@
+# PDSG-LISP 配置文件
+# 配电系统图自动生成程序配置
+
+# 图纸设置
+paper_width: 420.0
+paper_height: 297.0
+paper_size: A3
+
+# 母线设置
+bus_y: 220.0
+bus_layer: BUS
+bus_color: 1
+bus_lineweight: 0.50
+
+# 回路布局
+spacing: 35.0
+start_x: 20.0
+max_cols: 12
+row_height: 80.0
+
+# 图块设置
+block_insertion_scale: 1.0
+block_rotation: 0.0
+
+# 文字设置
+title_text_height: 5.0
+label_text_height: 3.0
+text_style: Standard
+
+# 图层设置
+layer_circuit: CIRCUIT
+layer_annotation: ANNOTATION
+layer_bus: BUS
+
+# 输出设置
+output_directory: D:\PDSG_Output
+output_filename: 配电系统图
+
+# CSV 文件格式
+csv_delimiter: ,
+csv_encoding: UTF-8
+
+# 图块映射（断路器类型 → 图块名称）
+block_mapping:
+  - type: MCCB
+    block_name: LOOP_MCCB
+    description: 塑壳断路器回路
+  - type: MCB
+    block_name: LOOP_MCB
+    description: 微型断路器回路
+  - type: ACB
+    block_name: LOOP_ACB
+    description: 空气断路器回路
+  - type: CONTACTOR
+    block_name: LOOP_CONTACTOR
+    description: 接触器回路
+  - type: FUSE
+    block_name: LOOP_FUSE
+    description: 熔断器回路
+  - type: DEFAULT
+    block_name: LOOP_DEFAULT
+    description: 默认回路

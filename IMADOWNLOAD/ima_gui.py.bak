@@ -1,0 +1,721 @@
+"""
+IMA Knowledge Base Downloader - GUI Version
+A modern GUI for downloading files from IMA knowledge base share pages.
+Supports scanning directory structure and selective download.
+"""
+
+import customtkinter as ctk
+import threading
+import json
+import os
+import re
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
+from datetime import datetime
+
+try:
+    import requests
+except ImportError:
+    requests = None
+
+API_BASE = "https://ima.qq.com/cgi-bin/knowledge_share_get/get_share_info"
+PAGE_SIZE = 50
+MEDIA_TYPE_NOTE = 11
+MEDIA_TYPE_FOLDER = 99
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+
+class IMAApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+        self.title("IMA Knowledge Base Downloader")
+        self.geometry("1000x800")
+        self.minsize(900, 700)
+        self.configure(fg_color="#1a1a2e")
+
+        self.downloading = False
+        self.cancel_flag = False
+        self.scanned_data = None
+        self.best_sid = None
+        self.kb_dir = ""
+        self.tree_items = {}
+
+        self._create_widgets()
+
+    def _create_widgets(self):
+        main = ctk.CTkFrame(self, fg_color="transparent")
+        main.pack(fill="both", expand=True, padx=15, pady=10)
+
+        ctk.CTkLabel(main, text="IMA Knowledge Base Downloader",
+                      font=ctk.CTkFont(size=22, weight="bold"),
+                      text_color="#00d4ff").pack(pady=(0, 8))
+
+        input_frame = ctk.CTkFrame(main, fg_color="#16213e", corner_radius=10)
+        input_frame.pack(fill="x", pady=(0, 8))
+
+        row1 = ctk.CTkFrame(input_frame, fg_color="transparent")
+        row1.pack(fill="x", padx=12, pady=(10, 2))
+        ctk.CTkLabel(row1, text="Share URL", font=ctk.CTkFont(size=12, weight="bold"), text_color="#aaa").pack(anchor="w")
+        self.url_entry = ctk.CTkEntry(row1, placeholder_text="https://ima.qq.com/wiki/?shareId=...", height=36,
+                                       font=ctk.CTkFont(size=12), fg_color="#0f3460", border_color="#00d4ff", corner_radius=6)
+        self.url_entry.pack(fill="x", pady=(2, 0))
+
+        row2 = ctk.CTkFrame(input_frame, fg_color="transparent")
+        row2.pack(fill="x", padx=12, pady=(6, 10))
+        ctk.CTkLabel(row2, text="Output Dir", font=ctk.CTkFont(size=12, weight="bold"), text_color="#aaa").pack(anchor="w")
+        dir_row = ctk.CTkFrame(row2, fg_color="transparent")
+        dir_row.pack(fill="x", pady=(2, 0))
+        self.dir_entry = ctk.CTkEntry(dir_row, height=36, font=ctk.CTkFont(size=12),
+                                       fg_color="#0f3460", border_color="#00d4ff", corner_radius=6)
+        self.dir_entry.pack(side="left", fill="x", expand=True, padx=(0, 6))
+        self.dir_entry.insert(0, "E:\\IMA_DOWNLOADS")
+        ctk.CTkButton(dir_row, text="Browse", width=80, height=36, fg_color="#533483",
+                       hover_color="#7b2d8e", corner_radius=6, command=self._browse_dir).pack(side="right")
+
+        btn_frame = ctk.CTkFrame(main, fg_color="transparent")
+        btn_frame.pack(fill="x", pady=(0, 8))
+
+        self.scan_btn = ctk.CTkButton(btn_frame, text="Scan", height=40,
+                                       font=ctk.CTkFont(size=14, weight="bold"),
+                                       fg_color="#0984e3", hover_color="#74b9ff", corner_radius=8,
+                                       command=self._start_scan)
+        self.scan_btn.pack(side="left", expand=True, fill="x", padx=(0, 4))
+
+        self.download_btn = ctk.CTkButton(btn_frame, text="Download Selected", height=40,
+                                           font=ctk.CTkFont(size=14, weight="bold"),
+                                           fg_color="#00b894", hover_color="#00cec9", corner_radius=8,
+                                           command=self._start_download, state="disabled")
+        self.download_btn.pack(side="left", expand=True, fill="x", padx=(4, 4))
+
+        self.download_all_btn = ctk.CTkButton(btn_frame, text="Download All", height=40,
+                                               font=ctk.CTkFont(size=14, weight="bold"),
+                                               fg_color="#6c5ce7", hover_color="#a29bfe", corner_radius=8,
+                                               command=self._start_download_all, state="disabled")
+        self.download_all_btn.pack(side="left", expand=True, fill="x", padx=(4, 4))
+
+        self.stop_btn = ctk.CTkButton(btn_frame, text="Stop", height=40,
+                                       font=ctk.CTkFont(size=14, weight="bold"),
+                                       fg_color="#d63031", hover_color="#e17055", corner_radius=8,
+                                       command=self._stop_download, state="disabled")
+        self.stop_btn.pack(side="left", expand=True, fill="x", padx=(4, 0))
+
+        stats_frame = ctk.CTkFrame(main, fg_color="#16213e", corner_radius=10)
+        stats_frame.pack(fill="x", pady=(0, 8))
+        stats_inner = ctk.CTkFrame(stats_frame, fg_color="transparent")
+        stats_inner.pack(fill="x", padx=12, pady=8)
+        self.stat_total = self._create_stat(stats_inner, "Total", "0")
+        self.stat_downloaded = self._create_stat(stats_inner, "Downloaded", "0")
+        self.stat_failed = self._create_stat(stats_inner, "Failed", "0")
+        self.stat_skipped = self._create_stat(stats_inner, "Skipped", "0")
+        for s in [self.stat_total, self.stat_downloaded, self.stat_failed, self.stat_skipped]:
+            s[0].pack(side="left", expand=True)
+
+        progress_frame = ctk.CTkFrame(main, fg_color="#16213e", corner_radius=10)
+        progress_frame.pack(fill="x", pady=(0, 8))
+        progress_inner = ctk.CTkFrame(progress_frame, fg_color="transparent")
+        progress_inner.pack(fill="x", padx=12, pady=8)
+        self.progress_label = ctk.CTkLabel(progress_inner, text="Ready", font=ctk.CTkFont(size=11), text_color="#aaa")
+        self.progress_label.pack(anchor="w")
+        self.progress_bar = ctk.CTkProgressBar(progress_inner, height=6, corner_radius=3, progress_color="#00d4ff")
+        self.progress_bar.pack(fill="x", pady=(6, 0))
+        self.progress_bar.set(0)
+
+        bottom = ctk.CTkFrame(main, fg_color="transparent")
+        bottom.pack(fill="both", expand=True)
+
+        tree_frame = ctk.CTkFrame(bottom, fg_color="#e8e8e8", corner_radius=10)
+        tree_frame.pack(side="left", fill="both", expand=True, padx=(0, 6))
+
+        tree_header = ctk.CTkFrame(tree_frame, fg_color="transparent")
+        tree_header.pack(fill="x", padx=10, pady=(8, 2))
+        ctk.CTkLabel(tree_header, text="Directory Structure", font=ctk.CTkFont(size=12, weight="bold"), text_color="#333").pack(side="left")
+        self.select_count_label = ctk.CTkLabel(tree_header, text="", font=ctk.CTkFont(size=11), text_color="#0984e3")
+        self.select_count_label.pack(side="right")
+
+        tree_btn_row = ctk.CTkFrame(tree_frame, fg_color="transparent")
+        tree_btn_row.pack(fill="x", padx=10, pady=(0, 4))
+        ctk.CTkButton(tree_btn_row, text="Check All", width=70, height=26, font=ctk.CTkFont(size=10),
+                       fg_color="#0984e3", hover_color="#74b9ff", corner_radius=4,
+                       command=self._check_all).pack(side="left", padx=(0, 4))
+        ctk.CTkButton(tree_btn_row, text="Uncheck All", width=80, height=26, font=ctk.CTkFont(size=10),
+                       fg_color="#636e72", hover_color="#b2bec3", corner_radius=4,
+                       command=self._uncheck_all).pack(side="left", padx=(0, 4))
+        ctk.CTkButton(tree_btn_row, text="Expand All", width=75, height=26, font=ctk.CTkFont(size=10),
+                       fg_color="#636e72", hover_color="#b2bec3", corner_radius=4,
+                       command=self._expand_all).pack(side="left")
+
+        tree_container = ctk.CTkFrame(tree_frame, fg_color="#ffffff", corner_radius=6)
+        tree_container.pack(fill="both", expand=True, padx=10, pady=(0, 8))
+
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure("Custom.Treeview",
+                         background="#ffffff", foreground="#222222",
+                         fieldbackground="#ffffff", borderwidth=0,
+                         font=("Microsoft YaHei UI", 10), rowheight=26)
+        style.configure("Custom.Treeview.Heading",
+                         background="#f0f0f0", foreground="#333333",
+                         font=("Microsoft YaHei UI", 10, "bold"))
+        style.map("Custom.Treeview", background=[("selected", "#cce5ff")], foreground=[("selected", "#000000")])
+
+        tree_scroll = ttk.Scrollbar(tree_container, orient="vertical")
+        tree_scroll.pack(side="right", fill="y")
+
+        self.tree = ttk.Treeview(tree_container, style="Custom.Treeview", yscrollcommand=tree_scroll.set,
+                                  columns=("size", "type"), selectmode="none")
+        tree_scroll.config(command=self.tree.yview)
+
+        self.tree.heading("#0", text="Name", anchor="w")
+        self.tree.heading("size", text="Size", anchor="e")
+        self.tree.heading("type", text="Type", anchor="w")
+        self.tree.column("#0", width=350, minwidth=200)
+        self.tree.column("size", width=80, minwidth=60, anchor="e")
+        self.tree.column("type", width=60, minwidth=50)
+        self.tree.pack(fill="both", expand=True)
+
+        self.tree.bind("<Button-1>", self._on_tree_click)
+        self.tree.bind("<Double-1>", self._on_tree_toggle)
+
+        log_frame = ctk.CTkFrame(bottom, fg_color="#16213e", corner_radius=10)
+        log_frame.pack(side="right", fill="both", expand=True, padx=(6, 0))
+
+        ctk.CTkLabel(log_frame, text="Log", font=ctk.CTkFont(size=12, weight="bold"), text_color="#ccc").pack(anchor="w", padx=10, pady=(8, 2))
+
+        self.log_text = ctk.CTkTextbox(log_frame, font=ctk.CTkFont(family="Consolas", size=10),
+                                        fg_color="#0a0a1a", text_color="#00ff88", corner_radius=6,
+                                        border_width=1, border_color="#333")
+        self.log_text.pack(fill="both", expand=True, padx=10, pady=(0, 8))
+
+        self._log("Ready. Paste a share URL and click Scan.")
+
+    def _create_stat(self, parent, label, value):
+        frame = ctk.CTkFrame(parent, fg_color="transparent")
+        ctk.CTkLabel(frame, text=label, font=ctk.CTkFont(size=10), text_color="#888").pack()
+        lbl = ctk.CTkLabel(frame, text=value, font=ctk.CTkFont(size=18, weight="bold"), text_color="#00d4ff")
+        lbl.pack()
+        return (lbl, frame)
+
+    def _log(self, msg):
+        ts = datetime.now().strftime("%H:%M:%S")
+        self.log_text.insert("end", "[%s] %s\n" % (ts, msg))
+        self.log_text.see("end")
+
+    def _browse_dir(self):
+        d = filedialog.askdirectory(title="Select Output Directory")
+        if d:
+            self.dir_entry.delete(0, "end")
+            self.dir_entry.insert(0, d)
+
+    def _set_state(self, scanning=False, downloading=False):
+        try:
+            if scanning:
+                self.scan_btn.configure(state="disabled", fg_color="#555")
+                self.download_btn.configure(state="disabled")
+                self.download_all_btn.configure(state="disabled")
+                self.stop_btn.configure(state="normal")
+                self.url_entry.configure(state="disabled")
+                self.dir_entry.configure(state="disabled")
+            elif downloading:
+                self.scan_btn.configure(state="disabled")
+                self.download_btn.configure(state="disabled", fg_color="#555")
+                self.download_all_btn.configure(state="disabled", fg_color="#555")
+                self.stop_btn.configure(state="normal")
+                self.url_entry.configure(state="disabled")
+                self.dir_entry.configure(state="disabled")
+            else:
+                has_data = self.scanned_data is not None
+                self.scan_btn.configure(state="normal", fg_color="#0984e3")
+                self.download_btn.configure(state="normal" if has_data else "disabled", fg_color="#00b894" if has_data else "#555")
+                self.download_all_btn.configure(state="normal" if has_data else "disabled", fg_color="#6c5ce7" if has_data else "#555")
+                self.stop_btn.configure(state="disabled")
+                self.url_entry.configure(state="normal")
+                self.dir_entry.configure(state="normal")
+        except Exception as e:
+            print("_set_state error:", e)
+
+    def _stop_download(self):
+        self.cancel_flag = True
+        self._log("Stopping...")
+
+    def _update_stat(self, label, value):
+        label[0].configure(text=str(value))
+
+    def _update_progress(self, current, total, text=""):
+        if total > 0:
+            self.progress_bar.set(current / total)
+        self.progress_label.configure(text=text)
+
+    def _start_scan(self):
+        url = self.url_entry.get().strip()
+        if not url:
+            messagebox.showwarning("Warning", "Please enter a share URL")
+            return
+        if not requests:
+            messagebox.showerror("Error", "requests not installed")
+            return
+        self._set_state(scanning=True)
+        self.cancel_flag = False
+        threading.Thread(target=self._scan_worker, args=(url,), daemon=True).start()
+
+    def _scan_worker(self, url):
+        try:
+            share_id = self._extract_share_id(url)
+            self.after(0, self._log, "Scanning shareId: ...%s" % share_id[-16:])
+
+            candidates = self._find_valid_share_id(share_id)
+            self.after(0, self._log, "Trying %d candidates..." % len(candidates))
+
+            best_data = None
+            best_sid = None
+
+            for i, sid in enumerate(candidates):
+                if self.cancel_flag:
+                    self.after(0, self._log, "Cancelled")
+                    return
+
+                self.after(0, self._log, "Candidate %d/%d ..." % (i + 1, len(candidates)))
+                try:
+                    data = self._api_get_share_info(sid)
+                except Exception as api_err:
+                    self.after(0, self._log, "  API error: %s" % str(api_err)[:60])
+                    data = None
+
+                if data:
+                    best_data = data
+                    best_sid = sid
+                    self.after(0, self._log, "Found valid shareId!")
+                    break
+
+            if not best_data:
+                self.after(0, self._log, "ERROR: Invalid shareId or auth required")
+                return
+
+            kb_info = best_data.get("knowledge_base_info", {}).get("basic_info", {})
+            kb_name = self._sanitize(kb_info.get("name", "unknown"))
+            output_dir = self.dir_entry.get().strip() or "ima_downloads"
+            kb_dir = os.path.join(output_dir, kb_name)
+            os.makedirs(kb_dir, exist_ok=True)
+
+            self.scanned_data = best_data
+            self.best_sid = best_sid
+            self.kb_dir = kb_dir
+
+            self.after(0, self._log, "KB: %s" % kb_info.get("name", "?"))
+            self.after(0, self._log, "Items: %s" % best_data.get("total_size", 0))
+            self.after(0, self._log, "Building directory tree...")
+
+            tree_data = self._build_tree_data(best_sid, best_data)
+            self.after(0, self._populate_tree, tree_data, kb_name)
+            self.after(0, self._log, "Scan complete! Select items and click Download.")
+
+        except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
+            self.after(0, self._log, "ERROR: %s" % str(e))
+            self.after(0, self._log, tb[-200:])
+
+        finally:
+            self.after(0, self._set_state)
+
+    def _build_tree_data(self, share_id, root_data):
+        tree = {"name": root_data.get("knowledge_base_info", {}).get("basic_info", {}).get("name", "root"),
+                "type": "root", "children": [], "items": [], "share_id": share_id}
+
+        root_items = root_data.get("knowledge_list", [])
+        for item in root_items:
+            fi = item.get("folder_info")
+            if fi:
+                folder = {"name": fi.get("name", "?"), "type": "folder",
+                          "count": fi.get("file_number", "0"), "folder_id": fi["folder_id"],
+                          "children": [], "items": [], "scanned": False, "share_id": share_id,
+                          "relative_path": fi.get("name", "?")}
+                tree["children"].append(folder)
+            else:
+                node = self._item_to_node(item)
+                node["relative_path"] = ""
+                tree["items"].append(node)
+
+        return tree
+
+    def _lazy_scan_folder(self, node):
+        if node.get("scanned"):
+            return
+        share_id = node.get("share_id", self.best_sid)
+        folder_id = node.get("folder_id")
+        if not folder_id:
+            return
+
+        parent_path = node.get("relative_path", "")
+
+        page_cursor = ""
+        while True:
+            if self.cancel_flag:
+                break
+            payload = {"shareId": share_id, "limit": PAGE_SIZE, "folder_id": folder_id}
+            if page_cursor:
+                payload["cursor"] = page_cursor
+            try:
+                r = requests.post(API_BASE, json=payload, timeout=15)
+                d = r.json()
+            except Exception:
+                break
+
+            if d.get("code") != 0:
+                break
+
+            for item in d.get("knowledge_list", []):
+                fi = item.get("folder_info")
+                if fi:
+                    sub_name = fi.get("name", "?")
+                    sub = {"name": sub_name, "type": "folder",
+                           "count": fi.get("file_number", "0"), "folder_id": fi["folder_id"],
+                           "children": [], "items": [], "scanned": False, "share_id": share_id,
+                           "relative_path": os.path.join(parent_path, sub_name)}
+                    node["children"].append(sub)
+                else:
+                    item_node = self._item_to_node(item)
+                    item_node["relative_path"] = parent_path
+                    node["items"].append(item_node)
+
+            if d.get("is_end", True) or not d.get("next_cursor"):
+                break
+            page_cursor = d["next_cursor"]
+
+        node["scanned"] = True
+
+    def _item_to_node(self, item):
+        mt = item.get("media_type", 0)
+        type_name = "note" if mt == MEDIA_TYPE_NOTE else "folder" if mt == MEDIA_TYPE_FOLDER else "file"
+        size = int(item.get("file_size", "0") or "0")
+        return {
+            "name": item.get("title", "untitled"),
+            "type": type_name,
+            "size": size,
+            "jump_url": item.get("jump_url", ""),
+            "media_type": mt,
+            "cover_urls": item.get("cover_urls", []),
+        }
+
+    def _populate_tree(self, tree_data, kb_name):
+        self.tree.delete(*self.tree.get_children())
+        self.tree_items.clear()
+
+        root_id = self.tree.insert("", "end", text=" " + kb_name, values=("", "KB"), open=True)
+        self.tree_items[root_id] = {"checked": True, "node": tree_data}
+
+        for child in tree_data.get("children", []):
+            count = child.get("count", "?")
+            cid = self.tree.insert(root_id, "end",
+                                    text=" \u2611 " + child["name"],
+                                    values=("%s items" % count, "DIR"),
+                                    open=False)
+            self.tree_items[cid] = {"checked": True, "node": child}
+
+        for item in tree_data.get("items", []):
+            size_str = self._format_size(item.get("size", 0))
+            type_tag = "NOTE" if item.get("media_type") == MEDIA_TYPE_NOTE else "FILE"
+            iid = self.tree.insert(root_id, "end",
+                                    text=" \u2611 " + item["name"],
+                                    values=(size_str, type_tag))
+            self.tree_items[iid] = {"checked": True, "node": item}
+
+        self.tree.bind("<<TreeviewOpen>>", self._on_tree_open)
+        self._update_check_count()
+
+    def _format_size(self, size):
+        if size < 1024:
+            return "%d B" % size
+        elif size < 1024 * 1024:
+            return "%.1f KB" % (size / 1024)
+        else:
+            return "%.1f MB" % (size / 1024 / 1024)
+
+    def _on_tree_click(self, event):
+        region = self.tree.identify("region", event.x, event.y)
+        if region == "tree":
+            col = self.tree.identify_column(event.x)
+            if col == "#0":
+                item_id = self.tree.identify_row(event.y)
+                if item_id and item_id in self.tree_items:
+                    self._toggle_check(item_id)
+
+    def _on_tree_toggle(self, event):
+        item_id = self.tree.identify_row(event.y)
+        if item_id:
+            children = self.tree.get_children(item_id)
+            if children:
+                if self.tree.item(item_id, "open"):
+                    self.tree.item(item_id, open=False)
+                else:
+                    self.tree.item(item_id, open=True)
+
+    def _on_tree_open(self, event):
+        selected = self.tree.focus()
+        if not selected or selected not in self.tree_items:
+            return
+
+        info = self.tree_items[selected]
+        node = info.get("node", {})
+
+        if node.get("type") == "folder" and not node.get("scanned", True):
+            self._lazy_scan_folder(node)
+
+            children = self.tree.get_children(selected)
+            if children:
+                self.tree.delete(*children)
+
+            check_mark = "\u2611" if info.get("checked", True) else "\u2610"
+
+            for child in node.get("children", []):
+                count = child.get("count", "?")
+                cid = self.tree.insert(selected, "end",
+                                        text=" %s %s" % (check_mark, child["name"]),
+                                        values=("%s items" % count, "DIR"),
+                                        open=False)
+                self.tree_items[cid] = {"checked": info.get("checked", True), "node": child}
+
+            for item in node.get("items", []):
+                size_str = self._format_size(item.get("size", 0))
+                type_tag = "NOTE" if item.get("media_type") == MEDIA_TYPE_NOTE else "FILE"
+                iid = self.tree.insert(selected, "end",
+                                        text=" %s %s" % (check_mark, item["name"]),
+                                        values=(size_str, type_tag))
+                self.tree_items[iid] = {"checked": info.get("checked", True), "node": item}
+
+            self._update_check_count()
+
+    def _toggle_check(self, item_id):
+        if item_id not in self.tree_items:
+            return
+        info = self.tree_items[item_id]
+        info["checked"] = not info["checked"]
+
+        self._propagate_check(item_id, info["checked"])
+        self._update_check_display(item_id)
+        self._update_check_count()
+
+    def _propagate_check(self, item_id, checked):
+        if item_id in self.tree_items:
+            self.tree_items[item_id]["checked"] = checked
+        for child_id in self.tree.get_children(item_id):
+            self._propagate_check(child_id, checked)
+            self._update_check_display(child_id)
+
+    def _update_check_display(self, item_id):
+        if item_id not in self.tree_items:
+            return
+        info = self.tree_items[item_id]
+        node = info["node"]
+        mark = "\u2611" if info["checked"] else "\u2610"
+        name = node.get("name", "?")
+        self.tree.item(item_id, text=" %s %s" % (mark, name))
+
+    def _update_check_count(self):
+        total = 0
+        checked = 0
+        for iid, info in self.tree_items.items():
+            if info["node"].get("type") in ("file", "note"):
+                total += 1
+                if info["checked"]:
+                    checked += 1
+        self.select_count_label.configure(text="%d/%d selected" % (checked, total))
+
+    def _check_all(self):
+        for iid in self.tree_items:
+            self.tree_items[iid]["checked"] = True
+            self._update_check_display(iid)
+        self._update_check_count()
+
+    def _uncheck_all(self):
+        for iid in self.tree_items:
+            self.tree_items[iid]["checked"] = False
+            self._update_check_display(iid)
+        self._update_check_count()
+
+    def _expand_all(self):
+        def expand(parent):
+            for child in self.tree.get_children(parent):
+                self.tree.item(child, open=True)
+                expand(child)
+        expand("")
+
+    def _get_selected_files(self):
+        files = []
+        self._collect_selected("", files)
+        return files
+
+    def _collect_selected(self, parent, files):
+        for child_id in self.tree.get_children(parent):
+            info = self.tree_items.get(child_id, {})
+            if not info.get("checked"):
+                continue
+            node = info.get("node", {})
+            if node.get("type") in ("file", "note"):
+                files.append(node)
+            elif node.get("type") in ("folder", "root"):
+                if node.get("type") == "folder" and not node.get("scanned", False):
+                    self._lazy_scan_folder(node)
+                self._collect_node_files(node, files)
+
+    def _collect_node_files(self, node, files):
+        for child_node in node.get("children", []):
+            if child_node.get("type") == "folder":
+                if not child_node.get("scanned", False):
+                    self._lazy_scan_folder(child_node)
+                self._collect_node_files(child_node, files)
+            else:
+                files.append(child_node)
+        for item_node in node.get("items", []):
+            files.append(item_node)
+
+    def _start_download(self):
+        files = self._get_selected_files()
+        if not files:
+            messagebox.showinfo("Info", "No files selected")
+            return
+        self._begin_download(files)
+
+    def _start_download_all(self):
+        for iid in self.tree_items:
+            self.tree_items[iid]["checked"] = True
+        self._update_check_count()
+        files = self._get_selected_files()
+        if not files:
+            messagebox.showinfo("Info", "No files found")
+            return
+        self._begin_download(files)
+
+    def _begin_download(self, files):
+        self._set_state(downloading=True)
+        self.cancel_flag = False
+        threading.Thread(target=self._download_worker, args=(files,), daemon=True).start()
+
+    def _download_worker(self, files):
+        try:
+            total = len(files)
+            downloaded = 0
+            failed = 0
+            skipped = 0
+
+            self.after(0, self._update_stat, self.stat_total, total)
+
+            for i, item in enumerate(files):
+                if self.cancel_flag:
+                    self.after(0, self._log, "Cancelled")
+                    break
+
+                title = item.get("name", "untitled")
+                jump_url = item.get("jump_url", "")
+                media_type = item.get("media_type", 0)
+
+                ext = self._get_file_ext(title, jump_url)
+                safe_title = self._sanitize(title)
+                if not safe_title.lower().endswith(ext):
+                    safe_title += ext
+
+                if media_type == MEDIA_TYPE_NOTE:
+                    save_path = os.path.join(self.kb_dir, item.get("relative_path", ""), safe_title)
+                else:
+                    save_path = os.path.join(self.kb_dir, item.get("relative_path", ""), safe_title)
+
+                if os.path.exists(save_path) and os.path.getsize(save_path) > 0:
+                    skipped += 1
+                    self.after(0, self._update_stat, self.stat_skipped, skipped)
+                    continue
+
+                if not jump_url:
+                    skipped += 1
+                    self.after(0, self._update_stat, self.stat_skipped, skipped)
+                    continue
+
+                self.after(0, self._update_progress, i + 1, total, "[%d/%d] %s" % (i + 1, total, title[:55]))
+                self.after(0, self._log, "[%d/%d] %s" % (i + 1, total, title))
+
+                try:
+                    r = requests.get(jump_url, timeout=60, stream=True)
+                    if r.status_code == 200:
+                        os.makedirs(os.path.dirname(save_path) if os.path.dirname(save_path) else ".", exist_ok=True)
+                        with open(save_path, "wb") as fobj:
+                            for chunk in r.iter_content(8192):
+                                if self.cancel_flag:
+                                    break
+                                fobj.write(chunk)
+                        size = os.path.getsize(save_path)
+                        downloaded += 1
+                        self.after(0, self._update_stat, self.stat_downloaded, downloaded)
+                        self.after(0, self._log, "  -> OK (%d bytes)" % size)
+                    else:
+                        failed += 1
+                        self.after(0, self._update_stat, self.stat_failed, failed)
+                        self.after(0, self._log, "  -> HTTP %d" % r.status_code)
+                except Exception as e:
+                    failed += 1
+                    self.after(0, self._update_stat, self.stat_failed, failed)
+                    self.after(0, self._log, "  -> Error: %s" % str(e)[:80])
+
+            self.after(0, self._update_progress, total, total, "Complete!")
+            self.after(0, self._log, "")
+            self.after(0, self._log, "Done! Downloaded: %d, Failed: %d, Skipped: %d" % (downloaded, failed, skipped))
+
+        except Exception as e:
+            self.after(0, self._log, "ERROR: %s" % str(e))
+
+        finally:
+            self.after(0, self._set_state)
+
+    def _extract_share_id(self, url):
+        if "shareId=" in url:
+            return url.split("shareId=")[1].split("&")[0]
+        return url
+
+    def _is_valid_hex(self, sid):
+        return len(sid) == 64 and all(c in "0123456789abcdef" for c in sid.lower())
+
+    def _find_valid_share_id(self, bad_id):
+        if self._is_valid_hex(bad_id):
+            return [bad_id]
+        non_hex = [i for i, c in enumerate(bad_id.lower()) if c not in "0123456789abcdef"]
+        if len(non_hex) != 1 or len(bad_id) != 64:
+            return [bad_id]
+        pos = non_hex[0]
+        return [bad_id[:pos] + c + bad_id[pos + 1:] for c in "0123456789abcdef"]
+
+    def _api_get_share_info(self, share_id, folder_id=None):
+        payload = {"shareId": share_id, "limit": PAGE_SIZE}
+        if folder_id:
+            payload["folder_id"] = folder_id
+        try:
+            r = requests.post(API_BASE, json=payload, timeout=15)
+            d = r.json()
+            if d.get("code") == 0:
+                return d
+        except Exception:
+            pass
+        return None
+
+    def _sanitize(self, name):
+        name = re.sub(r'[\\/:*?"<>|]', "_", name)
+        return name.strip(". ")[:200] or "unnamed"
+
+    def _get_file_ext(self, title, url):
+        ext_map = {".pdf": ".pdf", ".doc": ".doc", ".docx": ".docx", ".xls": ".xls",
+                   ".xlsx": ".xlsx", ".ppt": ".ppt", ".pptx": ".pptx",
+                   ".jpg": ".jpg", ".png": ".png", ".dwg": ".dwg"}
+        lower = title.lower()
+        for s, e in ext_map.items():
+            if lower.endswith(s):
+                return e
+        if url:
+            up = url.split("?")[0].lower()
+            for s, e in ext_map.items():
+                if up.endswith(s):
+                    return e
+        return ".bin"
+
+
+if __name__ == "__main__":
+    app = IMAApp()
+    app.mainloop()

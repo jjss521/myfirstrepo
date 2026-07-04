@@ -1,0 +1,174 @@
+# ============================================================
+# PDSG 默认配置文件
+# 配电柜系统图自动生成程序
+# ============================================================
+
+# AutoCAD 连接
+autocad:
+  progids:
+    - "AutoCAD.Application.24.1"   # AutoCAD 2022
+    - "AutoCAD.Application.23.1"   # AutoCAD 2020
+  visible: true
+
+# 图块库
+block_library:
+  path: "./blocks/block_library.dwg"
+  catalog: "./blocks/block_catalog.yaml"
+  title_block_path: "./blocks/title_block.dwg"
+  default_block: "LOOP_POWER_A"
+
+# Excel 读取
+excel:
+  sheet_name: "低压配电系统"
+  header_row: 1
+  data_start_row: 2
+  min_match_ratio: 0.7
+  format_auto_detect: true          # 自动检测标准/转置格式
+  default_breaker_model: "NSX100N"  # 转置格式 Excel 中无断路器型号列时的默认值
+  # 转置格式参数行名映射（A列参数名 → 内部字段名）
+  transposed_column_aliases:
+    回路用途: circuit_name
+    "设备功率Pe(kW)": rated_power_kw
+    "计算电流Ic(A)": rated_current_a
+    "断路器壳架电流(A)": breaker_frame_current_a
+    "脱扣器额定电流In(A)": breaker_trip_current_a
+    电流互感器变比: ct_ratio
+    线缆型号规格: cable_full
+    线缆编号: cable_number
+    运行方式: operation_mode
+    配电形式: distribution_type
+    接触器: contactor
+    热继电器: thermal_relay
+    变频器: vfd_model
+    电力监控信号: power_monitoring
+    开关柜代号: cabinet_code
+    "开关柜尺寸(WxDH)mm": cabinet_size
+    单元空间: unit_space
+  column_aliases:
+    # 回路编号
+    回路编号: circuit_id
+    编号: circuit_id
+    ID: circuit_id
+    回路ID: circuit_id
+    # 回路名称
+    回路名称: circuit_name
+    名称: circuit_name
+    用途: circuit_name
+    负荷名称: circuit_name
+    用电设备: circuit_name
+    # 负荷类型
+    负荷类型: load_type
+    类型: load_type
+    负荷类别: load_type
+    # 额定功率
+    额定功率: rated_power_kw
+    "功率(kW)": rated_power_kw
+    Pe: rated_power_kw
+    设备功率: rated_power_kw
+    # 额定电流
+    额定电流: rated_current_a
+    "电流(A)": rated_current_a
+    Ijs: rated_current_a
+    计算电流: rated_current_a
+    # 断路器型号
+    断路器型号: breaker_model
+    开关型号: breaker_model
+    断路器: breaker_model
+    # 断路器极数
+    断路器极数: breaker_poles
+    极数: breaker_poles
+    P数: breaker_poles
+    Poles: breaker_poles
+    # 脱扣器电流
+    脱扣器电流: breaker_trip_current_a
+    "脱扣器(A)": breaker_trip_current_a
+    Ir: breaker_trip_current_a
+    整定电流: breaker_trip_current_a
+    # CT变比
+    CT变比: ct_ratio
+    互感器变比: ct_ratio
+    CT: ct_ratio
+    电流互感器: ct_ratio
+    # 电缆型号
+    电缆型号: cable_type
+    电缆: cable_type
+    线缆型号: cable_type
+    # 电缆规格
+    电缆规格: cable_section
+    截面: cable_section
+    规格: cable_section
+    截面积: cable_section
+    # 变频器型号
+    变频器型号: vfd_model
+    变频器: vfd_model
+    VFD型号: vfd_model
+    # 变频器功率
+    变频器功率: vfd_power_kw
+    "VFD功率(kW)": vfd_power_kw
+    # 备注
+    备注: remark
+    Remark: remark
+    说明: remark
+
+# 图块映射规则（按断路器脱扣器额定电流分界）
+# ≤ 400A → LOOP_POWER_A, > 400A → LOOP_POWER_B
+block_mapping:
+  default_block: "LOOP_POWER_A"
+  breaker_threshold: 400          # 断路器电流分界值 (A)
+  block_small: "LOOP_POWER_A"     # ≤ 阈值使用此图块
+  block_large: "LOOP_POWER_B"     # > 阈值使用此图块
+  rules:
+    - match: {breaker_max_current: 400}
+      block: "LOOP_POWER_A"
+    - match: {breaker_min_current: 401}
+      block: "LOOP_POWER_B"
+
+# 布局 (水平排列: 回路从左到右, 水平母线在顶部)
+layout:
+  paper:
+    sizes:
+      - {name: "A2", width: 594, height: 420}
+      - {name: "A1", width: 841, height: 594}
+      - {name: "A0", width: 1189, height: 841}
+    auto_select: true
+  bus_x: 100
+  bus_y: 780
+  block_offset_x: 0
+  horizontal_spacing: 2140.5407    # 相邻回路 X 轴增量 (mm)
+  vertical_spacing: 70              # (兼容旧布局)
+  vertical_spacing_auto: true
+  table_enabled: true               # 原理图下方绘制参数表格
+  table_row_height: 7
+  table_label_col_width: 30
+  table_gap_from_schematic: 50
+  margins: {left: 25, right: 25, top: 15, bottom: 30}
+
+# 排序
+sort:
+  group_by: "load_type"
+  group_order: ["动力", "变频", "空调", "照明", "插座", "备用", "电容补偿"]
+  group_separator_enabled: true
+  group_separator_text: "{type} 配电"
+
+# 输出
+output:
+  dwg_path: "./output/配电系统图.dwg"
+  report_path: "./output/report.html"
+  log_path: "./logs/app.log"
+  log_level: "INFO"
+
+# 标注
+text_style:
+  font: "宋体"
+  height: 3.5
+
+# 图框
+title_block:
+  enabled: true
+  insert_at_x: 0
+  insert_at_y: 0
+  attributes:
+    PROJECT_NAME: ""
+    DRAWING_NO: ""
+    DATE: ""
+    DESIGNER: ""

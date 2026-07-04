@@ -1,0 +1,15 @@
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\bin\Debug\net8.0-windows\PDSG.AutoCAD.deps.json
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\bin\Debug\net8.0-windows\PDSG.AutoCAD.dll
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\bin\Debug\net8.0-windows\PDSG.AutoCAD.pdb
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\bin\Debug\net8.0-windows\PDSG.Core.dll
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\bin\Debug\net8.0-windows\PDSG.Core.pdb
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.csproj.AssemblyReference.cache
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.GeneratedMSBuildEditorConfig.editorconfig
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.AssemblyInfoInputs.cache
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.AssemblyInfo.cs
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.csproj.CoreCompileInputs.cache
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.Aut.250DDFC9.Up2Date
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.dll
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\refint\PDSG.AutoCAD.dll
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.pdb
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\ref\PDSG.AutoCAD.dll

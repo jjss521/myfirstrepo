@@ -1,0 +1,80 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\qoderwork\\PDSG.NET\\PDSG.Core\\PDSG.Core.csproj": {}
+  },
+  "projects": {
+    "D:\\qoderwork\\PDSG.NET\\PDSG.Core\\PDSG.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\qoderwork\\PDSG.NET\\PDSG.Core\\PDSG.Core.csproj",
+        "projectName": "PDSG.Core",
+        "projectPath": "D:\\qoderwork\\PDSG.NET\\PDSG.Core\\PDSG.Core.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\qoderwork\\PDSG.NET\\PDSG.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.105.0, )"
+            },
+            "Scriban": {
+              "target": "Package",
+              "version": "[7.2.5, )"
+            },
+            "YamlDotNet": {
+              "target": "Package",
+              "version": "[18.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.422/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

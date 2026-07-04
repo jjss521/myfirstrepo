@@ -1,0 +1,17 @@
+# PDSG 图块目录 v2.0
+# 简化版: 按断路器额定电流分为两种图块
+# 图块由用户在 AutoCAD 中手动创建，不含属性定义
+# 所有回路参数在图纸下方的表格中体现
+
+blocks:
+  - name: "LOOP_POWER_A"
+    description: "400A及以下断路器回路"
+    applicable:
+      breaker_max_current: 400    # 脱扣器额定电流 ≤ 400A
+    attributes: []                # 无块内属性，参数在表格中
+
+  - name: "LOOP_POWER_B"
+    description: "400A以上断路器回路"
+    applicable:
+      breaker_min_current: 401    # 脱扣器额定电流 > 400A
+    attributes: []                # 无块内属性，参数在表格中

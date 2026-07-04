@@ -1,0 +1,398 @@
+2026-06-20 23:08:35,165 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-20 23:08:35,177 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-20 23:08:35,177 [INFO] src.excel_reader: Sheet "回路清单" 共 20 行数据（从第 2 行起）
+2026-06-20 23:08:35,178 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-20 23:08:35,190 [INFO] src.block_library: 加载图块目录: 12 个图块
+2026-06-20 23:08:35,190 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-20 23:08:35,191 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-20 23:08:35,191 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-20 23:08:35,191 [INFO] pdsg: === DRY-RUN 模式 ===
+2026-06-20 23:08:35,191 [INFO] pdsg: 幅面: A0 (1189x841mm)
+2026-06-20 23:08:35,191 [INFO] pdsg: 回路数: 20
+2026-06-20 23:08:35,191 [INFO] pdsg: 母线: X=100.0, Y=[-994.0, 756.0]
+2026-06-20 23:08:35,192 [INFO] pdsg: 分组标签: 7 个
+2026-06-20 23:08:35,192 [INFO] pdsg:   L1 @ (115.0, 756.0) block=LOOP_PWR_3P_01
+2026-06-20 23:08:35,192 [INFO] pdsg:   L2 @ (115.0, 686.0) block=LOOP_PWR_3P_01
+2026-06-20 23:08:35,192 [INFO] pdsg:   L3 @ (115.0, 616.0) block=LOOP_PWR_3P_01
+2026-06-20 23:08:35,192 [INFO] pdsg:   L4 @ (115.0, 546.0) block=LOOP_PWR_3P_01
+2026-06-20 23:08:35,192 [INFO] pdsg:   L5 @ (115.0, 476.0) block=LOOP_PWR_3P_01
+2026-06-20 23:08:35,192 [INFO] pdsg:   ... 及另外 15 个回路
+2026-06-20 23:08:35,204 [INFO] src.reporter: 报告已生成: C:\Users\ThinkPad\Documents\Codex\2026-06-20\excel-autocad\output\report.html
+2026-06-20 23:08:35,204 [INFO] pdsg: Dry-run 完成 (0.0s): 有效 20 / 跳过 0 / 警告 0
+2026-06-23 10:10:27,722 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-23 10:10:27,733 [INFO] src.excel_reader: Sheet "低压配电系统" 未找到，自动使用备选 "回路清单"
+2026-06-23 10:10:27,734 [INFO] src.excel_reader: 检测到 Excel 格式: standard
+2026-06-23 10:10:27,735 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-23 10:10:27,735 [INFO] src.excel_reader: 标准格式: Sheet "低压配电系统" 共 20 行数据（从第 2 行起）
+2026-06-23 10:10:27,736 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-23 10:10:27,740 [INFO] src.block_library: 加载图块目录: 2 个图块
+2026-06-23 10:10:27,740 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-23 10:10:27,741 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-23 10:10:27,741 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-23 10:10:27,741 [INFO] pdsg: === DRY-RUN 模式 ===
+2026-06-23 10:10:27,741 [INFO] pdsg: 幅面: A0 (1189x841mm)
+2026-06-23 10:10:27,741 [INFO] pdsg: 回路数: 20
+2026-06-23 10:10:27,741 [INFO] pdsg: 母线: X=100.0, Y=[-994.0, 756.0]
+2026-06-23 10:10:27,741 [INFO] pdsg: 分组标签: 7 个
+2026-06-23 10:10:27,741 [INFO] pdsg:   L1 @ (115.0, 756.0) block=LOOP_POWER_A
+2026-06-23 10:10:27,741 [INFO] pdsg:   L2 @ (115.0, 686.0) block=LOOP_POWER_A
+2026-06-23 10:10:27,742 [INFO] pdsg:   L3 @ (115.0, 616.0) block=LOOP_POWER_A
+2026-06-23 10:10:27,742 [INFO] pdsg:   L4 @ (115.0, 546.0) block=LOOP_POWER_A
+2026-06-23 10:10:27,742 [INFO] pdsg:   L5 @ (115.0, 476.0) block=LOOP_POWER_A
+2026-06-23 10:10:27,742 [INFO] pdsg:   ... 及另外 15 个回路
+2026-06-23 10:10:27,755 [INFO] src.reporter: 报告已生成: D:\qoderwork\06 excel-autocad\output\report.html
+2026-06-23 10:10:27,755 [INFO] pdsg: Dry-run 完成 (0.0s): 有效 20 / 跳过 0 / 警告 0
+2026-06-23 10:10:45,586 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-23 10:10:45,595 [INFO] src.excel_reader: Sheet "低压配电系统" 未找到，自动使用备选 "回路清单"
+2026-06-23 10:10:45,595 [INFO] src.excel_reader: 检测到 Excel 格式: standard
+2026-06-23 10:10:45,596 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-23 10:10:45,596 [INFO] src.excel_reader: 标准格式: Sheet "低压配电系统" 共 20 行数据（从第 2 行起）
+2026-06-23 10:10:45,596 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-23 10:10:45,598 [INFO] src.block_library: 加载图块目录: 2 个图块
+2026-06-23 10:10:45,598 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-23 10:10:45,598 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-23 10:10:45,598 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-23 10:10:45,635 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:10:45,746 [INFO] comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'C:\\Program Files\\Python38\\lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-23 10:10:45,746 [INFO] comtypes.client._code_cache: Using writeable comtypes cache directory: 'C:\Program Files\Python38\lib\site-packages\comtypes\gen'
+2026-06-23 10:10:45,748 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:10:45,748 [DEBUG] src.cad_drawer: 尝试连接: AutoCAD.Application.24.1
+2026-06-23 10:10:45,756 [DEBUG] comtypes.client._managing: GetBestInterface(<POINTER(IUnknown) ptr=0x2965a3a5dd0 at 29672beb2c0>)
+2026-06-23 10:10:45,759 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo, trying IProvideClassInfo2
+2026-06-23 10:10:45,760 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo/IProvideClassInfo2
+2026-06-23 10:10:45,764 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x29671e28778 at 29672beb440>
+2026-06-23 10:10:45,764 [DEBUG] comtypes.client._managing: Default interface is {52EE1CD2-A793-4DEC-9DF9-71CE75881F05}
+2026-06-23 10:10:45,770 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x29671f0cb28 at 29672beb5c0>
+2026-06-23 10:10:45,790 [DEBUG] comtypes.client._generate: GetModule(TLIBATTR(GUID={AA9A2205-75AA-43AD-9138-1767F1BB5E0C}, Version=1.0, LCID=0, FLags=0x8))
+2026-06-23 10:10:45,887 [DEBUG] comtypes.client._managing: Implements default interface from typeinfo <class 'comtypes.gen._AA9A2205_75AA_43AD_9138_1767F1BB5E0C_0_1_0.IAcadApplication'>
+2026-06-23 10:10:45,887 [DEBUG] comtypes.client._managing: Final result is <POINTER(IAcadApplication) ptr=0x29671f0cb28 at 29672beb6c0>
+2026-06-23 10:10:45,887 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IDispatch) ptr=0x29671e289a8 at 29672beb3c0>
+2026-06-23 10:10:45,887 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeInfo) ptr=0x29671e28778 at 29672beb4c0>
+2026-06-23 10:10:45,888 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeLib) ptr=0x29671f0c2d8 at 29672beb5c0>
+2026-06-23 10:10:45,892 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2965a3a5dd0 at 29672beb2c0>
+2026-06-23 10:10:45,895 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x29671e28858 at 2967297ebc0>)
+2026-06-23 10:10:45,896 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x29671e28858 at 29672beb5c0>)
+2026-06-23 10:10:45,902 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x29671f0cb98 at 29672beb040>)
+2026-06-23 10:10:45,903 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x29671e28858 at 29672beb5c0>
+2026-06-23 10:10:45,904 [INFO] src.cad_drawer: AutoCAD 连接成功: AutoCAD.Application.24.1 (版本 24.1s (LMS Tech))
+2026-06-23 10:10:45,908 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x29671e281c8 at 29672beb5c0>)
+2026-06-23 10:10:46,560 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x29671f0cea8 at 29672beb2c0>)
+2026-06-23 10:10:46,560 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x29671e281c8 at 29672beb5c0>
+2026-06-23 10:10:46,580 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x29671e28858 at 2967297ebc0>
+2026-06-23 10:10:46,598 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x29671f0c5e8 at 2967297ebc0>)
+2026-06-23 10:10:46,599 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x29671f0cb98 at 29672beb040>
+2026-06-23 10:10:46,599 [DEBUG] src.cad_drawer: 新建文档
+2026-06-23 10:10:46,622 [WARNING] src.cad_drawer: CopyObjects 导入失败，回退到 INSERT 命令: (-2147418111, '被呼叫方拒绝接收呼叫。', (None, None, None, 0, None))
+2026-06-23 10:10:46,624 [ERROR] pdsg: 绘图失败: 导入图块库失败: (-2147418111, '被呼叫方拒绝接收呼叫。', (None, None, None, 0, None))
+2026-06-23 10:10:46,624 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadApplication) ptr=0x29671f0cb28 at 29672beb6c0>
+2026-06-23 10:10:46,624 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x29671f0cea8 at 29672beb2c0>
+2026-06-23 10:10:46,624 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x29671f0c5e8 at 2967297ebc0>
+2026-06-23 10:10:46,633 [INFO] src.reporter: 报告已生成: D:\qoderwork\06 excel-autocad\output\report.html
+2026-06-23 10:10:46,634 [DEBUG] comtypes._post_coinit.unknwn: Calling CoUninitialize()
+2026-06-23 10:10:46,634 [DEBUG] comtypes._post_coinit.unknwn: CoUninitialize() done.
+2026-06-23 10:13:23,932 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-23 10:13:23,942 [INFO] src.excel_reader: Sheet "低压配电系统" 未找到，自动使用备选 "回路清单"
+2026-06-23 10:13:23,942 [INFO] src.excel_reader: 检测到 Excel 格式: standard
+2026-06-23 10:13:23,943 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-23 10:13:23,943 [INFO] src.excel_reader: 标准格式: Sheet "低压配电系统" 共 20 行数据（从第 2 行起）
+2026-06-23 10:13:23,943 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-23 10:13:23,944 [INFO] src.block_library: 加载图块目录: 2 个图块
+2026-06-23 10:13:23,945 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-23 10:13:23,945 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-23 10:13:23,945 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-23 10:13:23,955 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:13:24,038 [INFO] comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'C:\\Program Files\\Python38\\lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-23 10:13:24,038 [INFO] comtypes.client._code_cache: Using writeable comtypes cache directory: 'C:\Program Files\Python38\lib\site-packages\comtypes\gen'
+2026-06-23 10:13:24,040 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:13:24,040 [DEBUG] src.cad_drawer: 尝试连接: AutoCAD.Application.24.1
+2026-06-23 10:13:24,046 [DEBUG] comtypes.client._managing: GetBestInterface(<POINTER(IUnknown) ptr=0x2082d9e0990 at 2084852b340>)
+2026-06-23 10:13:24,054 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo, trying IProvideClassInfo2
+2026-06-23 10:13:24,056 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo/IProvideClassInfo2
+2026-06-23 10:13:24,060 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2084787eef8 at 2084852b4c0>
+2026-06-23 10:13:24,060 [DEBUG] comtypes.client._managing: Default interface is {52EE1CD2-A793-4DEC-9DF9-71CE75881F05}
+2026-06-23 10:13:24,065 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x20847900798 at 2084852b640>
+2026-06-23 10:13:24,072 [DEBUG] comtypes.client._generate: GetModule(TLIBATTR(GUID={AA9A2205-75AA-43AD-9138-1767F1BB5E0C}, Version=1.0, LCID=0, FLags=0x8))
+2026-06-23 10:13:24,151 [DEBUG] comtypes.client._managing: Implements default interface from typeinfo <class 'comtypes.gen._AA9A2205_75AA_43AD_9138_1767F1BB5E0C_0_1_0.IAcadApplication'>
+2026-06-23 10:13:24,151 [DEBUG] comtypes.client._managing: Final result is <POINTER(IAcadApplication) ptr=0x20847900798 at 20848e97d40>
+2026-06-23 10:13:24,151 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IDispatch) ptr=0x2084787f278 at 2084852b440>
+2026-06-23 10:13:24,152 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeInfo) ptr=0x2084787eef8 at 2084852b540>
+2026-06-23 10:13:24,152 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeLib) ptr=0x208479002c8 at 2084852b640>
+2026-06-23 10:13:24,153 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2082d9e0990 at 2084852b340>
+2026-06-23 10:13:24,157 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787efd8 at 2084852b340>)
+2026-06-23 10:13:24,157 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787efd8 at 2084852b0c0>)
+2026-06-23 10:13:24,161 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x2084787f3c8 at 2084852b040>)
+2026-06-23 10:13:24,161 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787efd8 at 2084852b0c0>
+2026-06-23 10:13:24,161 [INFO] src.cad_drawer: AutoCAD 连接成功: AutoCAD.Application.24.1 (版本 24.1s (LMS Tech))
+2026-06-23 10:13:24,165 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x20847900648 at 2084852b0c0>)
+2026-06-23 10:13:25,235 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787f4a8 at 2084852b640>)
+2026-06-23 10:13:25,235 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x20847900648 at 2084852b0c0>
+2026-06-23 10:13:25,254 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787efd8 at 2084852b340>
+2026-06-23 10:13:25,275 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x2084787eef8 at 2084852b340>)
+2026-06-23 10:13:25,275 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x2084787f3c8 at 2084852b040>
+2026-06-23 10:13:25,279 [DEBUG] src.cad_drawer: 新建文档
+2026-06-23 10:13:25,301 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x2084787efd8 at 2084852b040>)
+2026-06-23 10:13:25,320 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x2084787efd8 at 2084852b040>
+2026-06-23 10:13:25,362 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x208478ffa08 at 2084852b040>)
+2026-06-23 10:13:25,365 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787f208 at 2084852b540>)
+2026-06-23 10:13:25,365 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x208478ffa08 at 2084852b040>
+2026-06-23 10:13:25,372 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x208479002c8 at 2084852b040>)
+2026-06-23 10:13:25,375 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787f6d8 at 2084852b0c0>)
+2026-06-23 10:13:25,375 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x208479002c8 at 2084852b040>
+2026-06-23 10:13:25,375 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787f208 at 2084852b540>
+2026-06-23 10:13:25,378 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x208479003a8 at 2084852b540>)
+2026-06-23 10:13:25,380 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787f7b8 at 2084852b740>)
+2026-06-23 10:13:25,380 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x208479003a8 at 2084852b540>
+2026-06-23 10:13:25,380 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787f6d8 at 2084852b0c0>
+2026-06-23 10:13:25,383 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x20847900338 at 2084852b0c0>)
+2026-06-23 10:13:25,384 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2084787f4a8 at 2084852b3c0>)
+2026-06-23 10:13:25,384 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x20847900338 at 2084852b0c0>
+2026-06-23 10:13:25,385 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787f7b8 at 2084852b740>
+2026-06-23 10:13:25,388 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x2084787ee88 at 2084852b740>)
+2026-06-23 10:13:26,416 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x20847900418 at 2084852b040>)
+2026-06-23 10:13:26,416 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x2084787ee88 at 2084852b740>
+2026-06-23 10:13:27,946 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x20847900098 at 2084852b740>)
+2026-06-23 10:13:27,948 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x20847900098 at 2084852b740>
+2026-06-23 10:13:27,951 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x20847900108 at 2084852b740>)
+2026-06-23 10:13:27,957 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787f438 at 2084852b0c0>)
+2026-06-23 10:13:27,957 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x20847900108 at 2084852b740>
+2026-06-23 10:13:27,961 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478ffa78 at 2084852b740>)
+2026-06-23 10:13:27,976 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787eb08 at 2084852b440>)
+2026-06-23 10:13:27,976 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478ffa78 at 2084852b740>
+2026-06-23 10:13:27,977 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787f438 at 2084852b0c0>
+2026-06-23 10:13:27,981 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x20847900488 at 2084852b0c0>)
+2026-06-23 10:13:27,987 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787f198 at 2084852b740>)
+2026-06-23 10:13:27,987 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x20847900488 at 2084852b0c0>
+2026-06-23 10:13:27,988 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787eb08 at 2084852b440>
+2026-06-23 10:13:27,993 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208479006b8 at 2084852b440>)
+2026-06-23 10:13:27,996 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787ec58 at 2084852b0c0>)
+2026-06-23 10:13:27,996 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208479006b8 at 2084852b440>
+2026-06-23 10:13:27,996 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787f198 at 2084852b740>
+2026-06-23 10:13:28,000 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x20847900028 at 2084852b740>)
+2026-06-23 10:13:28,007 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787f128 at 2084852b440>)
+2026-06-23 10:13:28,007 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x20847900028 at 2084852b740>
+2026-06-23 10:13:28,011 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478ffe68 at 2084852b740>)
+2026-06-23 10:13:28,014 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787f0b8 at 2084852b940>)
+2026-06-23 10:13:28,014 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478ffe68 at 2084852b740>
+2026-06-23 10:13:28,020 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208479002c8 at 2084852b740>)
+2026-06-23 10:13:28,024 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787ea98 at 2084852b540>)
+2026-06-23 10:13:28,024 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208479002c8 at 2084852b740>
+2026-06-23 10:13:28,028 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478ffa78 at 2084852b740>)
+2026-06-23 10:13:28,030 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787f748 at 20848ab6440>)
+2026-06-23 10:13:28,031 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478ffa78 at 2084852b740>
+2026-06-23 10:13:28,037 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478ffb58 at 2084852b740>)
+2026-06-23 10:13:28,040 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x2084787eb08 at 20848ab64c0>)
+2026-06-23 10:13:28,040 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478ffb58 at 2084852b740>
+2026-06-23 10:13:28,044 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478f9a48 at 2084852b740>)
+2026-06-23 10:13:28,047 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlock) ptr=0x208478f9818 at 20848ab6540>)
+2026-06-23 10:13:28,047 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478f9a48 at 2084852b740>
+2026-06-23 10:13:28,064 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478f90a8 at 2084852b740>)
+2026-06-23 10:13:28,106 [WARNING] src.cad_drawer: CopyObjects 第 1 次失败: (-2145320837, None, ('对象数组无效', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320837, None))
+2026-06-23 10:13:29,122 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478f90a8 at 20848ab63c0>)
+2026-06-23 10:13:29,127 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478f90a8 at 2084852b740>
+2026-06-23 10:13:29,128 [WARNING] src.cad_drawer: CopyObjects 第 2 次失败: (-2145320837, None, ('对象数组无效', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320837, None))
+2026-06-23 10:13:30,138 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadBlocks) ptr=0x208478f90a8 at 2084852b740>)
+2026-06-23 10:13:30,142 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478f90a8 at 20848ab63c0>
+2026-06-23 10:13:30,142 [WARNING] src.cad_drawer: CopyObjects 第 3 次失败: (-2145320837, None, ('对象数组无效', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320837, None))
+2026-06-23 10:13:31,924 [WARNING] src.cad_drawer: CopyObjects 导入失败，回退到 INSERT 命令: CopyObjects 3 次重试均失败: (-2145320837, None, ('对象数组无效', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320837, None))
+2026-06-23 10:13:35,083 [INFO] src.cad_drawer: 图块库已导入 (INSERT 命令): D:\qoderwork\06 excel-autocad\blocks\block_library.dwg
+2026-06-23 10:13:35,090 [DEBUG] src.cad_drawer: 设置图纸界限失败（可忽略）: (-2145320858, None, ('设置系统变量时出错', 'AutoCAD', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320858, None))
+2026-06-23 10:13:35,095 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadLine) ptr=0x208479006b8 at 20848ab6740>)
+2026-06-23 10:13:35,097 [DEBUG] src.cad_drawer: 母线绘制完成: (100.0, -994.0) -> (100.0, 756.0)
+2026-06-23 10:13:35,097 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadLine) ptr=0x208479006b8 at 20848ab6740>
+2026-06-23 10:13:35,101 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478f98f8 at 20848ab6740>)
+2026-06-23 10:13:35,102 [DEBUG] src.cad_drawer: 分组标签: "动力 配电" @ (100.0, 826.0)
+2026-06-23 10:13:35,102 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478f98f8 at 20848ab6740>
+2026-06-23 10:13:35,105 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x20847900488 at 20848ab6740>)
+2026-06-23 10:13:35,105 [DEBUG] src.cad_drawer: 分组标签: "变频 配电" @ (100.0, 406.0)
+2026-06-23 10:13:35,105 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x20847900488 at 20848ab6740>
+2026-06-23 10:13:35,108 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478f9188 at 20848ab6740>)
+2026-06-23 10:13:35,108 [DEBUG] src.cad_drawer: 分组标签: "空调 配电" @ (100.0, 196.0)
+2026-06-23 10:13:35,108 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478f9188 at 20848ab6740>
+2026-06-23 10:13:35,110 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478ffae8 at 20848ab6740>)
+2026-06-23 10:13:35,110 [DEBUG] src.cad_drawer: 分组标签: "照明 配电" @ (100.0, -84.0)
+2026-06-23 10:13:35,110 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478ffae8 at 20848ab6740>
+2026-06-23 10:13:35,112 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478f9658 at 20848ab6740>)
+2026-06-23 10:13:35,112 [DEBUG] src.cad_drawer: 分组标签: "插座 配电" @ (100.0, -434.0)
+2026-06-23 10:13:35,112 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478f9658 at 20848ab6740>
+2026-06-23 10:13:35,114 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478ffb58 at 20848ab6740>)
+2026-06-23 10:13:35,114 [DEBUG] src.cad_drawer: 分组标签: "备用 配电" @ (100.0, -644.0)
+2026-06-23 10:13:35,114 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478ffb58 at 20848ab6740>
+2026-06-23 10:13:35,117 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x208478f95e8 at 20848ab6740>)
+2026-06-23 10:13:35,117 [DEBUG] src.cad_drawer: 分组标签: "电容补偿 配电" @ (100.0, -854.0)
+2026-06-23 10:13:35,117 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x208478f95e8 at 20848ab6740>
+2026-06-23 10:13:35,121 [WARNING] src.cad_drawer: 图块插入失败 (回路 L1): 图块插入失败 (LOOP_POWER_A @ L1): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,123 [WARNING] src.cad_drawer: 图块插入失败 (回路 L2): 图块插入失败 (LOOP_POWER_A @ L2): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,124 [WARNING] src.cad_drawer: 图块插入失败 (回路 L3): 图块插入失败 (LOOP_POWER_A @ L3): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,126 [WARNING] src.cad_drawer: 图块插入失败 (回路 L4): 图块插入失败 (LOOP_POWER_A @ L4): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,129 [WARNING] src.cad_drawer: 图块插入失败 (回路 L5): 图块插入失败 (LOOP_POWER_A @ L5): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,132 [WARNING] src.cad_drawer: 图块插入失败 (回路 L6): 图块插入失败 (LOOP_POWER_A @ L6): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,135 [WARNING] src.cad_drawer: 图块插入失败 (回路 L7): 图块插入失败 (LOOP_POWER_A @ L7): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,138 [WARNING] src.cad_drawer: 图块插入失败 (回路 L8): 图块插入失败 (LOOP_POWER_A @ L8): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,140 [WARNING] src.cad_drawer: 图块插入失败 (回路 L9): 图块插入失败 (LOOP_POWER_A @ L9): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,142 [WARNING] src.cad_drawer: 图块插入失败 (回路 L10): 图块插入失败 (LOOP_POWER_A @ L10): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,145 [WARNING] src.cad_drawer: 图块插入失败 (回路 L11): 图块插入失败 (LOOP_POWER_A @ L11): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,148 [WARNING] src.cad_drawer: 图块插入失败 (回路 L12): 图块插入失败 (LOOP_POWER_A @ L12): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,150 [WARNING] src.cad_drawer: 图块插入失败 (回路 L13): 图块插入失败 (LOOP_POWER_A @ L13): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,153 [WARNING] src.cad_drawer: 图块插入失败 (回路 L14): 图块插入失败 (LOOP_POWER_A @ L14): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,156 [WARNING] src.cad_drawer: 图块插入失败 (回路 L15): 图块插入失败 (LOOP_POWER_A @ L15): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,158 [WARNING] src.cad_drawer: 图块插入失败 (回路 L16): 图块插入失败 (LOOP_POWER_A @ L16): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,160 [WARNING] src.cad_drawer: 图块插入失败 (回路 L17): 图块插入失败 (LOOP_POWER_A @ L17): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,162 [WARNING] src.cad_drawer: 图块插入失败 (回路 L18): 图块插入失败 (LOOP_POWER_A @ L18): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,164 [WARNING] src.cad_drawer: 图块插入失败 (回路 L19): 图块插入失败 (LOOP_POWER_A @ L19): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,167 [WARNING] src.cad_drawer: 图块插入失败 (回路 L20): 图块插入失败 (LOOP_POWER_A @ L20): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:35,167 [INFO] src.cad_drawer: 已插入 0/20 回路（失败 20）
+2026-06-23 10:13:35,170 [WARNING] src.cad_drawer: 图框插入失败: (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:13:36,709 [ERROR] pdsg: 绘图失败: 保存失败: (-2145320861, None, ('保存文档时出错', 'AutoCAD', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320861, None))
+2026-06-23 10:13:36,709 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadApplication) ptr=0x20847900798 at 20848e97d40>
+2026-06-23 10:13:36,709 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787f4a8 at 2084852b640>
+2026-06-23 10:13:36,709 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x2084787eef8 at 2084852b340>
+2026-06-23 10:13:36,710 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2084787f4a8 at 2084852b3c0>
+2026-06-23 10:13:36,710 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x20847900418 at 2084852b040>
+2026-06-23 10:13:36,718 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787ec58 at 2084852b0c0>
+2026-06-23 10:13:36,723 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787f128 at 2084852b440>
+2026-06-23 10:13:36,725 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787f0b8 at 2084852b940>
+2026-06-23 10:13:36,726 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787ea98 at 2084852b540>
+2026-06-23 10:13:36,726 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787f748 at 20848ab6440>
+2026-06-23 10:13:36,727 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x2084787eb08 at 20848ab64c0>
+2026-06-23 10:13:36,727 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlock) ptr=0x208478f9818 at 20848ab6540>
+2026-06-23 10:13:36,727 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadBlocks) ptr=0x208478f90a8 at 2084852b740>
+2026-06-23 10:13:36,736 [INFO] src.reporter: 报告已生成: D:\qoderwork\06 excel-autocad\output\report.html
+2026-06-23 10:13:36,736 [DEBUG] comtypes._post_coinit.unknwn: Calling CoUninitialize()
+2026-06-23 10:13:36,737 [DEBUG] comtypes._post_coinit.unknwn: CoUninitialize() done.
+2026-06-23 10:16:16,517 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-23 10:16:16,526 [INFO] src.excel_reader: Sheet "低压配电系统" 未找到，自动使用备选 "回路清单"
+2026-06-23 10:16:16,526 [INFO] src.excel_reader: 检测到 Excel 格式: standard
+2026-06-23 10:16:16,526 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-23 10:16:16,527 [INFO] src.excel_reader: 标准格式: Sheet "低压配电系统" 共 20 行数据（从第 2 行起）
+2026-06-23 10:16:16,527 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-23 10:16:16,528 [INFO] src.block_library: 加载图块目录: 2 个图块
+2026-06-23 10:16:16,528 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-23 10:16:16,529 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-23 10:16:16,529 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-23 10:16:16,540 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:16:16,636 [INFO] comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'C:\\Program Files\\Python38\\lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-23 10:16:16,636 [INFO] comtypes.client._code_cache: Using writeable comtypes cache directory: 'C:\Program Files\Python38\lib\site-packages\comtypes\gen'
+2026-06-23 10:16:16,639 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:16:16,639 [DEBUG] src.cad_drawer: 尝试连接: AutoCAD.Application.24.1
+2026-06-23 10:16:16,646 [DEBUG] comtypes.client._managing: GetBestInterface(<POINTER(IUnknown) ptr=0x15818d3fd00 at 158338b93c0>)
+2026-06-23 10:16:16,654 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo, trying IProvideClassInfo2
+2026-06-23 10:16:16,655 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo/IProvideClassInfo2
+2026-06-23 10:16:16,661 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x158321c6ec8 at 158338b9540>
+2026-06-23 10:16:16,662 [DEBUG] comtypes.client._managing: Default interface is {52EE1CD2-A793-4DEC-9DF9-71CE75881F05}
+2026-06-23 10:16:16,667 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x15832cca238 at 158338b96c0>
+2026-06-23 10:16:16,675 [DEBUG] comtypes.client._generate: GetModule(TLIBATTR(GUID={AA9A2205-75AA-43AD-9138-1767F1BB5E0C}, Version=1.0, LCID=0, FLags=0x8))
+2026-06-23 10:16:16,756 [DEBUG] comtypes.client._managing: Implements default interface from typeinfo <class 'comtypes.gen._AA9A2205_75AA_43AD_9138_1767F1BB5E0C_0_1_0.IAcadApplication'>
+2026-06-23 10:16:16,756 [DEBUG] comtypes.client._managing: Final result is <POINTER(IAcadApplication) ptr=0x15832cca238 at 158338b97c0>
+2026-06-23 10:16:16,756 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IDispatch) ptr=0x158321c60c8 at 158338b94c0>
+2026-06-23 10:16:16,756 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeInfo) ptr=0x158321c6ec8 at 158338b95c0>
+2026-06-23 10:16:16,757 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeLib) ptr=0x15832cca318 at 158338b96c0>
+2026-06-23 10:16:16,757 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x15818d3fd00 at 158338b93c0>
+2026-06-23 10:16:16,761 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x158321c6678 at 15834226dc0>)
+2026-06-23 10:16:16,762 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x158321c6678 at 158338b93c0>)
+2026-06-23 10:16:16,767 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x15832cca078 at 158338b9140>)
+2026-06-23 10:16:16,768 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x158321c6678 at 158338b93c0>
+2026-06-23 10:16:16,769 [INFO] src.cad_drawer: AutoCAD 连接成功: AutoCAD.Application.24.1 (版本 24.1s (LMS Tech))
+2026-06-23 10:16:16,773 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocuments) ptr=0x158321c6d08 at 158338b93c0>)
+2026-06-23 10:16:17,705 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x15832cca2a8 at 158338b90c0>)
+2026-06-23 10:16:17,706 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocuments) ptr=0x158321c6d08 at 158338b93c0>
+2026-06-23 10:16:17,747 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x158321c6678 at 15834226dc0>
+2026-06-23 10:16:17,753 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadModelSpace) ptr=0x15832cca0e8 at 15834226dc0>)
+2026-06-23 10:16:17,753 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x15832cca078 at 158338b9140>
+2026-06-23 10:16:17,771 [DEBUG] src.cad_drawer: 新建文档
+2026-06-23 10:16:17,774 [DEBUG] src.cad_drawer: 从目录加载图块名: ['LOOP_POWER_A', 'LOOP_POWER_B']
+2026-06-23 10:16:18,807 [DEBUG] src.cad_drawer: 导入图块定义: LOOP_POWER_A
+2026-06-23 10:16:19,727 [DEBUG] src.cad_drawer: 导入图块定义: LOOP_POWER_B
+2026-06-23 10:16:20,740 [INFO] src.cad_drawer: 已导入 2/2 个图块定义
+2026-06-23 10:16:20,769 [DEBUG] src.cad_drawer: 设置图纸界限失败（可忽略）: (-2145320858, None, ('设置系统变量时出错', 'AutoCAD', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320858, None))
+2026-06-23 10:16:20,784 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadLine) ptr=0x158321c6288 at 158338b9140>)
+2026-06-23 10:16:20,791 [DEBUG] src.cad_drawer: 母线绘制完成: (100.0, -994.0) -> (100.0, 756.0)
+2026-06-23 10:16:20,791 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadLine) ptr=0x158321c6288 at 158338b9140>
+2026-06-23 10:16:20,801 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c6448 at 158338b9140>)
+2026-06-23 10:16:20,801 [DEBUG] src.cad_drawer: 分组标签: "动力 配电" @ (100.0, 826.0)
+2026-06-23 10:16:20,801 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c6448 at 158338b9140>
+2026-06-23 10:16:20,812 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x15832cc9898 at 158338b9140>)
+2026-06-23 10:16:20,813 [DEBUG] src.cad_drawer: 分组标签: "变频 配电" @ (100.0, 406.0)
+2026-06-23 10:16:20,813 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x15832cc9898 at 158338b9140>
+2026-06-23 10:16:20,819 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c63d8 at 158338b9140>)
+2026-06-23 10:16:20,820 [DEBUG] src.cad_drawer: 分组标签: "空调 配电" @ (100.0, 196.0)
+2026-06-23 10:16:20,820 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c63d8 at 158338b9140>
+2026-06-23 10:16:20,824 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c6c98 at 158338b9140>)
+2026-06-23 10:16:20,824 [DEBUG] src.cad_drawer: 分组标签: "照明 配电" @ (100.0, -84.0)
+2026-06-23 10:16:20,824 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c6c98 at 158338b9140>
+2026-06-23 10:16:20,836 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c6218 at 158338b9140>)
+2026-06-23 10:16:20,836 [DEBUG] src.cad_drawer: 分组标签: "插座 配电" @ (100.0, -434.0)
+2026-06-23 10:16:20,836 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c6218 at 158338b9140>
+2026-06-23 10:16:20,842 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c69f8 at 158338b9140>)
+2026-06-23 10:16:20,843 [DEBUG] src.cad_drawer: 分组标签: "备用 配电" @ (100.0, -644.0)
+2026-06-23 10:16:20,843 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c69f8 at 158338b9140>
+2026-06-23 10:16:20,855 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadText) ptr=0x158321c62f8 at 158338b9140>)
+2026-06-23 10:16:20,855 [DEBUG] src.cad_drawer: 分组标签: "电容补偿 配电" @ (100.0, -854.0)
+2026-06-23 10:16:20,855 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadText) ptr=0x158321c62f8 at 158338b9140>
+2026-06-23 10:16:20,868 [WARNING] src.cad_drawer: 图块插入失败 (回路 L1): 图块插入失败 (LOOP_POWER_A @ L1): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,876 [WARNING] src.cad_drawer: 图块插入失败 (回路 L2): 图块插入失败 (LOOP_POWER_A @ L2): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,884 [WARNING] src.cad_drawer: 图块插入失败 (回路 L3): 图块插入失败 (LOOP_POWER_A @ L3): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,889 [WARNING] src.cad_drawer: 图块插入失败 (回路 L4): 图块插入失败 (LOOP_POWER_A @ L4): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,893 [WARNING] src.cad_drawer: 图块插入失败 (回路 L5): 图块插入失败 (LOOP_POWER_A @ L5): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,900 [WARNING] src.cad_drawer: 图块插入失败 (回路 L6): 图块插入失败 (LOOP_POWER_A @ L6): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,906 [WARNING] src.cad_drawer: 图块插入失败 (回路 L7): 图块插入失败 (LOOP_POWER_A @ L7): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,910 [WARNING] src.cad_drawer: 图块插入失败 (回路 L8): 图块插入失败 (LOOP_POWER_A @ L8): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,915 [WARNING] src.cad_drawer: 图块插入失败 (回路 L9): 图块插入失败 (LOOP_POWER_A @ L9): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,919 [WARNING] src.cad_drawer: 图块插入失败 (回路 L10): 图块插入失败 (LOOP_POWER_A @ L10): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,923 [WARNING] src.cad_drawer: 图块插入失败 (回路 L11): 图块插入失败 (LOOP_POWER_A @ L11): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,928 [WARNING] src.cad_drawer: 图块插入失败 (回路 L12): 图块插入失败 (LOOP_POWER_A @ L12): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,934 [WARNING] src.cad_drawer: 图块插入失败 (回路 L13): 图块插入失败 (LOOP_POWER_A @ L13): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,944 [WARNING] src.cad_drawer: 图块插入失败 (回路 L14): 图块插入失败 (LOOP_POWER_A @ L14): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,953 [WARNING] src.cad_drawer: 图块插入失败 (回路 L15): 图块插入失败 (LOOP_POWER_A @ L15): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,956 [WARNING] src.cad_drawer: 图块插入失败 (回路 L16): 图块插入失败 (LOOP_POWER_A @ L16): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,959 [WARNING] src.cad_drawer: 图块插入失败 (回路 L17): 图块插入失败 (LOOP_POWER_A @ L17): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,962 [WARNING] src.cad_drawer: 图块插入失败 (回路 L18): 图块插入失败 (LOOP_POWER_A @ L18): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,965 [WARNING] src.cad_drawer: 图块插入失败 (回路 L19): 图块插入失败 (LOOP_POWER_A @ L19): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,969 [WARNING] src.cad_drawer: 图块插入失败 (回路 L20): 图块插入失败 (LOOP_POWER_A @ L20): (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:20,970 [INFO] src.cad_drawer: 已插入 0/20 回路（失败 20）
+2026-06-23 10:16:20,973 [WARNING] src.cad_drawer: 图框插入失败: (-2145386445, None, ('文件处理器错误', 'AutoCAD.Application', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145386445, None))
+2026-06-23 10:16:22,497 [ERROR] pdsg: 绘图失败: 保存失败: (-2145320861, None, ('保存文档时出错', 'AutoCAD', 'D:\\autocad2022\\AutoCAD 2022\\HELP\\OLE_ERR.CHM', -2145320861, None))
+2026-06-23 10:16:22,498 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadApplication) ptr=0x15832cca238 at 158338b97c0>
+2026-06-23 10:16:22,498 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x15832cca2a8 at 158338b90c0>
+2026-06-23 10:16:22,499 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadModelSpace) ptr=0x15832cca0e8 at 15834226dc0>
+2026-06-23 10:16:22,511 [INFO] src.reporter: 报告已生成: D:\qoderwork\06 excel-autocad\output\report.html
+2026-06-23 10:16:22,511 [DEBUG] comtypes._post_coinit.unknwn: Calling CoUninitialize()
+2026-06-23 10:16:22,511 [DEBUG] comtypes._post_coinit.unknwn: CoUninitialize() done.
+2026-06-23 10:21:46,661 [INFO] pdsg: 开始处理: tests/fixtures/sample_valid.xlsx
+2026-06-23 10:21:46,677 [INFO] src.excel_reader: Sheet "低压配电系统" 未找到，自动使用备选 "回路清单"
+2026-06-23 10:21:46,678 [INFO] src.excel_reader: 检测到 Excel 格式: standard
+2026-06-23 10:21:46,678 [DEBUG] src.excel_reader: 必填列匹配率: 11/11 (100%)
+2026-06-23 10:21:46,678 [INFO] src.excel_reader: 标准格式: Sheet "低压配电系统" 共 20 行数据（从第 2 行起）
+2026-06-23 10:21:46,679 [INFO] src.excel_reader: 校验完成: 有效 20 / 跳过 0
+2026-06-23 10:21:46,680 [INFO] src.block_library: 加载图块目录: 2 个图块
+2026-06-23 10:21:46,680 [INFO] src.block_mapper: 图块映射完成: 20/20
+2026-06-23 10:21:46,681 [WARNING] src.layout_engine: 所需高度 1935mm 超出所有幅面，使用最大幅面 A0 (841mm)
+2026-06-23 10:21:46,681 [INFO] src.layout_engine: A0 幅面 20 回路 间距 70mm
+2026-06-23 10:21:46,692 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:21:46,789 [INFO] comtypes.client._code_cache: Imported existing <module 'comtypes.gen' from 'C:\\Program Files\\Python38\\lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2026-06-23 10:21:46,789 [INFO] comtypes.client._code_cache: Using writeable comtypes cache directory: 'C:\Program Files\Python38\lib\site-packages\comtypes\gen'
+2026-06-23 10:21:46,790 [DEBUG] comtypes: CoInitializeEx(None, 2)
+2026-06-23 10:21:46,791 [DEBUG] src.cad_drawer: 尝试连接: AutoCAD.Application.24.1
+2026-06-23 10:21:46,797 [DEBUG] comtypes.client._managing: GetBestInterface(<POINTER(IUnknown) ptr=0x2d8fa367580 at 2d8fb972540>)
+2026-06-23 10:21:46,801 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo, trying IProvideClassInfo2
+2026-06-23 10:21:46,801 [DEBUG] comtypes.client._managing: Does NOT implement IProvideClassInfo/IProvideClassInfo2
+2026-06-23 10:21:46,805 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2d8fa3123e8 at 2d8fb9726c0>
+2026-06-23 10:21:46,807 [DEBUG] comtypes.client._managing: Default interface is {52EE1CD2-A793-4DEC-9DF9-71CE75881F05}
+2026-06-23 10:21:46,813 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2d8fad496d8 at 2d8fb972840>
+2026-06-23 10:21:46,836 [DEBUG] comtypes.client._generate: GetModule(TLIBATTR(GUID={AA9A2205-75AA-43AD-9138-1767F1BB5E0C}, Version=1.0, LCID=0, FLags=0x8))
+2026-06-23 10:21:46,915 [DEBUG] comtypes.client._managing: Implements default interface from typeinfo <class 'comtypes.gen._AA9A2205_75AA_43AD_9138_1767F1BB5E0C_0_1_0.IAcadApplication'>
+2026-06-23 10:21:46,915 [DEBUG] comtypes.client._managing: Final result is <POINTER(IAcadApplication) ptr=0x2d8fad496d8 at 2d8fb972940>
+2026-06-23 10:21:46,915 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IDispatch) ptr=0x2d8fa3128b8 at 2d8fb972640>
+2026-06-23 10:21:46,916 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeInfo) ptr=0x2d8fa3123e8 at 2d8fb972740>
+2026-06-23 10:21:46,916 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(ITypeLib) ptr=0x2d8fad49908 at 2d8fb972840>
+2026-06-23 10:21:46,916 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IUnknown) ptr=0x2d8fa367580 at 2d8fb972540>
+2026-06-23 10:21:46,920 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2d8fa3120d8 at 2d8fc2d7f40>)
+2026-06-23 10:21:46,920 [DEBUG] comtypes.client._managing: wrap_outparam(<POINTER(IAcadDocument) ptr=0x2d8fa3120d8 at 2d8fb972540>)
+2026-06-23 10:21:46,922 [DEBUG] comtypes._post_coinit.unknwn: Release <POINTER(IAcadDocument) ptr=0x2d8fa3120d8 at 2d8fb972540>
+2026-06-23 10:21:46,922 [DEBUG] src.cad_drawer: 连接 AutoCAD.Application.24.1 失败: (-2147418111, '被呼叫方拒绝接收呼叫。', (None, None, None, 0, None))
+2026-06-23 10:21:46,922 [DEBUG] src.cad_drawer: 尝试连接: AutoCAD.Application.23.1
+2026-06-23 10:21:46,923 [DEBUG] src.cad_drawer: 连接 AutoCAD.Application.23.1 失败: [WinError -2147221005] 无效的类字符串
+2026-06-23 10:21:46,923 [ERROR] pdsg: AutoCAD 连接失败: 无法连接 AutoCAD。已尝试: ['AutoCAD.Application.24.1', 'AutoCAD.Application.23.1']。请确认 AutoCAD 已启动。最后错误: [WinError -2147221005] 无效的类字符串
+2026-06-23 10:21:46,923 [ERROR] pdsg: 请确认 AutoCAD 已启动后重试
+2026-06-23 10:21:46,931 [INFO] src.reporter: 报告已生成: D:\qoderwork\06 excel-autocad\output\report.html
+2026-06-23 10:21:46,931 [DEBUG] comtypes._post_coinit.unknwn: Calling CoUninitialize()
+2026-06-23 10:21:46,931 [DEBUG] comtypes._post_coinit.unknwn: CoUninitialize() done.

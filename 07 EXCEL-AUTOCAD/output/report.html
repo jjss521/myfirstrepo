@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PDSG 处理报告</title>
+<style>
+  body { font-family: "Microsoft YaHei", "宋体", sans-serif; margin: 30px; background: #fafafa; }
+  h1 { color: #333; border-bottom: 2px solid #4a90d9; padding-bottom: 8px; }
+  h2 { color: #555; margin-top: 30px; }
+  .summary { background: #fff; padding: 15px 20px; border-radius: 6px; border: 1px solid #ddd; margin: 15px 0; }
+  .summary span { display: inline-block; margin-right: 30px; font-size: 16px; }
+  .success { color: #27ae60; font-weight: bold; }
+  .warning { color: #e67e22; font-weight: bold; }
+  .error { color: #e74c3c; font-weight: bold; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; font-size: 13px; }
+  th { background: #4a90d9; color: #fff; }
+  tr:nth-child(even) { background: #f5f5f5; }
+  .footer { margin-top: 40px; color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>PDSG 配电系统图生成报告</h1>
+
+<div class="summary">
+  <span><strong>时间:</strong> 2026-06-23 15:38:08</span>
+  <span><strong>源文件:</strong> 低压配电系统2222.xlsx</span><br>
+  <span><strong>总回路数:</strong> 13</span>
+  <span class="success"><strong>成功:</strong> 13</span>
+  <span class="warning"><strong>警告:</strong> 0</span>
+  <span class="error"><strong>跳过:</strong> 0</span>
+</div>
+
+
+<h2>图块使用统计</h2>
+<table>
+  <tr><th>图块名称</th><th>使用次数</th></tr>
+  
+  <tr><td>LOOP_POWER_A</td><td>13</td></tr>
+  
+</table>
+
+
+
+<h2>成功回路清单</h2>
+<table>
+  <tr><th>回路编号</th><th>回路名称</th><th>负荷类型</th><th>图块名称</th><th>X</th><th>Y</th></tr>
+  
+  <tr>
+    <td>L1</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>100.0</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L2</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>2240.5</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L3</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>4381.1</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L4</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>6521.6</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L5</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>8662.2</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L6</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>10802.7</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L7</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>12943.2</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L8</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>15083.8</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L9</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>17224.3</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L10</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>19364.9</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L11</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>21505.4</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L12</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>23645.9</td>
+    <td>780.0</td>
+  </tr>
+  
+  <tr>
+    <td>L13</td>
+    <td>1#进线</td>
+    <td>变频</td>
+    <td>LOOP_POWER_A</td>
+    <td>25786.5</td>
+    <td>780.0</td>
+  </tr>
+  
+</table>
+
+
+
+
+
+
+<div class="footer">
+  PDSG v1.0.0 — 配电柜系统图自动生成程序 | 2026-06-23 15:38:08
+</div>
+</body>
+</html>

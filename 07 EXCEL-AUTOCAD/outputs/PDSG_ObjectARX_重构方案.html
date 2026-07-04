@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PDSG 重构方案 — Python+COM → C++ ObjectARX 2022</title>
+<style>
+:root{
+  --bg:#f7f8fa; --card:#fff; --ink:#1f2329; --mute:#6b7280;
+  --line:#e5e7eb; --accent:#2563eb; --accent2:#0ea5e9;
+  --green:#16a34a; --yellow:#d97706; --red:#dc2626; --blue:#2563eb;
+  --green-bg:#dcfce7; --yellow-bg:#fef3c7; --red-bg:#fee2e2; --blue-bg:#dbeafe;
+  --code-bg:#0f172a; --code-ink:#e2e8f0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+header.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb 60%,#0ea5e9);color:#fff;border-radius:18px;padding:38px 36px;box-shadow:0 10px 30px rgba(37,99,235,.25)}
+header.hero h1{margin:0 0 10px;font-size:28px;letter-spacing:.5px}
+header.hero .sub{opacity:.92;font-size:15px;margin-bottom:18px}
+header.hero .meta{display:flex;flex-wrap:wrap;gap:8px}
+header.hero .tag{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:999px;font-size:13px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:22px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+h2{font-size:21px;margin:0 0 4px;border-left:5px solid var(--accent);padding-left:12px}
+h2 .n{color:var(--accent);font-weight:800;margin-right:8px}
+h3{font-size:17px;margin:22px 0 8px;color:#0f172a}
+h4{font-size:15px;margin:16px 0 6px;color:#334155}
+.lead{color:var(--mute);margin:2px 0 0;font-size:14px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;overflow:hidden;border-radius:8px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#f1f5f9;font-weight:650;color:#0f172a}
+tr:nth-child(even) td{background:#fafbfc}
+code{background:#eff3f8;color:#be185d;padding:1.5px 6px;border-radius:4px;font-family:"Consolas","Courier New",monospace;font-size:13px}
+pre{background:var(--code-bg);color:var(--code-ink);padding:16px 18px;border-radius:10px;overflow:auto;font-size:13px;line-height:1.55;font-family:"Consolas","Courier New",monospace}
+pre .c{color:#64748b} /* comment */
+pre .k{color:#7dd3fc} /* keyword */
+pre .s{color:#86efac} /* string */
+pre .t{color:#fcd34d} /* type */
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.g{background:var(--green-bg);color:var(--green);border:1px solid #86efac}
+.y{background:var(--yellow-bg);color:var(--yellow);border:1px solid #fcd34d}
+.r{background:var(--red-bg);color:var(--red);border:1px solid #fca5a5}
+.b{background:var(--blue-bg);color:var(--blue);border:1px solid #93c5fd}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fcfcfd}
+.card h4{margin-top:0}
+.callout{border-left:4px solid var(--accent);background:#eff6ff;padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.callout.warn{border-color:var(--yellow);background:#fffbeb}
+.callout.danger{border-color:var(--red);background:#fef2f2}
+.callout.ok{border-color:var(--green);background:#f0fdf4}
+.toc{columns:2;column-gap:32px;font-size:14px}
+.toc a{color:var(--accent);text-decoration:none;break-inside:avoid;display:block;padding:2px 0}
+ul,ol{padding-left:22px}
+li{margin:4px 0}
+.kpi{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+.kpi .box{flex:1;min-width:150px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:10px;padding:14px}
+.kpi .box .v{font-size:24px;font-weight:800;color:#0369a1}
+.kpi .box .l{font-size:12px;color:#475569}
+footer{margin-top:30px;text-align:center;color:var(--mute);font-size:13px}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:14px 0}
+.flow .step{background:#eff6ff;border:1px solid #93c5fd;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;color:#1e40af}
+.flow .arr{color:var(--accent);font-size:18px;font-weight:700}
+.compare-old{border:1px solid #fca5a5;background:#fef2f2;border-radius:8px;padding:12px 14px}
+.compare-new{border:1px solid #86efac;background:#f0fdf4;border-radius:8px;padding:12px 14px}
+.legend span{display:inline-block;margin-right:14px;font-size:13px}
+@media(max-width:760px){.grid2,.grid3,.toc{columns:1;display:block}.wrap{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>PDSG 重构方案：Python + COM → C++ + ObjectARX 2022</h1>
+  <div class="sub">配电柜系统图自动生成程序（PDSG）从"进程外 COM 驱动"重构为"进程内 ObjectARX 原生插件"的完整工程方案</div>
+  <div class="meta">
+    <span class="tag">目标平台 AutoCAD 2022</span>
+    <span class="tag">ObjectARX 2022 SDK</span>
+    <span class="tag">C++ 17 / VS2019</span>
+    <span class="tag">输出 .arx 插件</span>
+    <span class="tag">编制日期 2026-06-24</span>
+  </div>
+</header>
+
+<div class="kpi">
+  <div class="box"><div class="v">6</div><div class="l">COM 卡死根因</div></div>
+  <div class="box"><div class="v">8</div><div class="l">重构模块</div></div>
+  <div class="box"><div class="v">4</div><div class="l">迁移阶段</div></div>
+  <div class="box"><div class="v">0</div><div class="l">进程外 RPC 调用（目标）</div></div>
+</div>
+
+<div class="callout">
+<b>一句话结论：</b>当前程序所有稳定性问题都源于"Python 进程通过 COM 跨进程驱动 AutoCAD"。改用 ObjectARX 后，插件直接运行在 AutoCAD 进程内，<b>跨进程 RPC、STA 线程、文件锁、硬编码 sleep、索引重排</b>这五类问题将<b>从架构上彻底消失</b>，无需任何重试/补丁代码。
+</div>
+
+<nav class="toc">
+  <a href="#s0">0. 目录与阅读指引</a>
+  <a href="#s1">1. 现状诊断：COM 为何卡死</a>
+  <a href="#s2">2. 技术选型论证</a>
+  <a href="#s3">3. 目标架构设计</a>
+  <a href="#s4">4. 数据模型 C++ 重设计</a>
+  <a href="#s5">5. 各模块重构详细方案</a>
+  <a href="#s6">6. COM→ObjectARX API 映射表</a>
+  <a href="#s7">7. 开发环境与构建</a>
+  <a href="#s8">8. 迁移路线图（4 阶段）</a>
+  <a href="#s9">9. 风险与对策</a>
+  <a href="#s10">10. 测试策略</a>
+  <a href="#s11">11. 附录：关键代码骨架</a>
+</nav>
+
+<!-- ===================== 1 现状诊断 ===================== -->
+<section id="s1">
+<h2><span class="n">1</span>现状诊断：COM 为何卡死</h2>
+<p class="lead">从 <code>src/cad_drawer.py</code> 中提取的所有"补丁代码"，反推出 6 类卡死根因。每一类都是 COM 跨进程架构的固有缺陷，无法通过优化消除。</p>
+
+<h3>1.1 现状架构</h3>
+<div class="flow">
+  <span class="step">Python 进程</span><span class="arr">→</span>
+  <span class="step">comtypes</span><span class="arr">→</span>
+  <span class="step">COM RPC（跨进程）</span><span class="arr">→</span>
+  <span class="step">AutoCAD 进程</span>
+</div>
+<p class="lead">Python 与 AutoCAD 是两个独立进程，所有绘图操作都要经 COM 接口跨进程通信（RPC）。这是全部问题的总根源。</p>
+
+<h3>1.2 六类卡死根因（附代码证据）</h3>
+
+<table>
+<tr><th style="width:5%">色码</th><th style="width:20%">根因</th><th style="width:42%">代码证据</th><th>本质问题</th></tr>
+<tr>
+  <td><span class="pill r">🔴 致命</span></td>
+  <td><b>RPC 调用被拒绝</b><br>RPC_E_CALL_REJECTED</td>
+  <td>定义常量 <code>RPC_E_CALL_REJECTED = -2147418111</code>；全局 <code>_com_retry()</code> 重试包装器包裹了<b>每一次</b> COM 调用（绘图、插入块、画线、写文字、保存）</td>
+  <td>跨进程 RPC 在 AutoCAD 忙碌时直接拒绝调用，Python 只能 sleep 后盲重试</td>
+</tr>
+<tr>
+  <td><span class="pill r">🔴 致命</span></td>
+  <td><b>硬编码 sleep 等待</b></td>
+  <td><code>open_library_as_working_doc</code> 中 <code>time.sleep(2)</code>；<code>load_blocks</code> 中 <code>time.sleep(1.5)</code> × N 次、<code>time.sleep(2)</code>；<code>_clean_model_space</code> 后 <code>time.sleep(1)</code></td>
+  <td>COM 是异步的，Python 不知道 AutoCAD 何时完成。只能靠 sleep 猜测，猜短了卡死、猜长了慢</td>
+</tr>
+<tr>
+  <td><span class="pill y">🟡 严重</span></td>
+  <td><b>STA 线程模式地狱</b></td>
+  <td><code>_ensure_sta_com()</code> 处理 <code>RPC_E_WRONG_THREAD</code> / <code>RPC_E_CHANGED_MODE</code>，<code>CoInitialize</code>/<code>CoUninitialize</code> 反复切换</td>
+  <td>COM 要求单线程单元(STA)，与 Python GUI(tkinter)多线程模型冲突，线程亲和性导致随机崩溃</td>
+</tr>
+<tr>
+  <td><span class="pill y">🟡 严重</span></td>
+  <td><b>实体删除索引重排</b></td>
+  <td><code>_clean_model_space</code> 用 <b>20 轮循环</b>倒序删除，每轮检查 <code>Count</code>，因为"某些实体删除后索引重排"</td>
+  <td>COM 集合在删除时索引实时变化，无法稳定遍历。ObjectARX 用事务/迭代器无此问题</td>
+</tr>
+<tr>
+  <td><span class="pill y">🟡 严重</span></td>
+  <td><b>文件锁与保存失败</b></td>
+  <td><code>save_as</code> 需先 <code>_close_other_documents()</code> 释放锁；主路径失败还要用<b>带时间戳的备用路径</b>兜底</td>
+  <td>跨进程持有 DWG 时文件锁状态不可控，保存常因锁冲突失败</td>
+</tr>
+<tr>
+  <td><span class="pill b">🔵 次要</span></td>
+  <td><b>SendCommand 字符串注入</b></td>
+  <td><code>load_blocks</code> 用 <code>self.doc.SendCommand('(command "-INSERT" ...)\n')</code> 拼字符串导入图块</td>
+  <td>命令行注入不可靠（引号转义、命令状态机、UI焦点），且无法获知执行结果</td>
+</tr>
+</table>
+
+<div class="callout danger">
+<b>核心结论：</b>这 6 类问题<b>无法通过优化 Python 代码解决</b>——它们是"跨进程 COM"架构的必然产物。即便把 <code>_com_retry</code> 的重试次数调到 100、sleep 调到 10 秒，也只能"减少"而非"消除"卡死。唯一根治路径：<b>把绘图代码搬进 AutoCAD 进程内</b>。
+</div>
+</section>
+
+<!-- ===================== 2 技术选型 ===================== -->
+<section id="s2">
+<h2><span class="n">2</span>技术选型论证</h2>
+
+<h3>2.1 三种 AutoCAD 二次开发技术对比</h3>
+<table>
+<tr><th style="width:16%">维度</th><th style="width:28%">COM / ActiveX（现状）</th><th style="width:28%">.NET AutoCAD API</th><th style="width:28%">ObjectARX C++（推荐）</th></tr>
+<tr><td><b>运行位置</b></td><td>进程外（Python↔AutoCAD）</td><td>进程内（DLL 加载到 acad.exe）</td><td><span class="pill g">🟢 进程内（.arx = DLL）</span></td></tr>
+<tr><td><b>通信开销</b></td><td>跨进程 RPC，高延迟</td><td>进程内直接调用</td><td><span class="pill g">🟢 进程内直接调用，零 RPC</span></td></tr>
+<tr><td><b>API 完整度</b></td><td>仅暴露 ActiveX 子集</td><td>较完整（托管包装）</td><td><span class="pill g">🟢 100% 完整，含 AcGe/AcBr/AcGi</span></td></tr>
+<tr><td><b>性能</b></td><td>🔴 最慢（RPC 序列化）</td><td>🟡 中等（托管层开销）</td><td><span class="pill g">🟢 最快（原生指针）</span></td></tr>
+<tr><td><b>稳定性</b></td><td>🔴 需大量重试补丁</td><td>🟢 稳定</td><td><span class="pill g">🟢 最稳定（事务原子性）</span></td></tr>
+<tr><td><b>开发难度</b></td><td>🟢 低（Python）</td><td>🟡 中（C#）</td><td>🔴 高（C++ + 手动内存/事务管理）</td></tr>
+<tr><td><b>Excel/生态</b></td><td>🟢 pandas/openpyxl 成熟</td><td>🟢 EPPlus/ClosedXML 成熟</td><td>🔴 需第三方库或自实现</td></tr>
+<tr><td><b>部署形态</b></td><td>外部 exe + Python 环境</td><td>.dll + acad.exe.config</td><td>.arx 文件，APPLOAD 加载</td></tr>
+<tr><td><b>版本绑定</b></td><td>弱（多 ProgID 探测）</td><td>中（每版本需重编译）</td><td>强（每版本需重编译）</td></tr>
+</table>
+
+<h3>2.2 选型结论</h3>
+<div class="callout ok">
+<b>采用 C++ + ObjectARX 2022</b>，理由：
+<ol style="margin:8px 0 0">
+<li><b>根治卡死</b>：进程内运行，RPC/sleep/STA/文件锁五类问题架构性消失——这是本次重构的首要目标。</li>
+<li><b>API 完整</b>：直接访问 <code>AcDbDatabase</code>、块表记录、事务管理器，块定义复制、属性写入、几何扫描都是原生操作，无需 SendCommand。</li>
+<li><b>用户明确指定</b>："采用 C++ 重新编程，利用 AutoCAD 2022 的 ObjectARX"。</li>
+</ol>
+</div>
+
+<div class="callout warn">
+<b>.NET 方案为何不选：</b>虽然 .NET 开发难度更低且也能进程内运行，但用户明确要求 C++/ObjectARX；且 C++ 方案在块表直接操作、几何计算(AcGe)、大批量实体处理上性能与控制力更强，契合"200 回路"规模。
+</div>
+</section>
+
+<!-- ===================== 3 目标架构 ===================== -->
+<section id="s3">
+<h2><span class="n">3</span>目标架构设计</h2>
+
+<h3>3.1 重构后架构（进程内）</h3>
+<div class="flow">
+  <span class="step">AutoCAD 2022 进程</span><span class="arr">→</span>
+  <span class="step">PDSG.arx 插件（进程内）</span><span class="arr">→</span>
+  <span class="step">AcDb 数据库直接操作</span>
+</div>
+<p class="lead">PDSG.arx 作为 ObjectARX 插件加载到 AutoCAD 进程内，所有绘图操作通过 AcDb API 直接读写数据库，零跨进程通信。</p>
+
+<h3>3.2 模块划分（8 大模块）</h3>
+<table>
+<tr><th style="width:18%">模块</th><th style="width:30%">职责</th><th style="width:22%">原 Python 文件</th><th style="width:30%">重构后 C++ 实现要点</th></tr>
+<tr><td><b>数据模型</b></td><td>回路/图块/布局/配置的数据结构</td><td><code>data_model.py</code></td><td>struct/class + 枚举，头文件集中定义</td></tr>
+<tr><td><b>Excel 读取</b></td><td>读取 .xlsx，标准/转置双格式</td><td><code>excel_reader.py</code></td><td>第三方库 xlnt 或 libxlsxreader</td></tr>
+<tr><td><b>配置加载</b></td><td>解析 config.yaml + catalog.yaml</td><td><code>config_loader.py</code></td><td>yaml-cpp 库</td></tr>
+<tr><td><b>图块映射</b></td><td>回路→图块名规则匹配</td><td><code>block_mapper.py</code></td><td>纯逻辑，直接移植</td></tr>
+<tr><td><b>属性构建</b></td><td>填充图块属性字典</td><td><code>attribute_builder.py</code></td><td>纯逻辑，直接移植</td></tr>
+<tr><td><b>布局引擎</b></td><td>坐标/母线/表格/幅面计算</td><td><code>layout_engine.py</code></td><td>纯逻辑，直接移植</td></tr>
+<tr><td><b>绘图器（核心）</b></td><td>操作 AutoCAD 绘制 DWG</td><td><code>cad_drawer.py</code></td><td><span class="pill r">🔴 彻底重写</span> ObjectARX AcDb API</td></tr>
+<tr><td><b>报告生成</b></td><td>HTML 处理报告</td><td><code>reporter.py</code></td><td>字符串拼接 + 模板（Jinja2→自写）</td></tr>
+<tr><td><b>命令/UI 入口</b></td><td>用户交互入口</td><td><code>main.py / gui.py</code></td><td>注册 AutoCAD 命令 + MFC 对话框</td></tr>
+</table>
+
+<div class="callout">
+<b>关键洞察：</b>8 个模块中，<b>只有"绘图器"需要彻底重写</b>（COM→ObjectARX）。其余 7 个模块是<b>纯计算逻辑</b>，可几乎逐行移植到 C++。这意味着重构风险高度集中、可控。
+</div>
+
+<h3>3.3 数据流</h3>
+<div class="flow">
+  <span class="step">Excel</span><span class="arr">→</span>
+  <span class="step">CircuitRecord[]</span><span class="arr">→</span>
+  <span class="step">映射+属性</span><span class="arr">→</span>
+  <span class="step">CircuitWithBlock[]</span><span class="arr">→</span>
+  <span class="step">布局引擎</span><span class="arr">→</span>
+  <span class="step">LayoutResult</span><span class="arr">→</span>
+  <span class="step" style="background:#dcfce7;border-color:#86efac;color:#166534">ObjectARX 绘图</span><span class="arr">→</span>
+  <span class="step">DWG + 报告</span>
+</div>
+</section>
+
+<!-- ===================== 4 数据模型 ===================== -->
+<section id="s4">
+<h2><span class="n">4</span>数据模型 C++ 重设计</h2>
+<p class="lead">将 Python dataclass 映射为 C++ struct/class。数据模型层是其余模块的基础，必须先定型。</p>
+
+<h3>4.1 Python → C++ 类型映射规则</h3>
+<table>
+<tr><th>Python</th><th>C++</th><th>说明</th></tr>
+<tr><td><code>dataclass</code></td><td><code>struct</code> / <code>class</code></td><td>纯数据用 struct，带逻辑用 class</td></tr>
+<tr><td><code>str</code></td><td><code>std::wstring</code> / <code>AcString</code></td><td>AutoCAD 内部用宽字符，统一用 wstring</td></tr>
+<tr><td><code>Optional[T]</code></td><td><code>std::optional&lt;T&gt;</code></td><td>C++17</td></tr>
+<tr><td><code>List[T]</code></td><td><code>std::vector&lt;T&gt;</code></td><td>—</td></tr>
+<tr><td><code>Dict[str,str]</code></td><td><code>std::map/std::unordered_map</code></td><td>属性字典用 map&lt;wstring,wstring&gt;</td></tr>
+<tr><td><code>Enum(str,Enum)</code></td><td><code>enum class</code> + 转换函数</td><td>保留中文字符串值</td></tr>
+<tr><td><code>float</code></td><td><code>double</code></td><td>坐标统一 double（mm）</td></tr>
+</table>
+
+<h3>4.2 核心数据类设计（示意）</h3>
+<pre><span class="c">// pdsg_types.h — 核心数据模型</span>
+<span class="k">enum class</span> <span class="t">LoadType</span> { Power, Lighting, Vfd, Ac, Socket, Spare, Capacitor };
+
+<span class="k">struct</span> <span class="t">CircuitRecord</span> {
+    <span class="k">int</span> row_number;
+    std::wstring circuit_id;
+    std::wstring circuit_name;
+    LoadType load_type;
+    <span class="k">double</span> rated_power_kw;
+    <span class="k">double</span> rated_current_a;
+    std::wstring breaker_model;
+    <span class="k">int</span> breaker_poles;
+    <span class="k">double</span> breaker_trip_current_a;
+    std::wstring ct_ratio;
+    std::wstring cable_type;
+    std::wstring cable_section;
+    std::optional&lt;std::wstring&gt; vfd_model;
+    std::optional&lt;<span class="k">double</span>&gt;      vfd_power_kw;
+    <span class="c">// ... v1.1 扩展字段 cabinet_code / contactor / ...</span>
+};
+
+<span class="k">struct</span> <span class="t">Placement</span> {
+    std::wstring block_name;
+    <span class="k">double</span> x, y;
+    std::map&lt;std::wstring, std::wstring&gt; attributes;
+    std::wstring circuit_id;
+};
+
+<span class="k">struct</span> <span class="t">LayoutResult</span> {
+    std::vector&lt;Placement&gt;  placements;
+    BusLine                  bus_line;
+    std::vector&lt;GroupLabel&gt; group_labels;
+    PaperSize                paper_size;
+    std::optional&lt;TableLayout&gt; table;
+};</pre>
+</section>
+
+<!-- ===================== 5 各模块方案 ===================== -->
+<section id="s5">
+<h2><span class="n">5</span>各模块重构详细方案</h2>
+
+<h3>5.1 🔴 绘图器（核心重写）— COM → ObjectARX</h3>
+<p class="lead">这是本次重构的主战场。下表逐个列出原 COM 方法对应的 ObjectARX 实现方案。</p>
+
+<table>
+<tr><th style="width:24%">原 COM 方法</th><th style="width:10%">痛点</th><th style="width:34%">ObjectARX 实现方案</th><th>关键 API</th></tr>
+<tr>
+  <td><code>connect()</code><br>GetActiveObject</td>
+  <td><span class="pill r">🔴 RPC</span></td>
+  <td><b>删除</b>。插件已在进程内，无需连接</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td><code>open_library_as_working_doc</code><br>Documents.Open + sleep</td>
+  <td><span class="pill r">🔴 sleep/锁</span></td>
+  <td><code>acdbHostApplicationServices-&gt;workingDatabase()</code> 取当前库；或 <code>AcDbDatabase::readDwgFile()</code> 读取图块库到内存库</td>
+  <td>AcDbDatabase::readDwgFile</td>
+</tr>
+<tr>
+  <td><code>_clean_model_space</code><br>20轮循环删除</td>
+  <td><span class="pill y">🟡 索引重排</span></td>
+  <td>事务内遍历块表记录，<code>erase()</code> 每个实体。事务保证一致性，无需多轮</td>
+  <td>AcDbBlockTableRecord + AcDbObjectIterator</td>
+</tr>
+<tr>
+  <td><code>_scan_block_geometry</code><br>逐个读 COM 属性</td>
+  <td><span class="pill b">🔵 慢</span></td>
+  <td>打开块表记录，遍历实体，<code>AcDbLine::startPoint()/endPoint()</code> 直接取几何</td>
+  <td>AcDbLine, AcGePoint3d</td>
+</tr>
+<tr>
+  <td><code>load_blocks</code><br>SendCommand 注入</td>
+  <td><span class="pill y">🟡 不可靠</span></td>
+  <td><code>AcDbDatabase::insert()</code> 或 <code>acdbTransactionManager-&gt;wblockCloneObjects()</code> 从库文件克隆块定义</td>
+  <td>AcDbDatabase::insert / wblockCloneObjects</td>
+</tr>
+<tr>
+  <td><code>_place_block_at</code><br>InsertBlock + GetAttributes</td>
+  <td><span class="pill r">🔴 重试</span></td>
+  <td>新建 <code>AcDbBlockReference</code>，设置插入点/比例/旋转，<code>appendAcDbEntity</code> 入库；<code>attributeMap()</code> 找属性定义，新建 <code>AcDbAttribute</code> 填值</td>
+  <td>AcDbBlockReference + AcDbAttribute</td>
+</tr>
+<tr>
+  <td><code>draw_bus</code><br>AddLine + Lineweight</td>
+  <td><span class="pill r">🔴 重试</span></td>
+  <td>新建 <code>AcDbLine</code>，<code>setLineweight()</code>，append 入库</td>
+  <td>AcDbLine::setLineweight</td>
+</tr>
+<tr>
+  <td><code>_safe_add_text</code><br>AddText + Alignment</td>
+  <td><span class="pill r">🔴 重试</span></td>
+  <td>新建 <code>AcDbText</code>（或 AcDbMText 中文友好），<code>setAlignment()</code> 设置对齐</td>
+  <td>AcDbText / AcDbMText</td>
+</tr>
+<tr>
+  <td><code>draw_table</code><br>线段+文字循环</td>
+  <td><span class="pill y">🟡 慢</span></td>
+  <td>可改用 <code>AcDbTable</code> 原生表格实体，一次创建整表；或保持线段方案但批量 append</td>
+  <td>AcDbTable（推荐）</td>
+</tr>
+<tr>
+  <td><code>insert_title_block</code></td>
+  <td><span class="pill y">🟡</span></td>
+  <td>同 _place_block_at，块引用+属性</td>
+  <td>AcDbBlockReference</td>
+</tr>
+<tr>
+  <td><code>save_as</code><br>SaveAs + 备用路径</td>
+  <td><span class="pill r">🔴 锁/失败</span></td>
+  <td><code>AcDbDatabase::saveAs()</code> 或 <code>acDocManager-&gt;lockDocument()+dbSaveAs</code>。进程内无外部锁冲突</td>
+  <td>AcDbDatabase::saveAs</td>
+</tr>
+<tr>
+  <td><code>_set_paper_limits</code></td>
+  <td><span class="pill b">🔵</span></td>
+  <td><code>acedSetVar(_T("LIMMIN"),...)</code> 或直接改系统变量</td>
+  <td>acedSetVar</td>
+</tr>
+</table>
+
+<h3>5.2 📗 Excel 读取层</h3>
+<p>Python 用 openpyxl/pandas，C++ 没有等价标准库。三个方案：</p>
+<div class="grid3">
+<div class="card">
+<h4><span class="pill g">🟢 方案A（推荐）</span></h4>
+<b>xlnt 库</b>（C++ 原生 xlsx 读写库，MIT）<br>
+优点：纯 C++，无 COM；支持单元格/合并/格式<br>
+缺点：需自行编译，大体型
+</div>
+<div class="card">
+<h4><span class="pill b">🔵 方案B</span></h4>
+<b>libxlsxreader</b>（C 库）<br>
+优点：轻量<br>
+缺点：只读、格式支持有限
+</div>
+<div class="card">
+<h4><span class="pill y">🟡 方案C</span></h4>
+<b>OLE DB / ADO 读 Excel</b><br>
+优点：Windows 原生<br>
+缺点：又回到 COM（Excel 的），但非 AutoCAD，不影响主目标
+</div>
+</div>
+<div class="callout">
+<b>双格式处理保留：</b>标准格式（行=回路）和转置格式（列=回路）的自动检测逻辑、列名别名模糊匹配，全部按 <code>excel_reader.py</code> 原逻辑移植到 C++。A1 含"参数"判定转置格式的规则不变。
+</div>
+
+<h3>5.3 📗 配置加载层</h3>
+<ul>
+<li><b>库</b>：<code>yaml-cpp</code>（成熟开源 C++ YAML 库）</li>
+<li><b>配置结构</b>：对应 <code>AppConfig</code> 及 10 个子配置类的 C++ struct，逐字段映射</li>
+<li><b>两份配置</b>：<code>config.yaml</code>（主配置）+ <code>block_catalog.yaml</code>（图块目录）</li>
+<li><b>列名别名映射</b>：<code>std::map&lt;wstring,wstring&gt;</code>，保留全部中英文别名</li>
+</ul>
+
+<h3>5.4 📗 图块映射 + 属性构建层</h3>
+<p class="lead">纯逻辑模块，几乎逐行移植。</p>
+<ul>
+<li><b>映射规则</b>：按 <code>load_type + breaker_poles</code> 匹配，首个命中决定图块名，否则用 default_block</li>
+<li><b>属性构建</b>：将 CircuitRecord 字段格式化后填入 11 个标准属性 Tag + 变频/扩展属性</li>
+<li>C++ 实现为自由函数，输入 <code>vector&lt;CircuitRecord&gt;</code>，输出 <code>vector&lt;CircuitWithBlock&gt;</code></li>
+</ul>
+
+<h3>5.5 📗 布局引擎层</h3>
+<p class="lead">纯几何计算，逐行移植。</p>
+<ul>
+<li>水平布局：回路从左到右，间距 <code>horizontal_spacing</code>，水平母线在顶部</li>
+<li>分组排序：<code>load_type</code> 分组 + 自然排序（L1/L2/L10）</li>
+<li>参数表格：列=回路、行=参数，列宽=间距</li>
+<li>幅面自动选择：A2/A1/A0 + 横向判断</li>
+<li>C++ 用 <code>std::regex</code> 替代 Python <code>re</code> 实现自然排序</li>
+</ul>
+
+<h3>5.6 📗 报告生成层</h3>
+<ul>
+<li>Python 用 Jinja2 模板，C++ 改用<b>字符串流拼接 + 预定义 HTML 模板常量</b></li>
+<li>报告内容（汇总统计/图块使用/回路清单/错误明细）数据结构不变</li>
+<li>中文字符串注意用 <code>std::wstring</code> + UTF-8 写文件</li>
+</ul>
+
+<h3>5.7 📗 命令/UI 入口层</h3>
+<p class="lead">从"独立 GUI 程序"变为"AutoCAD 内命令 + 对话框"。</p>
+<table>
+<tr><th>原方案</th><th>重构后</th></tr>
+<tr><td><code>python main.py --gui</code> 启动 tkinter 窗口</td><td>AutoCAD 命令行输入 <code>PDSG</code> 弹出 MFC 模态对话框</td></tr>
+<tr><td><code>python main.py excel.xlsx</code> CLI</td><td>命令 <code>PDSG_GEN</code>（或对话框内"生成"按钮）</td></tr>
+<tr><td>—</td><td>命令 <code>PDSG_DRYRUN</code> 仅校验不绘图</td></tr>
+<tr><td>—</td><td>命令 <code>PDSG_CONFIG</code> 打开配置编辑</td></tr>
+</table>
+<div class="callout warn">
+<b>UI 技术选型：</b>ObjectARX 原生支持 <b>MFC</b>（推荐，与 SDK 模板一致）。对话框含：Excel 路径选择、输出路径、配置参数、数据预览表格、执行按钮、日志区。可用 <code>acedGetFileNavDialog</code> 或 MFC <code>CFileDialog</code> 选文件。
+</div>
+</section>
+
+<!-- ===================== 6 API 映射 ===================== -->
+<section id="s6">
+<h2><span class="n">6</span>COM → ObjectARX API 映射速查表</h2>
+<table>
+<tr><th style="width:30%">COM 操作</th><th style="width:40%">ObjectARX 等价 API</th><th>说明</th></tr>
+<tr><td><code>app.ActiveDocument</code></td><td><code>acdbCurDwg()</code></td><td>当前图形数据库</td></tr>
+<tr><td><code>doc.ModelSpace</code></td><td><code>AcDbBlockTableRecord</code>（*Model_Space）</td><td>打开块表记录获取模型空间</td></tr>
+<tr><td><code>model.AddLine(p1,p2)</code></td><td><code>new AcDbLine(p1,p2)</code> + <code>appendAcDbEntity</code></td><td>需事务包裹</td></tr>
+<tr><td><code>model.InsertBlock(pt,name,sx,sy,sz,rot)</code></td><td><code>new AcDbBlockReference</code> + <code>setBlockName/setLocation/setScaleFactors/setRotation</code></td><td>块引用</td></tr>
+<tr><td><code>blockRef.GetAttributes()</code></td><td><code>blockRef-&gt;attributeMap()</code> + 遍历 + <code>new AcDbAttribute</code></td><td>写属性需先查块定义的 AttDef</td></tr>
+<tr><td><code>doc.Blocks.Item(name)</code></td><td><code>AcDbBlockTable::getAt(name,...)</code></td><td>块定义查找</td></tr>
+<tr><td><code>model.AddText(text,pt,h)</code></td><td><code>new AcDbText(pt,normal,text,style,h,rot)</code></td><td>—</td></tr>
+<tr><td><code>doc.Documents.Open(path)</code></td><td><code>AcDbDatabase::readDwgFile(path)</code></td><td>读到内存库，不影响当前文档</td></tr>
+<tr><td><code>doc.SendCommand(str)</code></td><td><span class="pill g">🟢 删除</span>，改用原生 API</td><td>彻底告别命令注入</td></tr>
+<tr><td><code>doc.SaveAs(path,fmt)</code></td><td><code>db-&gt;saveAs(path)</code></td><td>进程内无锁冲突</td></tr>
+<tr><td><code>doc.SetVariable(name,val)</code></td><td><code>acedSetVar(name,res)</code></td><td>系统变量</td></tr>
+<tr><td><code>line.Lineweight=50</code></td><td><code>line-&gt;setLineweight(50)</code></td><td>线宽</td></tr>
+<tr><td><code>text.Alignment=10</code></td><td><code>text-&gt;setHorizontalMode(kTextMid)</code></td><td>对齐</td></tr>
+<tr><td><code>_com_retry(fn)</code></td><td><span class="pill g">🟢 删除</span></td><td>无需重试</td></tr>
+<tr><td><code>time.sleep(n)</code></td><td><span class="pill g">🟢 删除</span></td><td>无需等待</td></tr>
+<tr><td><code>_ensure_sta_com()</code></td><td><span class="pill g">🟢 删除</span></td><td>无 COM 线程问题</td></tr>
+</table>
+</section>
+
+<!-- ===================== 7 环境构建 ===================== -->
+<section id="s7">
+<h2><span class="n">7</span>开发环境与构建</h2>
+
+<h3>7.1 工具链版本（严格匹配 AutoCAD 2022）</h3>
+<table>
+<tr><th>组件</th><th>版本要求</th><th>说明</th></tr>
+<tr><td>AutoCAD</td><td>2022（内部版本 24.1）</td><td>运行宿主</td></tr>
+<tr><td>ObjectARX SDK</td><td>2022（对应 acad.exe 24.1）</td><td>从 Autodesk 开发者中心下载</td></tr>
+<tr><td>Visual Studio</td><td>2019（VC++ 14.2x，v142 工具集）</td><td><b>必须</b>用 VS2019，ARX 2022 不支持 VS2022</td></tr>
+<tr><td>Windows SDK</td><td>10.0.19041+</td><td>—</td></tr>
+<tr><td>C++ 标准</td><td>C++17</td><td>用 std::optional / std::filesystem</td></tr>
+<tr><td>项目类型</td><td>Win32 DLL（.arx 即重命名 DLL）</td><td>用 ObjectARX 工程向导</td></tr>
+</table>
+
+<h3>7.2 第三方库依赖</h3>
+<table>
+<tr><th>库</th><th>用途</th><th>集成方式</th></tr>
+<tr><td>yaml-cpp</td><td>读 config.yaml / catalog.yaml</td><td>vcpkg 或源码编译，静态链接</td></tr>
+<tr><td>xlnt</td><td>读 .xlsx</td><td>vcpkg，静态链接</td></tr>
+<tr><td>MFC</td><td>对话框 UI</td><td>VS2019 安装时勾选</td></tr>
+</table>
+
+<h3>7.3 构建产物与部署</h3>
+<div class="grid2">
+<div class="compare-old">
+<b>构建产物（现状）</b>
+<ul style="margin:6px 0">
+<li>Python 源码 + 依赖包</li>
+<li>需安装 Python 3.10+</li>
+<li>需 AutoCAD 已启动</li>
+</ul>
+</div>
+<div class="compare-new">
+<b>构建产物（重构后）</b>
+<ul style="margin:6px 0">
+<li><code>PDSG.arx</code>（单文件 DLL）</li>
+<li><code>PDSG.resources</code>（可选资源）</li>
+<li>无需 Python 环境</li>
+<li>用户在 AutoCAD 内 <code>APPLOAD</code> 加载即可</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- ===================== 8 路线图 ===================== -->
+<section id="s8">
+<h2><span class="n">8</span>迁移路线图（4 阶段）</h2>
+<p class="lead">采用"由内向外、风险隔离"策略，每阶段都可独立验证。</p>
+
+<table>
+<tr><th style="width:8%">阶段</th><th style="width:20%">目标</th><th style="width:42%">工作内容</th><th style="width:18%">交付物</th><th>风险色码</th></tr>
+<tr>
+  <td><b>P1</b></td>
+  <td>搭骨架，跑通"Hello ARX"</td>
+  <td>建 VS2019 工程、配 ObjectARX SDK、注册 <code>PDSG</code> 命令、弹出空对话框、能加载到 AutoCAD</td>
+  <td>可加载的空 .arx</td>
+  <td><span class="pill g">🟢 低</span></td>
+</tr>
+<tr>
+  <td><b>P2</b></td>
+  <td>纯逻辑层移植（不碰 AutoCAD）</td>
+  <td>数据模型 / Excel 读取(xlnt) / 配置(yaml-cpp) / 映射 / 属性 / 布局引擎 全部 C++ 化，单元测试覆盖</td>
+  <td>libpdsg_core 静态库 + 测试</td>
+  <td><span class="pill g">🟢 低</span></td>
+</tr>
+<tr>
+  <td><b>P3</b></td>
+  <td>ObjectARX 绘图器（核心战场）</td>
+  <td>AcDb 绘图器：读图块库/清理模型空间/块引用插入/属性写入/母线/表格/图框/保存；块几何扫描</td>
+  <td>可生成 DWG 的 .arx</td>
+  <td><span class="pill r">🔴 高</span></td>
+</tr>
+<tr>
+  <td><b>P4</b></td>
+  <td>UI + 报告 + 收尾</td>
+  <td>MFC 对话框（文件选择/配置/预览/执行/日志）、HTML 报告、DryRun 命令、错误处理、文档</td>
+  <td>完整 PDSG.arx</td>
+  <td><span class="pill y">🟡 中</span></td>
+</tr>
+</table>
+
+<div class="callout warn">
+<b>关键里程碑建议：</b>P2 完成后，用 <b>Python 旧版绘图器 + C++ 核心库</b> 做一次"数据层先行验证"——即 C++ 算好 LayoutResult 输出 JSON，Python 读 JSON 调 COM 绘图。这能提前发现数据模型迁移的偏差，降低 P3 风险。
+</div>
+</section>
+
+<!-- ===================== 9 风险 ===================== -->
+<section id="s9">
+<h2><span class="n">9</span>风险与对策</h2>
+<table>
+<tr><th style="width:8%">色码</th><th style="width:24%">风险</th><th style="width:40%">影响</th><th>对策</th></tr>
+<tr>
+  <td><span class="pill r">🔴 高</span></td>
+  <td>ObjectARX 学习曲线陡</td>
+  <td>事务/对象指针/关闭顺序误用导致崩溃或内存泄漏</td>
+  <td>P3 严格用 RAII 包装 AcDbObject 指针；开启 <code>MEMTRACE</code>；先抄官方 sample</td>
+</tr>
+<tr>
+  <td><span class="pill r">🔴 高</span></td>
+  <td>版本严格绑定</td>
+  <td>ARX 2022 的 .arx 无法在 2020/2024 加载</td>
+  <td>明确声明仅支持 2022；如需多版本，每个版本独立编译分支</td>
+</tr>
+<tr>
+  <td><span class="pill y">🟡 中</span></td>
+  <td>xlnt/yaml-cpp 编译集成</td>
+  <td>vcpkg 不可用时手动编译耗时；字符编码(中文路径)踩坑</td>
+  <td>统一用 vcpkg manifest 模式；路径统一 wstring + UTF-8 转换层</td>
+</tr>
+<tr>
+  <td><span class="pill y">🟡 中</span></td>
+  <td>块属性写入语义差异</td>
+  <td>COM 的 GetAttributes 与 ARX 的 attributeMap + AcDbAttribute 流程不同，易漏属性</td>
+  <td>P3 单独写"块属性写入"测试用例，对照旧版输出逐 Tag 校验</td>
+</tr>
+<tr>
+  <td><span class="pill b">🔵 低</span></td>
+  <td>中文显示乱码</td>
+  <td>AcDbText 用 SimSun，但样式表/字体映射不当会出?</td>
+  <td>统一创建 PDSG_TEXT 文字样式，字体 gbcbig.shx + bigfont</td>
+</tr>
+<tr>
+  <td><span class="pill b">🔵 低</span></td>
+  <td>用户习惯变化</td>
+  <td>从"双击 exe"变"AutoCAD 内 APPLOAD + 命令"</td>
+  <td>文档 + 首次使用引导；可做 <code>bundle</code> 自动加载</code></td>
+</tr>
+</table>
+</section>
+
+<!-- ===================== 10 测试 ===================== -->
+<section id="s10">
+<h2><span class="n">10</span>测试策略</h2>
+
+<h3>10.1 分层测试</h3>
+<table>
+<tr><th style="width:20%">层</th><th style="width:40%">测试内容</th><th>工具</th></tr>
+<tr><td><b>核心逻辑层（P2）</b></td><td>Excel 读取/映射/布局 计算结果与 Python 版逐字段对比</td><td>Google Test / Catch2</td></tr>
+<tr><td><b>绘图器层（P3）</b></td><td>生成 DWG 后用 <code>acdbHostApplicationServices</code> 反读，校验实体数/属性值/坐标</td><td>ARX 测试命令 + 回读校验</td></tr>
+<tr><td><b>对比回归（P3-P4）</b></td><td>同一 Excel 用旧 Python 版和新 ARX 版各生成一次，对比实体数、属性、坐标一致性</td><td>自写对比脚本</td></tr>
+<tr><td><b>规模压测</b></td><td>200 回路 Excel，验证无卡死、无崩溃、耗时可接受</td><td>—</td></tr>
+</table>
+
+<h3>10.2 回归用例集（直接复用）</h3>
+<p class="lead">现有 <code>tests/fixtures/</code> 下 5 个 .xlsx 样本可直接作为 C++ 版回归输入，保证行为一致性。</p>
+</section>
+
+<!-- ===================== 11 附录 ===================== -->
+<section id="s11">
+<h2><span class="n">11</span>附录：关键代码骨架</h2>
+
+<h3>11.1 命令注册与入口（arx 入口）</h3>
+<pre><span class="c">// pdsg_app.cpp — ObjectARX 应用入口</span>
+<span class="k">#include</span> <span class="s">"aced.h"</span>
+<span class="k">#include</span> <span class="s">"rxregsvc.h"</span>
+
+<span class="c">// 注册命令 PDSG：弹出对话框</span>
+<span class="k">void</span> cmdPDSG() {
+    CPdsgDlg dlg;
+    dlg.DoModal();
+}
+
+<span class="c">// 注册命令 PDSG_GEN：直接生成</span>
+<span class="k">void</span> cmdPDSGGen() {
+    <span class="k">auto</span> cfg = pdsg::LoadConfig(L<span class="s">"config.yaml"</span>);
+    <span class="k">auto</span> records = pdsg::ReadExcel(cfg.excel);
+    <span class="k">auto</span> mapped   = pdsg::MapCircuits(records, cfg.block_mapping);
+    pdsg::BuildAttributes(mapped);
+    <span class="k">auto</span> layout   = pdsg::ComputeLayout(mapped, cfg.layout, cfg.sort);
+
+    pdsg::ArxDrawer drawer;          <span class="c">// ObjectARX 绘图器</span>
+    drawer.OpenLibrary(cfg.block_library);
+    drawer.Draw(layout, cfg.layout);
+    <span class="k">if</span> (cfg.title_block.enabled)
+        drawer.InsertTitleBlock(cfg.title_block, layout.paper_size);
+    drawer.SaveAs(cfg.output.dwg_path);
+
+    pdsg::GenerateReport(records, mapped, cfg);
+}
+
+<span class="c">// ARX 初始化：注册命令</span>
+<span class="k">extern</span> <span class="s">"C"</span> AcRx::AppRetCode acrxEntryPoint(AcRx::AppMsgCode msg, <span class="k">void</span>* pkt) {
+    <span class="k">switch</span> (msg) {
+    <span class="k">case</span> AcRx::kInitAppMsg:
+        acrxUnlockApplication(pkt);
+        acedRegCmds-&gt;addCommand(L<span class="s">"PDSG"</span>, L<span class="s">"PDSG"</span>, L<span class="s">"PDSG"</span>, ACRX_CMD_MODAL, cmdPDSG);
+        acedRegCmds-&gt;addCommand(L<span class="s">"PDSG"</span>, L<span class="s">"PDSG_GEN"</span>, L<span class="s">"PDSG_GEN"</span>, ACRX_CMD_MODAL, cmdPDSGGen);
+        <span class="k">break</span>;
+    <span class="k">case</span> AcRx::kUnloadAppMsg:
+        acedRegCmds-&gt;removeGroup(L<span class="s">"PDSG"</span>);
+        <span class="k">break</span>;
+    }
+    <span class="k">return</span> AcRx::kRetOK;
+}</pre>
+
+<h3>11.2 ObjectARX 绘图器核心片段（块引用+属性，无重试无 sleep）</h3>
+<pre><span class="c">// arx_drawer.cpp — 对比 COM 版的 _place_block_at</span>
+<span class="k">void</span> ArxDrawer::PlaceBlock(<span class="k">const</span> Placement& p) {
+    AcDbDatabase* db = acdbCurDwg();
+
+    <span class="c">// 事务包裹，自动管理对象打开/关闭</span>
+    AcTransaction* tr = acdbTransactionManager-&gt;startTransaction();
+    AcDbBlockTableRecord* ms = <span class="c">/* 打开 *Model_Space */</span>;
+
+    <span class="c">// 新建块引用</span>
+    AcDbBlockReference* ref = <span class="k">new</span> AcDbBlockReference;
+    ref-&gt;setBlockName(p.block_name.c_str());
+    ref-&gt;setLocation(AcGePoint3d(p.x, p.y, <span class="s">0</span>));
+    ref-&gt;setScaleFactors(AcGeScale3d(<span class="s">1</span>, <span class="s">1</span>, <span class="s">1</span>));
+    ref-&gt;setRotation(<span class="s">0</span>);
+
+    AcDbObjectId refId;
+    ms-&gt;appendAcDbEntity(refId, ref);
+
+    <span class="c">// 写属性：查块定义里的 AttDef，逐个建 Attribute</span>
+    AcDbBlockTableRecord* blkDef = <span class="c">/* 打开块定义 */</span>;
+    AcDbObjectIterator* it = blkDef-&gt;newIterator();
+    <span class="k">for</span> (; !it-&gt;done(); it-&gt;step()) {
+        AcDbEntity* ent = <span class="c">/* 打开 */</span>;
+        <span class="k">auto</span>* attDef = AcDbAttributeDefinition::cast(ent);
+        <span class="k">if</span> (!attDef) <span class="k">continue</span>;
+        <span class="k">auto</span> tag = attDef-&gt;tag();
+        <span class="k">auto</span> it = p.attributes.find(tag.constPtr());
+        <span class="k">if</span> (it == p.attributes.end()) <span class="k">continue</span>;
+
+        AcDbAttribute* attr = <span class="k">new</span> AcDbAttribute;
+        attr-&gt;setPropertiesFrom(attDef);
+        attr-&gt;setTag(tag);
+        attr-&gt;setTextString(it-&gt;second.c_str());
+        ref-&gt;appendAttribute(attr);   <span class="c">// 原子操作，无索引重排</span>
+    }
+    <span class="k">delete</span> it;
+
+    acdbTransactionManager-&gt;endTransaction();   <span class="c">// 一次性提交</span>
+}
+<span class="c">// 注意：全程无 _com_retry、无 time.sleep、无 SendCommand、无文件锁兜底</span></pre>
+
+<div class="callout ok">
+<b>对比：</b>原 COM 版 <code>_place_block_at</code> 含 <code>_com_retry</code> + <code>GetAttributes</code> 循环 + 异常吞咽共 ~30 行补丁代码。ObjectARX 版核心逻辑约 20 行，且<b>零重试、零等待、原子提交</b>。
+</div>
+
+<h3>11.3 项目目录建议</h3>
+<pre>pdsg-arx/
+├── pdsg-arx.vcxproj          <span class="c"># VS2019 DLL 工程</span>
+├── inc/
+│   ├── pdsg_types.h          <span class="c"># 数据模型（对应 data_model.py）</span>
+│   ├── excel_reader.h        <span class="c"># Excel 读取（对应 excel_reader.py）</span>
+│   ├── config_loader.h       <span class="c"># 配置加载</span>
+│   ├── block_mapper.h        <span class="c"># 图块映射</span>
+│   ├── attribute_builder.h   <span class="c"># 属性构建</span>
+│   ├── layout_engine.h       <span class="c"># 布局引擎</span>
+│   ├── arx_drawer.h          <span class="c"># ObjectARX 绘图器（核心，对应 cad_drawer.py）</span>
+│   └── reporter.h            <span class="c"># 报告</span>
+├── src/
+│   ├── pdsg_app.cpp          <span class="c"># ARX 入口 + 命令注册</span>
+│   ├── excel_reader.cpp
+│   ├── config_loader.cpp
+│   ├── block_mapper.cpp
+│   ├── attribute_builder.cpp
+│   ├── layout_engine.cpp
+│   ├── arx_drawer.cpp        <span class="c"># AcDb 绘图实现</span>
+│   └── reporter.cpp
+├── ui/
+│   ├── PdsgDlg.cpp/.h        <span class="c"># MFC 主对话框</span>
+│   └── PdsgDlg.rc            <span class="c"># 对话框资源</span>
+├── third_party/
+│   ├── yaml-cpp/
+│   └── xlnt/
+└── vcpkg.json                <span class="c"># 依赖清单</span></pre>
+</section>
+
+<div class="callout">
+<b>方案总结：</b>本重构以"<b>消灭跨进程 COM</b>"为唯一核心目标，通过 ObjectARX 进程内运行从根本上消除 6 类卡死根因。8 个模块中仅绘图器需彻底重写，其余 7 个为纯逻辑可逐行移植，风险高度集中可控。建议按 4 阶段推进，P2 后用"数据层先行验证"提前暴露偏差。
+</div>
+
+<footer>
+PDSG ObjectARX 重构方案 · 编制 2026-06-24 · 面向 AutoCAD 2022 / ObjectARX 2022 / VS2019
+</footer>
+
+</div>
+</body>
+</html>
