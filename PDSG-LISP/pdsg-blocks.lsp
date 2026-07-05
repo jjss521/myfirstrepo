@@ -13,41 +13,58 @@
 
 ;;; ------------------------------------------------------------
 ;;; 创建回路图块（带属性定义）
+;;; 使用 entmake 避免嵌套 command 导致的 AutoCAD 崩溃
 ;;; ------------------------------------------------------------
 (defun pdsg-create-circuit-block (block-name description width height
-                                   / pt1 pt2)
+                                    / pt1 pt2)
   (if (pdsg-block-exists block-name)
     (progn
       (princ (strcat "\n[WARN] 图块已存在: " block-name))
       nil
     )
     (progn
-      ;; 设置 UCS 到原点
-      (command "_.UCS" "_World")
+      ;; 使用 entmake 创建图块定义
+      (entmake (list '(0 . "BLOCK") (cons 2 block-name) '(70 . 0) '(10 0.0 0.0 0.0)))
 
-      ;; 定义图块范围
-      (setq pt1 (list 0.0 0.0 0.0))
-      (setq pt2 (list width height 0.0))
+      ;; 矩形框（四条线段）
+      (entmake (list '(0 . "LINE") (cons 10 (list 0.0 0.0 0.0)) (cons 11 (list width 0.0 0.0))))
+      (entmake (list '(0 . "LINE") (cons 10 (list width 0.0 0.0)) (cons 11 (list width height 0.0))))
+      (entmake (list '(0 . "LINE") (cons 10 (list width height 0.0)) (cons 11 (list 0.0 height 0.0))))
+      (entmake (list '(0 . "LINE") (cons 10 (list 0.0 height 0.0)) (cons 11 (list 0.0 0.0 0.0))))
 
-      ;; 创建图块
-      (command "_.BLOCK" block-name pt1
-               ;; 矩形框
-               (command "_.RECTANGLE" pt1 pt2)
-               ;; 断路器符号（简化）
-               (command "_.LINE" (list (* width 0.3) (* height 0.4))
-                        (list (* width 0.7) (* height 0.4)) "")
-               (command "_.LINE" (list (* width 0.3) (* height 0.6))
-                        (list (* width 0.7) (* height 0.6)) "")
-               ;; 属性定义
-               (command "_.ATTDEF" "_Justify" "_MC"
-                        (list (* width 0.5) (* height 0.9)) "" "CIRCUIT_NAME" "回路名称")
-               (command "_.ATTDEF" "_Justify" "_MC"
-                        (list (* width 0.5) (* height 0.15)) "" "BREAKER_TYPE" "断路器类型")
-               (command "_.ATTDEF" "_Justify" "_MC"
-                        (list (* width 0.5) (* height 0.05)) "" "BREAKER_RATING" "额定电流")
-               ;; 结束图块定义
-               "" "_End"
-      )
+      ;; 断路器符号（简化）
+      (entmake (list '(0 . "LINE")
+                     (cons 10 (list (* width 0.3) (* height 0.4) 0.0))
+                     (cons 11 (list (* width 0.7) (* height 0.4) 0.0))))
+      (entmake (list '(0 . "LINE")
+                     (cons 10 (list (* width 0.3) (* height 0.6) 0.0))
+                     (cons 11 (list (* width 0.7) (* height 0.6) 0.0))))
+
+      ;; 属性定义 — CIRCUIT_NAME
+      (entmake (list
+        '(0 . "ATTDEF") '(2 . "CIRCUIT_NAME") '(3 . "回路名称")
+        '(70 . 0) '(1 . "") (cons 10 (list (* width 0.5) (* height 0.9) 0.0))
+        (cons 11 (list (* width 0.5) (* height 0.9) 0.0))
+        '(40 . 2.5) '(41 . 1.0) '(50 . 0.0) '(7 . "Standard")
+        '(72 . 1) '(73 . 2)))
+
+      ;; 属性定义 — BREAKER_TYPE
+      (entmake (list
+        '(0 . "ATTDEF") '(2 . "BREAKER_TYPE") '(3 . "断路器类型")
+        '(70 . 0) '(1 . "") (cons 10 (list (* width 0.5) (* height 0.15) 0.0))
+        (cons 11 (list (* width 0.5) (* height 0.15) 0.0))
+        '(40 . 2.5) '(41 . 1.0) '(50 . 0.0) '(7 . "Standard")
+        '(72 . 1) '(73 . 2)))
+
+      ;; 属性定义 — BREAKER_RATING
+      (entmake (list
+        '(0 . "ATTDEF") '(2 . "BREAKER_RATING") '(3 . "额定电流")
+        '(70 . 0) '(1 . "") (cons 10 (list (* width 0.5) (* height 0.05) 0.0))
+        (cons 11 (list (* width 0.5) (* height 0.05) 0.0))
+        '(40 . 2.5) '(41 . 1.0) '(50 . 0.0) '(7 . "Standard")
+        '(72 . 1) '(73 . 2)))
+
+      (entmake '((0 . "ENDBLK")))
 
       (princ (strcat "\n[INFO] 图块已创建: " block-name))
       T

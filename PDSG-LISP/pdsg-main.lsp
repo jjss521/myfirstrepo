@@ -364,8 +364,20 @@
 ;;; 主命令：PDSG - 生成配电系统图
 ;;; ------------------------------------------------------------
 (defun c:PDSG ( / csv-file result records valid-errors valid errors
-                   paper-width paper-height bus-y spacing start-x
-                   placements cfg)
+                    paper-width paper-height bus-y spacing start-x
+                    placements cfg old-cmdecho old-osmode old-clayer old-error)
+  (setq old-cmdecho (getvar "cmdecho")
+        old-osmode (getvar "osmode")
+        old-clayer (getvar "clayer")
+        old-error *error*)
+  (setvar "cmdecho" 0)
+  (defun *error* (msg)
+    (setq *error* old-error)
+    (setvar "cmdecho" old-cmdecho)
+    (setvar "osmode" old-osmode)
+    (setvar "clayer" old-clayer)
+    (if msg (princ (strcat "\n[ERROR] " (vl-princ-to-string msg))))
+    (princ))
   (princ "\n")
   (princ "========================================")
   (princ "\n  PDSG 配电系统图自动生成")
@@ -419,13 +431,30 @@
     )
   )
 
+  (setq *error* old-error)
+  (setvar "cmdecho" old-cmdecho)
+  (setvar "osmode" old-osmode)
+  (setvar "clayer" old-clayer)
   (princ)
 )
 
 ;;; ------------------------------------------------------------
 ;;; 辅助命令：PDSG_DRY - 校验模式（不绘图）
 ;;; ------------------------------------------------------------
-(defun c:PDSG_DRY ( / csv-file records valid-errors valid errors)
+(defun c:PDSG_DRY ( / csv-file records valid-errors valid errors
+                      old-cmdecho old-osmode old-clayer old-error)
+  (setq old-cmdecho (getvar "cmdecho")
+        old-osmode (getvar "osmode")
+        old-clayer (getvar "clayer")
+        old-error *error*)
+  (setvar "cmdecho" 0)
+  (defun *error* (msg)
+    (setq *error* old-error)
+    (setvar "cmdecho" old-cmdecho)
+    (setvar "osmode" old-osmode)
+    (setvar "clayer" old-clayer)
+    (if msg (princ (strcat "\n[ERROR] " (vl-princ-to-string msg))))
+    (princ))
   (princ "\n[PDSG_DRY] 校验模式 - 仅检查数据")
 
   (pdsg-load-config)
@@ -456,6 +485,10 @@
     )
   )
 
+  (setq *error* old-error)
+  (setvar "cmdecho" old-cmdecho)
+  (setvar "osmode" old-osmode)
+  (setvar "clayer" old-clayer)
   (princ)
 )
 

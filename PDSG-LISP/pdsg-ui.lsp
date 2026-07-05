@@ -35,7 +35,20 @@
 ;;; ------------------------------------------------------------
 ;;; 显示主界面
 ;;; ------------------------------------------------------------
-(defun c:PDSG_UI ( / dcl-id result file-list dcl-file)
+(defun c:PDSG_UI ( / dcl-id result file-list dcl-file
+                     old-cmdecho old-osmode old-clayer old-error)
+  (setq old-cmdecho (getvar "cmdecho")
+        old-osmode (getvar "osmode")
+        old-clayer (getvar "clayer")
+        old-error *error*)
+  (setvar "cmdecho" 0)
+  (defun *error* (msg)
+    (setq *error* old-error)
+    (setvar "cmdecho" old-cmdecho)
+    (setvar "osmode" old-osmode)
+    (setvar "clayer" old-clayer)
+    (if msg (princ (strcat "\n[ERROR] " (vl-princ-to-string msg))))
+    (princ))
   (setq dcl-file (pdsg-get-dcl-path))
 
   ;; 检查 DCL 文件
@@ -81,6 +94,10 @@
       )
     )
   )
+  (setq *error* old-error)
+  (setvar "cmdecho" old-cmdecho)
+  (setvar "osmode" old-osmode)
+  (setvar "clayer" old-clayer)
   (princ)
 )
 
@@ -312,8 +329,22 @@
 ;;; 生成配电系统图
 ;;; ------------------------------------------------------------
 (defun pdsg-generate (/ records valid-errors valid errors
-                       paper-width paper-height bus-y spacing start-x
-                       placements output-path paper-map)
+                        paper-width paper-height bus-y spacing start-x
+                        placements output-path paper-map
+                        old-cmdecho old-osmode old-clayer old-error)
+  (setq old-cmdecho (getvar "cmdecho")
+        old-osmode (getvar "osmode")
+        old-clayer (getvar "clayer")
+        old-error *error*)
+  (setvar "cmdecho" 0)
+  (defun *error* (msg)
+    (setq *error* old-error)
+    (setvar "cmdecho" old-cmdecho)
+    (setvar "osmode" old-osmode)
+    (setvar "clayer" old-clayer)
+    (set_tile "status" (strcat "错误: " (if msg (vl-princ-to-string msg) "未知错误")))
+    (princ (strcat "\n[ERROR] " (if msg (vl-princ-to-string msg) "未知错误")))
+    (princ))
   (if (null *pdsg-ui-file*)
     (alert "请先选择数据文件")
     (progn
@@ -360,7 +391,7 @@
               (pdsg-init-drawing)
 
               ;; 绘制母线
-              (pdsg-draw-bus start-x (- (* spacing (length valid)) start-x)
+              (pdsg-draw-bus start-x (+ start-x (* spacing (1- (length valid))))
                              bus-y "BUS" 1 50)
 
               ;; 绘制回路图块
@@ -397,6 +428,10 @@
       )
     )
   )
+  (setq *error* old-error)
+  (setvar "cmdecho" old-cmdecho)
+  (setvar "osmode" old-osmode)
+  (setvar "clayer" old-clayer)
 )
 
 ;;; ------------------------------------------------------------

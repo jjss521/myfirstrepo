@@ -128,9 +128,9 @@
     (if (and (= (cdr (assoc 0 ent-ent)) "ATTRIB")
              (= (cdr (assoc 2 ent-ent)) tag))
       (progn
-        (subst (cons 1 value) (assoc 1 ent-ent) ent-ent)
+        (setq ent-ent (subst (cons 1 value) (assoc 1 ent-ent) ent-ent))
         (entmod ent-ent)
-        (entupd ent-ent)
+        (entupd sub-ent)
       )
     )
     (setq sub-ent (entnext sub-ent))

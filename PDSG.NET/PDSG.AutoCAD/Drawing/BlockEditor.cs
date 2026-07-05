@@ -272,10 +272,10 @@ public class BlockEditor : IDisposable
             // 跳过已存在的块
             if (bt.Has(sourceBtr.Name)) continue;
 
-            // 使用 DeepCloneObjects 复制块定义
+            // 使用 DeepCloneObjects 复制块定义到块表
             var idCollection = new ObjectIdCollection { sourceBtr.ObjectId };
             var mapping = new IdMapping();
-            sourceDb.DeepCloneObjects(idCollection, _db.CurrentSpaceId, mapping, false);
+            sourceDb.DeepCloneObjects(idCollection, _db.BlockTableId, mapping, false);
 
             imported++;
         }
