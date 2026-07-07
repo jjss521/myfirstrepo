@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PDSG.AutoCAD")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a2f20a373af53b48110c94ded1880c82c34ee29")]
 [assembly: System.Reflection.AssemblyProductAttribute("PDSG.AutoCAD")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PDSG.AutoCAD")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

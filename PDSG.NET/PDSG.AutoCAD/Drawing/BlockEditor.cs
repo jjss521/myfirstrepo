@@ -246,41 +246,52 @@ public class BlockEditor : IDisposable
 
         int imported = 0;
 
-        using var sourceDb = new Database(false, true);
-        sourceDb.ReadDwgFile(sourceDwgPath,
-            FileOpenMode.OpenForReadAndAllShare, true, "");
-
-        using var tr = _db!.TransactionManager.StartTransaction();
-        var bt = (BlockTable)tr.GetObject(_db.BlockTableId, OpenMode.ForWrite);
-
-        using var sourceTr = sourceDb.TransactionManager.StartTransaction();
-        var sourceBt = (BlockTable)sourceTr.GetObject(
-            sourceDb.BlockTableId, OpenMode.ForRead);
-
-        foreach (var objId in sourceBt)
+        var sourceDb = new Database(false, true);
+        try
         {
-            var sourceBtr = (BlockTableRecord)sourceTr.GetObject(
-                objId, OpenMode.ForRead);
+            sourceDb.ReadDwgFile(sourceDwgPath,
+                FileOpenMode.OpenForReadAndAllShare, true, "");
 
-            if (sourceBtr.IsLayout) continue;
-            if (sourceBtr.Name.StartsWith("*")) continue; // 跳过匿名块
+            using var tr = _db!.TransactionManager.StartTransaction();
+            var bt = (BlockTable)tr.GetObject(_db.BlockTableId, OpenMode.ForWrite);
 
-            // 如果指定了块名列表，只导入指定的块
-            if (blockNames != null && !blockNames.Contains(sourceBtr.Name))
-                continue;
+            // sourceTr 必须在 sourceDb 之前释放
+            using (var sourceTr = sourceDb.TransactionManager.StartTransaction())
+            {
+                var sourceBt = (BlockTable)sourceTr.GetObject(
+                    sourceDb.BlockTableId, OpenMode.ForRead);
 
-            // 跳过已存在的块
-            if (bt.Has(sourceBtr.Name)) continue;
+                foreach (var objId in sourceBt)
+                {
+                    var sourceBtr = (BlockTableRecord)sourceTr.GetObject(
+                        objId, OpenMode.ForRead);
 
-            // 使用 DeepCloneObjects 复制块定义到块表
-            var idCollection = new ObjectIdCollection { sourceBtr.ObjectId };
-            var mapping = new IdMapping();
-            sourceDb.DeepCloneObjects(idCollection, _db.BlockTableId, mapping, false);
+                    if (sourceBtr.IsLayout) continue;
+                    if (sourceBtr.Name.StartsWith("*")) continue; // 跳过匿名块
 
-            imported++;
+                    // 如果指定了块名列表，只导入指定的块
+                    if (blockNames != null && !blockNames.Contains(sourceBtr.Name))
+                        continue;
+
+                    // 跳过已存在的块
+                    if (bt.Has(sourceBtr.Name)) continue;
+
+                    // 使用 DeepCloneObjects 复制块定义到块表
+                    var idCollection = new ObjectIdCollection { sourceBtr.ObjectId };
+                    var mapping = new IdMapping();
+                    sourceDb.DeepCloneObjects(idCollection, _db.BlockTableId, mapping, false);
+
+                    imported++;
+                }
+            } // sourceTr 在此释放
+
+            tr.Commit();
+        }
+        finally
+        {
+            sourceDb.Dispose(); // sourceDb 在 sourceTr 之后释放
         }
 
-        tr.Commit();
         return imported;
     }
 
@@ -305,7 +316,7 @@ public class BlockEditor : IDisposable
             {
                 Name = btr.Name,
                 Exists = true,
-                EntityCount = btr.Cast<object>().Count()
+                EntityCount = 0
             };
 
             // 扫描几何信息
@@ -314,6 +325,7 @@ public class BlockEditor : IDisposable
 
             foreach (var entId in btr)
             {
+                info.EntityCount++;
                 var ent = tr.GetObject(entId, OpenMode.ForRead);
                 try
                 {
@@ -358,24 +370,27 @@ public class BlockEditor : IDisposable
 
         var btr = (BlockTableRecord)tr.GetObject(bt[name], OpenMode.ForWrite);
 
-        // 删除模型空间中所有引用
-        var ms = (BlockTableRecord)tr.GetObject(
-            _db!.CurrentSpaceId, OpenMode.ForWrite);
-
-        var toDelete = new List<ObjectId>();
-        foreach (var objId in ms)
+        // 遍历所有布局（模型空间 + 图纸空间），删除所有块引用
+        foreach (var btObjId in bt)
         {
-            var ent = tr.GetObject(objId, OpenMode.ForRead);
-            if (ent is BlockReference blkRef && blkRef.Name == name)
+            var layoutBtr = (BlockTableRecord)tr.GetObject(btObjId, OpenMode.ForRead);
+            if (!layoutBtr.IsLayout) continue;
+
+            layoutBtr.UpgradeOpen();
+            var toDelete = new List<ObjectId>();
+            foreach (var objId in layoutBtr)
             {
-                toDelete.Add(objId);
+                var ent = tr.GetObject(objId, OpenMode.ForRead);
+                if (ent is BlockReference blkRef && blkRef.Name == name)
+                {
+                    toDelete.Add(objId);
+                }
             }
-        }
-
-        foreach (var objId in toDelete)
-        {
-            var ent = tr.GetObject(objId, OpenMode.ForWrite);
-            ent.Erase(true);
+            foreach (var objId in toDelete)
+            {
+                var ent = tr.GetObject(objId, OpenMode.ForWrite);
+                ent.Erase(true);
+            }
         }
 
         // 删除块定义

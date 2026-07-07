@@ -1,4 +1,10 @@
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\CoverletSourceRootsMapping_PDSG.Core.Tests
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.csproj.AssemblyReference.cache
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.GeneratedMSBuildEditorConfig.editorconfig
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.AssemblyInfoInputs.cache
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.AssemblyInfo.cs
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.csproj.CoreCompileInputs.cache
+D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.sourcelink.json
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\testhost.dll
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\testhost.exe
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
@@ -99,11 +105,6 @@ D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\zh-Hant\Microsoft.TestPla
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\PDSG.Core.dll
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\bin\Debug\net8.0\PDSG.Core.pdb
-D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.csproj.AssemblyReference.cache
-D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.GeneratedMSBuildEditorConfig.editorconfig
-D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.AssemblyInfoInputs.cache
-D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.AssemblyInfo.cs
-D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.csproj.CoreCompileInputs.cache
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Cor.E72FE0DD.Up2Date
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\PDSG.Core.Tests.dll
 D:\qoderwork\PDSG.NET\PDSG.Core.Tests\obj\Debug\net8.0\refint\PDSG.Core.Tests.dll

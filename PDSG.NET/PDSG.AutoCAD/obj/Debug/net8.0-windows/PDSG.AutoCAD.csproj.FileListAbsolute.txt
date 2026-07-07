@@ -8,6 +8,7 @@ D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.Generat
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.AssemblyInfoInputs.cache
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.AssemblyInfo.cs
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.csproj.CoreCompileInputs.cache
+D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.sourcelink.json
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.Aut.250DDFC9.Up2Date
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\PDSG.AutoCAD.dll
 D:\qoderwork\PDSG.NET\PDSG.AutoCAD\obj\Debug\net8.0-windows\refint\PDSG.AutoCAD.dll

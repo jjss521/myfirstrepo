@@ -33,6 +33,7 @@ public class CadDrawer : IDisposable
     {
         EnsureConnected();
 
+        using var docLock = _doc!.LockDocument();
         using var tr = _db!.TransactionManager.StartTransaction();
 
         var bt = (BlockTable)tr.GetObject(_db.BlockTableId, OpenMode.ForRead);
@@ -61,6 +62,15 @@ public class CadDrawer : IDisposable
                 System.Diagnostics.Debug.WriteLine(
                     $"图块插入失败 ({p.CircuitId}): {ex.Message}");
             }
+        }
+
+        // 如果有任何插入失败，回滚事务以避免残缺数据
+        if (failed > 0)
+        {
+            var msg = $"{failed} 个图块插入失败，事务已回滚。请检查图块库配置。";
+            System.Diagnostics.Debug.WriteLine(msg);
+            _doc?.Editor.WriteMessage($"\n错误: {msg}");
+            return; // using var tr 会自动回滚
         }
 
         // 绘制参数表格
@@ -113,27 +123,33 @@ public class CadDrawer : IDisposable
         btr.AppendEntity(blkRef);
         tr.AddNewlyCreatedDBObject(blkRef, true);
 
-        // 写入属性
+        // 写入属性 - 使用字典查找优化
         if (p.Attributes.Count > 0)
         {
             var btrDef = (BlockTableRecord)tr.GetObject(
                 bt[p.BlockName], OpenMode.ForRead);
 
+            // 建立属性标签到 ObjectId 的映射（单次遍历）
+            var attrMap = new Dictionary<string, ObjectId>(StringComparer.OrdinalIgnoreCase);
+            foreach (var objId in btrDef)
+            {
+                var ent = tr.GetObject(objId, OpenMode.ForRead);
+                if (ent is AttributeDefinition attDef && !string.IsNullOrEmpty(attDef.Tag))
+                {
+                    attrMap[attDef.Tag] = objId;
+                }
+            }
+
+            // 使用字典 O(1) 查找写入属性值
             foreach (var kv in p.Attributes)
             {
-                foreach (var objId in btrDef)
+                if (attrMap.TryGetValue(kv.Key, out var attObjId))
                 {
-                    var ent = tr.GetObject(objId, OpenMode.ForRead);
-                    if (ent is AttributeDefinition attDef
-                        && attDef.Tag == kv.Key)
-                    {
-                        var attRef = new AttributeReference();
-                        attRef.SetAttributeFromBlock(
-                            attDef, blkRef.BlockTransform);
-                        attRef.TextString = kv.Value;
-                        tr.AddNewlyCreatedDBObject(attRef, true);
-                        break;
-                    }
+                    var attDef = (AttributeDefinition)tr.GetObject(attObjId, OpenMode.ForRead);
+                    var attRef = new AttributeReference();
+                    attRef.SetAttributeFromBlock(attDef, blkRef.BlockTransform);
+                    attRef.TextString = kv.Value;
+                    tr.AddNewlyCreatedDBObject(attRef, true);
                 }
             }
         }

@@ -1,0 +1,43 @@
+## .NET
+bin/
+obj/
+Debug/
+Release/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+## NuGet
+packages/
+*.nupkg
+**/[Pp]ackages/*
+
+## Build
+*.dll
+*.exe
+*.pdb
+*.msi
+*.msp
+*.log
+*.tmp
+*.cache
+
+## Visual Studio
+*.sln.ide/
+*.userprefs
+*.csproj.user
+*.dbmdl
+*.jfm
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
