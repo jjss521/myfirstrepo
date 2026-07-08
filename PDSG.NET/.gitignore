@@ -18,6 +18,13 @@ packages/
 *.dll
 *.exe
 *.pdb
+
+## Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.codegraph/
 *.msi
 *.msp
 *.log
