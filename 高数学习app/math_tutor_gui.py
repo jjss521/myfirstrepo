@@ -499,44 +499,71 @@ class MathTutorApp(CTk):
         if chapter_num == "1":
             self._render_chapter1(content)
         elif chapter_num == "2":
-            self._render_sections(content, get_surfaces_sections())
-            if HAS_PLOT:
-                self._add_demo_button(content, "🌐 二次曲面 3D 演示", demos.demo_surfaces)
+            self._render_chapter_demos(content, get_surfaces_sections(), {
+                "2.1 旋转曲面":        (demos.demo_surface_rotation, "🌐 旋转曲面生成", MacColors.CH2),
+                "2.2 柱面":            (demos.demo_surface_cylinder, "🌐 柱面演示", MacColors.CH2),
+                "2.3 二次曲面":        (demos.demo_surface_quadric, "🌐 六种二次曲面", MacColors.CH2),
+            })
         elif chapter_num == "3":
-            self._render_sections(content, get_lines_planes_sections())
-            if HAS_SYMPY:
-                self._add_demo_button(content, "🔢 直线平面方程演示", demos.demo_lines_planes)
+            self._render_chapter_demos(content, get_lines_planes_sections(), {
+                "3.1 空间平面方程":    (demos.demo_plane_equation,  "📐 平面方程可视化", MacColors.CH3),
+                "3.2 空间直线方程":    (demos.demo_line_equation,   "📐 直线方程可视化", MacColors.CH3),
+                "3.3 位置关系":        (demos.demo_plane_line_relations, "📐 位置关系演示", MacColors.CH3),
+            })
         elif chapter_num == "4":
-            self._render_sections(content, get_limits_sections())
-            if HAS_PLOT:
-                self._add_demo_button(content, "📊 极限与连续性演示", demos.demo_limits)
+            self._render_chapter_demos(content, get_limits_sections(), {
+                "4.1 函数":            (demos.demo_function_graph,   "📊 函数图形展示", MacColors.CH4),
+                "4.2 极限":            (demos.demo_limits_geometric, "📊 极限几何意义", MacColors.CH4),
+                "4.3 洛必达法则":      (demos.demo_lhospital,       "📊 洛必达法则图示", MacColors.CH4),
+                "4.4 连续性":          (demos.demo_continuity,      "📊 连续性几何示意", MacColors.CH4),
+            })
         elif chapter_num == "5":
-            self._render_sections(content, get_derivatives_sections())
-            if HAS_SYMPY:
-                self._add_demo_button(content, "🔢 导数计算演示", demos.demo_derivatives)
+            self._render_chapter_demos(content, get_derivatives_sections(), {
+                "5.1 导数的定义与背景":       (demos.demo_derivative_definition, "📐 导数定义图示", MacColors.CH5),
+                "5.2 求导公式与四则运算法则": (demos.demo_derivative_rules,     "📐 求导法则图示", MacColors.CH5),
+                "5.3 隐函数求导与参数方程求导": (demos.demo_implicit_diff,       "📐 隐函数求导图示", MacColors.CH5),
+                "5.4 高阶导数与微分":         (demos.demo_higher_order,         "📐 高阶导数图示", MacColors.CH5),
+            })
         elif chapter_num == "6":
-            self._render_sections(content, get_multivariable_sections())
-            if HAS_SYMPY:
-                self._add_demo_button(content, "🔢 偏导数演示", demos.demo_multivariable)
+            self._render_chapter_demos(content, get_multivariable_sections(), {
+                "6.1 多元函数的基本概念":  (demos.demo_multi_concept,        "🌐 多元函数曲面", MacColors.CH6),
+                "6.2 偏导数":              (demos.demo_partial_derivative,   "🌐 偏导数几何意义", MacColors.CH6),
+                "6.3 全微分":              (demos.demo_total_differential,   "🌐 全微分切平面", MacColors.CH6),
+                "6.4 复合函数与隐函数求偏导": (demos.demo_chain_rule,         "🔢 链式法则演示", MacColors.CH6),
+                "6.5 方向导数与梯度":       (demos.demo_gradient,            "🌐 梯度可视化", MacColors.CH6),
+                "6.6 多元函数的极值":       (demos.demo_multi_extreme,       "🌐 极值类型演示", MacColors.CH6),
+            })
         elif chapter_num == "7":
-            self._render_sections(content, get_calculus_apps_sections())
-            if HAS_SYMPY and HAS_PLOT:
-                self._add_demo_button(content, "📊 微分学应用演示", demos.demo_calculus_apps)
+            self._render_chapter_demos(content, get_calculus_apps_sections(), {
+                "7.1 微分中值定理":      (demos.demo_mean_value_theorems, "📊 中值定理图示", MacColors.CH7),
+                "7.2 洛必达法则":        (demos.demo_lhospital,          "📊 洛必达图示", MacColors.CH7),
+                "7.3 泰勒公式":          (demos.demo_taylor,             "📊 泰勒展开图示", MacColors.CH7),
+                "7.4 函数的单调性与极值": (demos.demo_monotonicity,       "📊 单调性图示", MacColors.CH7),
+                "7.5 凹凸性、拐点与渐近线": (demos.demo_asymptote,         "📊 渐近线图示", MacColors.CH7),
+            })
         elif chapter_num == "8":
-            sections = get_indefinite_integral_sections()
-            self._render_sections(content, sections)
-            if HAS_SYMPY:
-                self._add_demo_button(content, "🔢 不定积分演示", demos.demo_indefinite_integral)
+            self._render_chapter_demos(content, get_indefinite_integral_sections(), {
+                "8.1 原函数与不定积分":       (demos.demo_antiderivative,       "📊 原函数曲线族", MacColors.CH8),
+                "8.2 基本积分公式":           (demos.demo_integral_formulas,    "🔢 积分公式验证", MacColors.CH8),
+                "8.3 换元积分法":             (demos.demo_substitution,         "🔢 换元法演示", MacColors.CH8),
+                "8.4 分部积分法":             (demos.demo_integration_by_parts, "🔢 分部积分演示", MacColors.CH8),
+                "8.5 有理函数的积分":         (demos.demo_rational_integral,    "🔢 有理函数积分", MacColors.CH8),
+            })
         elif chapter_num == "9":
-            sections = get_definite_integral_sections()
-            self._render_sections(content, sections)
-            if HAS_SYMPY and HAS_PLOT:
-                self._add_demo_button(content, "📊 定积分演示 (黎曼和)", demos.demo_definite_integral)
+            self._render_chapter_demos(content, get_definite_integral_sections(), {
+                "9.1 定积分的概念":    (demos.demo_riemann_sum,       "📊 黎曼和图示", MacColors.CH9),
+                "9.2 定积分的性质":    (demos.demo_definite_properties, "📊 积分性质图示", MacColors.CH9),
+                "9.3 微积分基本定理":  (demos.demo_ftc,               "📊 微积分基本定理", MacColors.CH9),
+                "9.4 定积分的计算":    (demos.demo_definite_calc,     "🔢 定积分计算演示", MacColors.CH9),
+                "9.5 广义积分":        (demos.demo_improper_integral, "📊 广义积分图示", MacColors.CH9),
+            })
         elif chapter_num == "10":
-            sections = get_integral_applications_sections()
-            self._render_sections(content, sections)
-            if HAS_PLOT:
-                self._add_demo_button(content, "🌐 定积分应用演示", demos.demo_integral_applications)
+            self._render_chapter_demos(content, get_integral_applications_sections(), {
+                "10.1 平面图形的面积":  (demos.demo_area_calc,         "📊 面积微元法", MacColors.CH10),
+                "10.2 旋转体的体积":    (demos.demo_volume,            "📊 旋转体体积", MacColors.CH10),
+                "10.3 曲线的弧长":      (demos.demo_arc_length,        "📊 弧长演示", MacColors.CH10),
+                "10.4 旋转体的侧面积":  (demos.demo_surface_area,      "📊 侧面积演示", MacColors.CH10),
+            })
         elif chapter_num == "E":
             exercises.render_exercises(content)
         elif chapter_num == "F":
@@ -683,22 +710,22 @@ class MathTutorApp(CTk):
                 w.bind("<Button-1>", lambda e, fn=_make_toggle(): fn())
             header_bar.configure(cursor="hand2")
 
-    def _render_chapter1(self, parent):
-        """第 1 章使用 _render_one_section + 内联演示按钮"""
-        demo_map = {
-            "1.1 向量的概念":        (demos.demo_vector_concept,   "📐 查看图形解释",       MacColors.CH1),
-            "1.1.1 向量几何意义详解 ⭐": (demos.demo_vector_meaning,  "🎨 查看向量几何意义图",  MacColors.CH1),
-            "1.2 向量的表示法":       (demos.demo_vector_decompose, "📊 查看分解图",         MacColors.CH1),
-            "1.3 向量的线性运算":     (demos.demo_vector_add,       "➕ 查看加法图",         MacColors.CH1),
-            "1.4 数量积（点积）":     (demos.demo_vector_dot,       "✖️ 查看几何图",         MacColors.CH1),
-            "1.5 向量积（叉积）":     (demos.demo_vector_cross,     "⊗ 查看叉积图",         MacColors.CH1),
-        }
-
-        for title, items in get_vector_algebra_sections():
+    def _render_chapter_demos(self, parent, sections, demo_map):
+        """通用渲染: 每节渲染内容卡片 + 对应图形解释按钮"""
+        # Functions that output to terminal (sympy only, no matplotlib)
+        _TERMINAL_DEMOS = {'demo_chain_rule', 'demo_integral_formulas', 'demo_substitution',
+                          'demo_integration_by_parts', 'demo_rational_integral', 'demo_definite_calc'}
+        for title, items in sections:
             self._render_one_section(parent, title, items)
-            if HAS_PLOT and title in demo_map:
+            if title in demo_map:
                 func, btn_text, btn_color = demo_map[title]
-                self._add_inline_demo(parent, btn_text, func, btn_color)
+                fname = func.__name__
+                if fname in _TERMINAL_DEMOS:
+                    if HAS_SYMPY:
+                        self._add_inline_demo(parent, btn_text, func, btn_color)
+                else:
+                    if HAS_PLOT:
+                        self._add_inline_demo(parent, btn_text, func, btn_color)
 
     # ────────────────────────────────────────────
     #  通用渲染组件

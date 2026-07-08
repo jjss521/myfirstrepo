@@ -1,0 +1,22 @@
+# OpenCode working files
+.omo/
+__pycache__/
+*.pyc
+*.pyo
+
+# Installers
+*.msi
+*.exe
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Python virtual environment
+venv/
+.venv/
