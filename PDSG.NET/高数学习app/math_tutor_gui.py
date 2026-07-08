@@ -44,8 +44,12 @@ from content_data import (
     get_derivatives_sections,
     get_multivariable_sections,
     get_calculus_apps_sections,
+    get_indefinite_integral_sections,
+    get_definite_integral_sections,
+    get_integral_applications_sections,
     CHAPTER_TITLES,
 )
+from progress_tracker import mark_visited, get_progress_summary, is_chapter_visited
 import demos
 import exercises
 
@@ -153,6 +157,8 @@ class MathTutorApp(CTk):
         self.current_chapter = None
         self._is_zoomed = False
         self._drag_data = {"x": 0, "y": 0}
+        self.total_chapters = 10
+        self._chapter_dots = {}
 
         self._build_ui()
 
@@ -250,6 +256,18 @@ class MathTutorApp(CTk):
             btn = self._create_chapter_button(num, name, color)
             self.chapter_buttons.append(btn)
 
+        # 学习进度
+        self.progress_frame = CTkFrame(self.sidebar, fg_color="transparent")
+        self.progress_frame.pack(fill="x", padx=16, pady=(10, 0))
+
+        self.progress_label = CTkLabel(
+            self.progress_frame, text="",
+            font=ctk.CTkFont(family=self._font_family, size=12),
+            text_color=MacColors.TEXT_SECONDARY,
+        )
+        self.progress_label.pack(anchor="w", padx=4)
+        self._update_progress_display()
+
         # 底部区域
         CTkFrame(self.sidebar, height=1, fg_color=MacColors.SUBTLE_BORDER).pack(
             fill="x", padx=16, pady=(10, 8), side="bottom")
@@ -296,6 +314,15 @@ class MathTutorApp(CTk):
         # 左侧色条
         CTkFrame(btn_frame, width=3, fg_color=color, corner_radius=2).pack(
             side="left", padx=(4, 8), pady=8)
+
+        # 已访问圆点指示器
+        visited = is_chapter_visited(num)
+        dot_color = MacColors.ACCENT if visited else MacColors.TEXT_TERTIARY
+        dot_frame = CTkFrame(btn_frame, width=8, height=8, fg_color=dot_color,
+                             corner_radius=4)
+        dot_frame.pack(side="left", padx=(0, 4), pady=14)
+        dot_frame.pack_propagate(False)
+        self._chapter_dots[num] = dot_frame
 
         btn = CTkButton(
             btn_frame, text=f"  {num}.  {name}",
@@ -426,11 +453,23 @@ class MathTutorApp(CTk):
     #  章节路由
     # ────────────────────────────────────────────
 
+    def _update_progress_display(self):
+        visited, total, pct = get_progress_summary(self.total_chapters)
+        self.progress_label.configure(text=f"学习进度: {visited}/{total} ({pct}%)")
+        # Update dot indicators
+        for num, dot_frame in self._chapter_dots.items():
+            if is_chapter_visited(num):
+                dot_frame.configure(fg_color=MacColors.ACCENT)
+            else:
+                dot_frame.configure(fg_color=MacColors.TEXT_TERTIARY)
+
     def _show_chapter(self, chapter_num):
         self.current_chapter = chapter_num
         self._clear_content()
 
         title, color = CHAPTER_TITLES[chapter_num]
+        mark_visited(chapter_num, title)
+        self._update_progress_display()
 
         content = CTkScrollableFrame(
             self.content_frame, fg_color=MacColors.BG, corner_radius=0,
@@ -477,7 +516,165 @@ class MathTutorApp(CTk):
             if HAS_SYMPY and HAS_PLOT:
                 self._add_demo_button(content, "📊 微分学应用演示", demos.demo_calculus_apps)
         elif chapter_num == "8":
+            sections = get_indefinite_integral_sections()
+            self._render_sections(content, sections)
+            if HAS_SYMPY:
+                self._add_demo_button(content, "🔢 不定积分演示", demos.demo_indefinite_integral)
+        elif chapter_num == "9":
+            sections = get_definite_integral_sections()
+            self._render_sections(content, sections)
+            if HAS_SYMPY and HAS_PLOT:
+                self._add_demo_button(content, "📊 定积分演示 (黎曼和)", demos.demo_definite_integral)
+        elif chapter_num == "10":
+            sections = get_integral_applications_sections()
+            self._render_sections(content, sections)
+            if HAS_PLOT:
+                self._add_demo_button(content, "🌐 定积分应用演示", demos.demo_integral_applications)
+        elif chapter_num == "E":
             exercises.render_exercises(content)
+        elif chapter_num == "F":
+            self._show_formula_sheet(content)
+
+    def _show_formula_sheet(self, parent):
+        """公式速查页 — 7 个可展开分类卡片"""
+        # 页面标题
+        header = CTkFrame(parent, fg_color="transparent")
+        header.pack(fill="x", pady=(0, 20))
+        CTkLabel(
+            header, text="📖 公式速查",
+            font=ctk.CTkFont(family=self._font_family, size=24, weight="bold"),
+            text_color=MacColors.TEXT_PRIMARY,
+        ).pack(anchor="w")
+        CTkLabel(
+            header, text="全部章节核心公式汇总，点击分类标题展开 / 收起",
+            font=ctk.CTkFont(family=self._font_family, size=13),
+            text_color=MacColors.TEXT_SECONDARY,
+        ).pack(anchor="w", pady=(4, 0))
+
+        # 公式数据: (分类名, 颜色, [公式行])
+        formula_data = [
+            ("向量运算", MacColors.CH1, [
+                "模长:   |a| = √(aₓ² + aᵧ² + aᵤ²)",
+                "点积:   a·b = |a|·|b|·cosθ = aₓbₓ + aᵧbᵧ + aᵤbᵤ",
+                "叉积:   a×b = |i  j  k ; aₓ aᵧ aᵤ; bₓ bᵧ bᵤ|",
+                "垂直:   a⊥b  ⟺  a·b = 0",
+                "平行:   a∥b  ⟺  a×b = 0",
+                "夹角:   cosθ = (a·b) / (|a|·|b|)",
+            ]),
+            ("空间曲面", MacColors.CH2, [
+                "椭球面:       x²/a² + y²/b² + z²/c² = 1",
+                "椭圆抛物面:   x²/(2p) + y²/(2q) = z",
+                "双曲抛物面(鞍面): -x²/(2p) + y²/(2q) = z",
+                "单叶双曲面:   x²/a² + y²/b² - z²/c² = 1",
+                "双叶双曲面:   x²/a² + y²/b² - z²/c² = -1",
+                "二次锥面:     x²/a² + y²/b² - z²/c² = 0",
+                "圆柱面:       x² + y² = R²",
+            ]),
+            ("直线与平面", MacColors.CH3, [
+                "平面一般式:   Ax + By + Cz + D = 0",
+                "点法式:       A(x-x₀) + B(y-y₀) + C(z-z₀) = 0",
+                "截距式:       x/a + y/b + z/c = 1",
+                "直线对称式:   (x-x₀)/m = (y-y₀)/n = (z-z₀)/p",
+                "直线参数式:   x=x₀+mt,  y=y₀+nt,  z=z₀+pt",
+                "点到平面距离: d = |Ax₀+By₀+Cz₀+D| / √(A²+B²+C²)",
+                "平面夹角:     cosθ = |n₁·n₂| / (|n₁|·|n₂|)",
+            ]),
+            ("极限公式", MacColors.CH4, [
+                "重要极限1:  lim(sinx / x) = 1    (x→0)",
+                "重要极限2:  lim(1 + 1/x)ˣ = e    (x→∞)",
+                "",
+                "等价无穷小 (x→0):",
+                "  sinx ~ x,   tanx ~ x,   1-cosx ~ x²/2",
+                "  ln(1+x) ~ x,   eˣ-1 ~ x",
+            ]),
+            ("导数公式", MacColors.CH5, [
+                "(C)' = 0,          (xⁿ)' = nxⁿ⁻¹",
+                "(sinx)' = cosx,    (cosx)' = -sinx",
+                "(eˣ)' = eˣ,        (lnx)' = 1/x",
+                "",
+                "(uv)' = u'v + uv'",
+                "(u/v)' = (u'v - uv') / v²",
+                "链式法则: [f(g(x))]' = f'(g(x)) · g'(x)",
+            ]),
+            ("偏导数", MacColors.CH6, [
+                "∂z/∂x = lim [f(x+Δx,y) - f(x,y)] / Δx",
+                "",
+                "全微分:  dz = fₓdx + fᵧdy",
+                "链式:    dz/dt = (∂z/∂u)(du/dt) + (∂z/∂v)(dv/dt)",
+                "隐函数:  ∂z/∂x = -Fₓ / Fᵤ",
+            ]),
+            ("微分中值定理", MacColors.CH7, [
+                "罗尔定理:   f(a)=f(b)  →  ∃ξ∈(a,b), f'(ξ)=0",
+                "拉格朗日:   f(b)-f(a) = f'(ξ)(b-a)",
+                "",
+                "极值判定:",
+                "  f'(x₀)=0,  f''(x₀)<0  →  极大值",
+                "  f'(x₀)=0,  f''(x₀)>0  →  极小值",
+            ]),
+        ]
+
+        # 构建可展开卡片
+        for cat_name, accent_color, formulas in formula_data:
+            card = CTkFrame(
+                parent, fg_color=MacColors.CARD_BG, corner_radius=10,
+                border_width=1, border_color=MacColors.BORDER,
+            )
+            card.pack(fill="x", pady=6)
+
+            # 顶部 4px 色条
+            CTkFrame(card, height=4, fg_color=accent_color, corner_radius=2).pack(fill="x")
+
+            # 可点击标题栏
+            header_bar = CTkFrame(card, fg_color="transparent")
+            header_bar.pack(fill="x", padx=4, pady=2)
+
+            toggle_label = CTkLabel(
+                header_bar, text="▼",
+                font=ctk.CTkFont(family=self._font_family, size=12),
+                text_color=accent_color, width=20,
+            )
+            toggle_label.pack(side="left", padx=(12, 4))
+
+            CTkLabel(
+                header_bar, text=cat_name,
+                font=ctk.CTkFont(family=self._font_family, size=15, weight="bold"),
+                text_color=MacColors.TEXT_PRIMARY,
+            ).pack(side="left")
+
+            # 内容区 (初始展开)
+            content_frame = CTkFrame(card, fg_color="transparent")
+            content_frame.pack(fill="x", padx=20, pady=(4, 15))
+
+            formula_text = "\n".join(formulas)
+            textbox = CTkTextbox(
+                content_frame,
+                font=ctk.CTkFont(size=13, family=self._font_family),
+                fg_color="transparent", text_color=MacColors.TEXT_PRIMARY,
+                activate_scrollbars=False,
+                height=max(60, len(formulas) * 22),
+            )
+            textbox.pack(fill="x")
+            textbox.insert("1.0", formula_text)
+            textbox.configure(state="disabled")
+
+            # 展开/收起切换
+            expanded = [True]
+
+            def _make_toggle(tl=toggle_label, cf=content_frame, ex=expanded):
+                def toggle():
+                    if ex[0]:
+                        cf.pack_forget()
+                        tl.configure(text="▶")
+                        ex[0] = False
+                    else:
+                        cf.pack(fill="x", padx=20, pady=(4, 15))
+                        tl.configure(text="▼")
+                        ex[0] = True
+                return toggle
+
+            for w in (header_bar, toggle_label):
+                w.bind("<Button-1>", lambda e, fn=_make_toggle(): fn())
+            header_bar.configure(cursor="hand2")
 
     def _render_chapter1(self, parent):
         """第 1 章使用 _render_one_section + 内联演示按钮"""
