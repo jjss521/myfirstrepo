@@ -1,17 +1,19 @@
 """TXT报告生成"""
-import os
-import logging
-from datetime import datetime
-from typing import List
 
-from models import ValidatedStandard, StandardStatus
+from __future__ import annotations
+
+import logging
+import os
+from datetime import datetime
+
+from models import StandardStatus, ValidatedStandard
 
 logger = logging.getLogger("standard_checker")
 
 
 def generate_report(
-    validated: List[ValidatedStandard],
-    source_files: List[str],
+    validated: list[ValidatedStandard],
+    source_files: list[str],
     total_ocr_count: int,
 ) -> str:
     """
@@ -90,9 +92,9 @@ def generate_report(
                 elif rp.replacement_notes:
                     w(f"      >>> 替代说明: {rp.replacement_notes}")
                 else:
-                    w(f"      >>> 替代情况: 未获取到明确替代信息")
+                    w("      >>> 替代情况: 未获取到明确替代信息")
             else:
-                w(f"      >>> 替代信息: 未能获取（详情页访问失败）")
+                w("      >>> 替代信息: 未能获取（详情页访问失败）")
 
             w("")
 
@@ -108,7 +110,7 @@ def generate_report(
             sr = v.search_result
 
             w(f"  [{idx}] {ref.number} {ref.name}")
-            w(f"      状态: [OK] 现行")
+            w("      状态: [OK] 现行")
             w(f"      来源: {', '.join(ref.source_files)}")
 
             if sr.csres_name and sr.csres_name != ref.name:
@@ -146,9 +148,9 @@ def generate_report(
             ref = v.standard_ref
 
             w(f"  [{idx}] {ref.number} {ref.name}")
-            w(f"      状态: [?] 未能确认")
+            w("      状态: [?] 未能确认")
             w(f"      来源: {', '.join(ref.source_files)}")
-            w(f"      建议: 请手动查询确认")
+            w("      建议: 请手动查询确认")
             if ref.raw_text:
                 w(f"      原始文本: {ref.raw_text}")
             w("")
@@ -168,7 +170,7 @@ def save_report(report_text: str, output_dir: str) -> str:
     filepath = os.path.join(output_dir, filename)
 
     # 使用 UTF-8 BOM 编码，确保 Windows 记事本正常显示中文
-    with open(filepath, 'w', encoding='utf-8-sig') as f:
+    with open(filepath, "w", encoding="utf-8-sig") as f:
         f.write(report_text)
 
     logger.info(f"报告已保存: {filepath}")

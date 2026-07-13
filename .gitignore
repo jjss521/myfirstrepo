@@ -20,3 +20,7 @@ Thumbs.db
 # Python virtual environment
 venv/
 .venv/
+
+# Output reports & cache
+**/output/*.txt
+**/output/*.json

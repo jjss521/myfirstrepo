@@ -3,10 +3,11 @@
 
 输入文字 → 识别所有标准编号 → 在线检查有效性 → 自动纠正错误 → 标红记录
 """
-import os
-import sys
-import queue
+
 import logging
+import os
+import queue
+import sys
 import threading
 from tkinter import messagebox
 
@@ -14,17 +15,18 @@ try:
     import customtkinter as ctk
 except ImportError:
     import tkinter as tk
+
     tk.messagebox.showerror("缺少依赖", "未安装 customtkinter")
     sys.exit(1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 
-from config import REQUEST_DELAY_MIN, REQUEST_DELAY_MAX
+from config import REQUEST_DELAY_MAX, REQUEST_DELAY_MIN
 from models import StandardStatus, ValidatedStandard
 from standard_parser import parse_standards_from_text
-from web_scraper import search_standard, fetch_replacement_info
 from utils import RateLimiter
+from web_scraper import fetch_replacement_info, search_standard
 
 logger = logging.getLogger("standard_checker")
 
@@ -77,7 +79,8 @@ class ProofreadWindow(ctk.CTkToplevel):
         header.pack(fill="x", padx=22, pady=(16, 6))
 
         ctk.CTkLabel(
-            header, text="规范编号校对工具",
+            header,
+            text="规范编号校对工具",
             font=ctk.CTkFont(size=22, weight="bold"),
         ).pack(side="left")
 
@@ -91,26 +94,30 @@ class ProofreadWindow(ctk.CTkToplevel):
         # 图例
         legend = ctk.CTkFrame(header, fg_color="transparent")
         legend.pack(side="right")
-        ctk.CTkLabel(legend, text="■ 有效", font=ctk.CTkFont(size=11),
-                     text_color=self.SUCCESS).pack(side="left", padx=(0, 10))
-        ctk.CTkLabel(legend, text="■ 过期/错误", font=ctk.CTkFont(size=11),
-                     text_color=self.DANGER).pack(side="left", padx=(0, 10))
-        ctk.CTkLabel(legend, text="■ 未确认", font=ctk.CTkFont(size=11),
-                     text_color=self.TEXT_SECONDARY).pack(side="left")
+        ctk.CTkLabel(
+            legend, text="■ 有效", font=ctk.CTkFont(size=11), text_color=self.SUCCESS
+        ).pack(side="left", padx=(0, 10))
+        ctk.CTkLabel(
+            legend, text="■ 过期/错误", font=ctk.CTkFont(size=11), text_color=self.DANGER
+        ).pack(side="left", padx=(0, 10))
+        ctk.CTkLabel(
+            legend, text="■ 未确认", font=ctk.CTkFont(size=11), text_color=self.TEXT_SECONDARY
+        ).pack(side="left")
 
         # 输入区卡片
-        input_card = ctk.CTkFrame(self, corner_radius=12,
-                                  border_width=1, border_color=self.BORDER)
+        input_card = ctk.CTkFrame(self, corner_radius=12, border_width=1, border_color=self.BORDER)
         input_card.pack(fill="x", padx=22, pady=(6, 6))
 
         input_title = ctk.CTkFrame(input_card, fg_color="transparent")
         input_title.pack(fill="x", padx=18, pady=(12, 0))
 
-        ctk.CTkLabel(input_title, text="输入文本",
-                     font=ctk.CTkFont(size=14, weight="bold")).pack(side="left")
+        ctk.CTkLabel(input_title, text="输入文本", font=ctk.CTkFont(size=14, weight="bold")).pack(
+            side="left"
+        )
 
         self.line_count_label = ctk.CTkLabel(
-            input_title, text="",
+            input_title,
+            text="",
             font=ctk.CTkFont(size=11),
             text_color=self.TEXT_SECONDARY,
         )
@@ -128,8 +135,11 @@ class ProofreadWindow(ctk.CTkToplevel):
         self.text_input = ctk.CTkTextbox(
             input_card,
             font=ctk.CTkFont(family="Consolas", size=14),
-            wrap="word", height=130,
-            corner_radius=8, border_width=1, border_color="gray30",
+            wrap="word",
+            height=130,
+            corner_radius=8,
+            border_width=1,
+            border_color="gray30",
         )
         self.text_input.pack(fill="x", padx=18, pady=(0, 6))
 
@@ -148,7 +158,8 @@ class ProofreadWindow(ctk.CTkToplevel):
         toolbar.pack(fill="x", padx=18, pady=(0, 12))
 
         btn_kwargs = dict(
-            height=32, corner_radius=6,
+            height=32,
+            corner_radius=6,
             font=ctk.CTkFont(size=12),
             fg_color="gray25",
             hover_color="gray35",
@@ -156,43 +167,66 @@ class ProofreadWindow(ctk.CTkToplevel):
             border_color="gray35",
         )
 
-        ctk.CTkButton(toolbar, text="从文件导入", width=90,
-                      command=self._import_file, **btn_kwargs).pack(side="left", padx=(0, 6))
-        ctk.CTkButton(toolbar, text="从剪贴板粘贴", width=100,
-                      command=self._paste_clipboard, **btn_kwargs).pack(side="left", padx=(0, 6))
-        ctk.CTkButton(toolbar, text="清空", width=60,
-                      command=self._clear_input,
-                      fg_color="gray25", hover_color="#7F1D1D",
-                      border_width=1, border_color="gray35",
-                      corner_radius=6, height=32,
-                      font=ctk.CTkFont(size=12)).pack(side="left")
+        ctk.CTkButton(
+            toolbar, text="从文件导入", width=90, command=self._import_file, **btn_kwargs
+        ).pack(side="left", padx=(0, 6))
+        ctk.CTkButton(
+            toolbar, text="从剪贴板粘贴", width=100, command=self._paste_clipboard, **btn_kwargs
+        ).pack(side="left", padx=(0, 6))
+        ctk.CTkButton(
+            toolbar,
+            text="清空",
+            width=60,
+            command=self._clear_input,
+            fg_color="gray25",
+            hover_color="#7F1D1D",
+            border_width=1,
+            border_color="gray35",
+            corner_radius=6,
+            height=32,
+            font=ctk.CTkFont(size=12),
+        ).pack(side="left")
 
         # 操作按钮（右侧）
         self.btn_start = ctk.CTkButton(
-            toolbar, text="开始校对", width=100,
+            toolbar,
+            text="开始校对",
+            width=100,
             font=ctk.CTkFont(size=13, weight="bold"),
-            fg_color=self.PRIMARY, hover_color=self.PRIMARY_HOVER,
-            corner_radius=6, height=34,
+            fg_color=self.PRIMARY,
+            hover_color=self.PRIMARY_HOVER,
+            corner_radius=6,
+            height=34,
             command=self._on_start_proofread,
         )
         self.btn_start.pack(side="right", padx=(6, 0))
 
         self.btn_parse_only = ctk.CTkButton(
-            toolbar, text="仅解析", width=75,
+            toolbar,
+            text="仅解析",
+            width=75,
             font=ctk.CTkFont(size=12),
-            fg_color="gray30", hover_color="gray40",
-            corner_radius=6, height=34,
-            border_width=1, border_color="gray40",
+            fg_color="gray30",
+            hover_color="gray40",
+            corner_radius=6,
+            height=34,
+            border_width=1,
+            border_color="gray40",
             command=self._on_parse_only,
         )
         self.btn_parse_only.pack(side="right", padx=(6, 0))
 
         self.btn_stop = ctk.CTkButton(
-            toolbar, text="停止", width=60,
+            toolbar,
+            text="停止",
+            width=60,
             font=ctk.CTkFont(size=12, weight="bold"),
-            fg_color=self.DANGER, hover_color=self.DANGER_HOVER,
-            corner_radius=6, height=34,
-            command=self._on_stop, state="disabled",
+            fg_color=self.DANGER,
+            hover_color=self.DANGER_HOVER,
+            corner_radius=6,
+            height=34,
+            command=self._on_stop,
+            state="disabled",
         )
         self.btn_stop.pack(side="right")
 
@@ -210,7 +244,9 @@ class ProofreadWindow(ctk.CTkToplevel):
         self.result_box = ctk.CTkTextbox(
             result_tab,
             font=ctk.CTkFont(family="Microsoft YaHei", size=13),
-            wrap="word", state="disabled", corner_radius=6,
+            wrap="word",
+            state="disabled",
+            corner_radius=6,
         )
         self.result_box.pack(fill="both", expand=True, padx=4, pady=4)
 
@@ -224,14 +260,20 @@ class ProofreadWindow(ctk.CTkToplevel):
         self.corrected_box = ctk.CTkTextbox(
             corrected_tab,
             font=ctk.CTkFont(family="Consolas", size=13),
-            wrap="word", state="disabled", corner_radius=6,
+            wrap="word",
+            state="disabled",
+            corner_radius=6,
         )
         self.corrected_box.pack(fill="both", expand=True, padx=4, pady=4)
 
         self.btn_copy_corrected = ctk.CTkButton(
-            corrected_tab, text="复制纠正结果", width=120, height=32,
+            corrected_tab,
+            text="复制纠正结果",
+            width=120,
+            height=32,
             font=ctk.CTkFont(size=12),
-            fg_color=self.PRIMARY, hover_color=self.PRIMARY_HOVER,
+            fg_color=self.PRIMARY,
+            hover_color=self.PRIMARY_HOVER,
             corner_radius=6,
             command=self._copy_corrected_text,
         )
@@ -242,14 +284,18 @@ class ProofreadWindow(ctk.CTkToplevel):
         status_bar.pack(fill="x", padx=22, pady=(0, 8))
 
         self.status_label = ctk.CTkLabel(
-            status_bar, text="就绪 - 请粘贴包含标准编号的文本",
-            font=ctk.CTkFont(size=12), text_color=self.TEXT_SECONDARY,
+            status_bar,
+            text="就绪 - 请粘贴包含标准编号的文本",
+            font=ctk.CTkFont(size=12),
+            text_color=self.TEXT_SECONDARY,
         )
         self.status_label.pack(side="left")
 
         self.stats_label = ctk.CTkLabel(
-            status_bar, text="",
-            font=ctk.CTkFont(size=12), text_color=self.TEXT_SECONDARY,
+            status_bar,
+            text="",
+            font=ctk.CTkFont(size=12),
+            text_color=self.TEXT_SECONDARY,
         )
         self.stats_label.pack(side="right")
 
@@ -258,13 +304,16 @@ class ProofreadWindow(ctk.CTkToplevel):
     def _on_text_changed(self, event=None):
         try:
             text = self.text_input.get("1.0", "end-1c")
-            entries = [e for e in text.replace(';', '\n').replace('；', '\n').split('\n') if e.strip()]
+            entries = [
+                e for e in text.replace(";", "\n").replace("；", "\n").split("\n") if e.strip()
+            ]
             self.line_count_label.configure(text=f"{len(entries)} 条内容")
         except Exception:
             pass
 
     def _import_file(self):
         from tkinter import filedialog
+
         path = filedialog.askopenfilename(
             title="选择文本文件",
             filetypes=[("文本文件", "*.txt"), ("所有文件", "*.*")],
@@ -272,10 +321,10 @@ class ProofreadWindow(ctk.CTkToplevel):
         if not path:
             return
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except UnicodeDecodeError:
-            with open(path, 'r', encoding='gbk') as f:
+            with open(path, encoding="gbk") as f:
                 content = f.read()
         current = self.text_input.get("1.0", "end-1c").strip()
         if current:
@@ -320,8 +369,7 @@ class ProofreadWindow(ctk.CTkToplevel):
             lines.append(f"{i:>3}. {ref.number}{name_part}")
 
         self._show_result_text(
-            f"共解析出 {len(standards)} 条标准（仅解析，未做在线检查）:\n\n"
-            + "\n".join(lines)
+            f"共解析出 {len(standards)} 条标准（仅解析，未做在线检查）:\n\n" + "\n".join(lines)
         )
         self.status_label.configure(text=f"解析完成: {len(standards)} 条标准")
         self.tabview.set("校对结果")
@@ -379,6 +427,7 @@ class ProofreadWindow(ctk.CTkToplevel):
         """后台线程：逐条在线查询标准"""
         try:
             import requests as req_lib
+
             session = req_lib.Session()
             rate_limiter = RateLimiter(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
             total = len(standards)
@@ -388,8 +437,9 @@ class ProofreadWindow(ctk.CTkToplevel):
                     break
 
                 self.log_queue.put(("INFO", f"[{i}/{total}] 查询: {ref.number} {ref.name}"))
-                self.after(0, lambda idx=i, t=total: self.stats_label.configure(
-                    text=f"查询: {idx}/{t}"))
+                self.after(
+                    0, lambda idx=i, t=total: self.stats_label.configure(text=f"查询: {idx}/{t}")
+                )
 
                 # 在线搜索
                 search_result = search_standard(ref, session, rate_limiter)
@@ -397,14 +447,18 @@ class ProofreadWindow(ctk.CTkToplevel):
 
                 # 如果是过期标准，获取替代信息
                 if search_result and search_result.status in (
-                    StandardStatus.ABOLISHED, StandardStatus.REPEALED
+                    StandardStatus.ABOLISHED,
+                    StandardStatus.REPEALED,
                 ):
-                    self.log_queue.put(("WARNING",
-                        f"  → {search_result.status.value}，获取替代信息..."))
+                    self.log_queue.put(
+                        ("WARNING", f"  → {search_result.status.value}，获取替代信息...")
+                    )
                     replacement_info = fetch_replacement_info(
                         search_result.detail_url,
-                        ref.number, ref.name,
-                        session, rate_limiter,
+                        ref.number,
+                        ref.name,
+                        session,
+                        rate_limiter,
                     )
 
                 validated = ValidatedStandard(
@@ -428,6 +482,7 @@ class ProofreadWindow(ctk.CTkToplevel):
         except Exception as e:
             self.log_queue.put(("ERROR", f"校对出错: {e}"))
             import traceback
+
             self.log_queue.put(("ERROR", traceback.format_exc()))
             self._finish_proofread(False)
 
@@ -446,14 +501,24 @@ class ProofreadWindow(ctk.CTkToplevel):
         if self._finish_ok:
             self.progress.set(1.0)
             # 统计
-            expired = sum(1 for v in self._validated_results
-                         if v.search_result and v.search_result.status.value in ('作废', '废止'))
-            active = sum(1 for v in self._validated_results
-                        if v.search_result and v.search_result.status.value == '现行')
-            unknown = sum(1 for v in self._validated_results
-                         if v.search_result is None or v.search_result.status.value == '未知')
+            expired = sum(
+                1
+                for v in self._validated_results
+                if v.search_result and v.search_result.status.value in ("作废", "废止")
+            )
+            active = sum(
+                1
+                for v in self._validated_results
+                if v.search_result and v.search_result.status.value == "现行"
+            )
+            unknown = sum(
+                1
+                for v in self._validated_results
+                if v.search_result is None or v.search_result.status.value == "未知"
+            )
             self.stats_label.configure(
-                text=f"现行: {active}  |  过期: {expired}  |  未确认: {unknown}")
+                text=f"现行: {active}  |  过期: {expired}  |  未确认: {unknown}"
+            )
             self.status_label.configure(text="校对完成")
 
             # 生成纠正文本
@@ -480,15 +545,15 @@ class ProofreadWindow(ctk.CTkToplevel):
 
             if sr is None:
                 status_tag = "[?] 未确认"
-            elif sr.status.value == '现行':
+            elif sr.status.value == "现行":
                 status_tag = "[✓] 现行"
-            elif sr.status.value in ('作废', '废止'):
+            elif sr.status.value in ("作废", "废止"):
                 status_tag = "[✗] 已过期"
                 if rp and rp.replacement_number:
                     status_tag += f"  → 替代: {rp.replacement_number}"
                     if rp.replacement_name:
                         status_tag += f" {rp.replacement_name}"
-            elif sr.status.value == '即将实施':
+            elif sr.status.value == "即将实施":
                 status_tag = "[~] 即将实施"
             else:
                 status_tag = f"[?] {sr.status.value}"
@@ -509,17 +574,17 @@ class ProofreadWindow(ctk.CTkToplevel):
         self.result_box.delete("1.0", "end")
 
         # 解析文本，为不同状态添加颜色标签
-        for line in text.split('\n'):
-            if '[✓] 现行' in line:
+        for line in text.split("\n"):
+            if "[✓] 现行" in line:
                 # 绿色
                 self.result_box.insert("end", line + "\n", "valid")
-            elif '[✗] 已过期' in line:
+            elif "[✗] 已过期" in line:
                 # 红色
                 self.result_box.insert("end", line + "\n", "expired")
-            elif '[~] 即将实施' in line:
+            elif "[~] 即将实施" in line:
                 # 橙色
                 self.result_box.insert("end", line + "\n", "upcoming")
-            elif '[?]' in line:
+            elif "[?]" in line:
                 # 灰色
                 self.result_box.insert("end", line + "\n", "unknown")
             else:
@@ -543,12 +608,18 @@ class ProofreadWindow(ctk.CTkToplevel):
         header.pack(fill="x", pady=(0, 2))
         header.pack_propagate(False)
 
-        cols = [("序号", 40), ("标准编号", 140), ("名称", 200),
-                ("状态", 70), ("修正编号", 140), ("来源", 100)]
+        cols = [
+            ("序号", 40),
+            ("标准编号", 140),
+            ("名称", 200),
+            ("状态", 70),
+            ("修正编号", 140),
+            ("来源", 100),
+        ]
         for name, width in cols:
-            ctk.CTkLabel(header, text=name, width=width,
-                        font=ctk.CTkFont(size=11, weight="bold"),
-                        anchor="w").pack(side="left", padx=(4, 2))
+            ctk.CTkLabel(
+                header, text=name, width=width, font=ctk.CTkFont(size=11, weight="bold"), anchor="w"
+            ).pack(side="left", padx=(4, 2))
 
         # 数据行
         for i, v in enumerate(self._validated_results, 1):
@@ -560,10 +631,10 @@ class ProofreadWindow(ctk.CTkToplevel):
             if sr is None:
                 status_text = "未确认"
                 row_color = "gray55"
-            elif sr.status.value == '现行':
+            elif sr.status.value == "现行":
                 status_text = "现行"
                 row_color = self.SUCCESS
-            elif sr.status.value in ('作废', '废止'):
+            elif sr.status.value in ("作废", "废止"):
                 status_text = "已过期"
                 row_color = self.DANGER
             else:
@@ -585,22 +656,39 @@ class ProofreadWindow(ctk.CTkToplevel):
             row.pack(fill="x", pady=1)
             row.pack_propagate(False)
 
-            ctk.CTkLabel(row, text=str(i), width=40,
-                        font=ctk.CTkFont(size=11), anchor="w").pack(side="left", padx=(4, 2))
-            ctk.CTkLabel(row, text=ref.number, width=140,
-                        font=ctk.CTkFont(size=11), anchor="w").pack(side="left", padx=2)
-            ctk.CTkLabel(row, text=ref.name or "(无)", width=200,
-                        font=ctk.CTkFont(size=11), anchor="w").pack(side="left", padx=2)
-            ctk.CTkLabel(row, text=status_text, width=70,
-                        font=ctk.CTkFont(size=11, weight="bold"),
-                        text_color=row_color, anchor="w").pack(side="left", padx=2)
-            ctk.CTkLabel(row, text=replacement_text, width=140,
-                        font=ctk.CTkFont(size=11),
-                        text_color=self.DANGER if replacement_text else "gray55",
-                        anchor="w").pack(side="left", padx=2)
-            ctk.CTkLabel(row, text=source, width=100,
-                        font=ctk.CTkFont(size=10),
-                        text_color="gray55", anchor="w").pack(side="left", padx=2)
+            ctk.CTkLabel(row, text=str(i), width=40, font=ctk.CTkFont(size=11), anchor="w").pack(
+                side="left", padx=(4, 2)
+            )
+            ctk.CTkLabel(
+                row, text=ref.number, width=140, font=ctk.CTkFont(size=11), anchor="w"
+            ).pack(side="left", padx=2)
+            ctk.CTkLabel(
+                row, text=ref.name or "(无)", width=200, font=ctk.CTkFont(size=11), anchor="w"
+            ).pack(side="left", padx=2)
+            ctk.CTkLabel(
+                row,
+                text=status_text,
+                width=70,
+                font=ctk.CTkFont(size=11, weight="bold"),
+                text_color=row_color,
+                anchor="w",
+            ).pack(side="left", padx=2)
+            ctk.CTkLabel(
+                row,
+                text=replacement_text,
+                width=140,
+                font=ctk.CTkFont(size=11),
+                text_color=self.DANGER if replacement_text else "gray55",
+                anchor="w",
+            ).pack(side="left", padx=2)
+            ctk.CTkLabel(
+                row,
+                text=source,
+                width=100,
+                font=ctk.CTkFont(size=10),
+                text_color="gray55",
+                anchor="w",
+            ).pack(side="left", padx=2)
 
     # ==================== 纠正文本生成 ====================
 
@@ -634,8 +722,7 @@ class ProofreadWindow(ctk.CTkToplevel):
                         if v.replacement_info and v.replacement_info.replacement_name:
                             new_name = v.replacement_info.replacement_name
                         break
-                correction_log.append(
-                    f"  {old_number} {old_name}  →  {new_number} {new_name}")
+                correction_log.append(f"  {old_number} {old_name}  →  {new_number} {new_name}")
 
         self._corrected_text = corrected
 
@@ -644,8 +731,7 @@ class ProofreadWindow(ctk.CTkToplevel):
         self.corrected_box.delete("1.0", "end")
 
         if correction_log:
-            self.corrected_box.insert("end",
-                f"=== 共纠正 {len(corrections)} 条标准编号 ===\n\n")
+            self.corrected_box.insert("end", f"=== 共纠正 {len(corrections)} 条标准编号 ===\n\n")
             for log_line in correction_log:
                 self.corrected_box.insert("end", log_line + "\n", "correction")
             self.corrected_box.tag_config("correction", foreground=self.DANGER)

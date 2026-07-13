@@ -4,34 +4,43 @@
 输入文字 → 识别所有标准编号 → 在线检查有效性 → 自动纠正错误 → 标红记录
 """
 
-import os
-import sys
-import queue
 import logging
+import os
+import queue
+import sys
 import threading
 
-from PySide6.QtWidgets import (
-    QDialog, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QTextEdit, QPushButton, QProgressBar,
-    QTabWidget, QScrollArea, QFrame,
-    QMessageBox, QFileDialog, QHBoxLayout, QVBoxLayout,
-)
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont, QTextCursor, QColor
+from PySide6.QtGui import QColor, QFont, QTextCursor
+from PySide6.QtWidgets import (
+    QDialog,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QScrollArea,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 
 # 确保能导入项目其他模块
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from config import REQUEST_DELAY_MIN, REQUEST_DELAY_MAX
+from config import REQUEST_DELAY_MAX, REQUEST_DELAY_MIN
 from models import StandardStatus, ValidatedStandard
 from standard_parser import parse_standards_from_text
-from web_scraper import search_standard, fetch_replacement_info
 from utils import RateLimiter
-
+from web_scraper import fetch_replacement_info, search_standard
 
 # ==================== 自定义日志 Handler ====================
+
 
 class QueueLogHandler(logging.Handler):
     def __init__(self, log_queue: queue.Queue):
@@ -45,6 +54,7 @@ class QueueLogHandler(logging.Handler):
 
 
 # ==================== 校对窗口 ====================
+
 
 class ProofreadWindowPySide6(QDialog):
     """规范编号校对工具 - PySide6 独立窗口"""
@@ -218,11 +228,15 @@ class ProofreadWindowPySide6(QDialog):
         legend_layout.setContentsMargins(0, 0, 0, 0)
         legend_layout.setSpacing(12)
 
-        for text, color in [("■ 有效", self.SUCCESS),
-                            ("■ 过期/错误", self.DANGER),
-                            ("■ 未确认", self.TEXT_SECONDARY)]:
+        for text, color in [
+            ("■ 有效", self.SUCCESS),
+            ("■ 过期/错误", self.DANGER),
+            ("■ 未确认", self.TEXT_SECONDARY),
+        ]:
             lbl = QLabel(text)
-            lbl.setStyleSheet(f"color: {color}; font-size: 12px; background: transparent; border: none;")
+            lbl.setStyleSheet(
+                f"color: {color}; font-size: 12px; background: transparent; border: none;"
+            )
             legend_layout.addWidget(lbl)
 
         h_layout.addWidget(legend)
@@ -443,7 +457,7 @@ class ProofreadWindowPySide6(QDialog):
         try:
             text = self.text_input.toPlainText()
             entries = []
-            for line in text.replace('；', '\n').replace(';', '\n').split('\n'):
+            for line in text.replace("；", "\n").replace(";", "\n").split("\n"):
                 if line.strip():
                     entries.append(line)
             self.line_count_label.setText(f"{len(entries)} 条内容")
@@ -452,16 +466,15 @@ class ProofreadWindowPySide6(QDialog):
 
     def _import_file(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "选择文本文件", "",
-            "文本文件 (*.txt);;所有文件 (*.*)"
+            self, "选择文本文件", "", "文本文件 (*.txt);;所有文件 (*.*)"
         )
         if not path:
             return
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except UnicodeDecodeError:
-            with open(path, 'r', encoding='gbk') as f:
+            with open(path, encoding="gbk") as f:
                 content = f.read()
         current = self.text_input.toPlainText().strip()
         if current:
@@ -473,6 +486,7 @@ class ProofreadWindowPySide6(QDialog):
     def _paste_clipboard(self):
         try:
             from PySide6.QtGui import QGuiApplication
+
             text = QGuiApplication.clipboard().text()
             if text:
                 self.text_input.setPlainText(text)
@@ -504,8 +518,7 @@ class ProofreadWindowPySide6(QDialog):
             lines.append(f"{i:>3}. {ref.number}{name_part}")
 
         self.result_box.setPlainText(
-            f"共解析出 {len(standards)} 条标准（仅解析，未做在线检查）:\n\n"
-            + "\n".join(lines)
+            f"共解析出 {len(standards)} 条标准（仅解析，未做在线检查）:\n\n" + "\n".join(lines)
         )
         self.status_label.setText(f"解析完成: {len(standards)} 条标准")
         self.tab_widget.setCurrentIndex(0)
@@ -563,6 +576,7 @@ class ProofreadWindowPySide6(QDialog):
         """后台线程：逐条在线查询标准"""
         try:
             import requests as req_lib
+
             session = req_lib.Session()
             rate_limiter = RateLimiter(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
             total = len(standards)
@@ -578,14 +592,18 @@ class ProofreadWindowPySide6(QDialog):
                 replacement_info = None
 
                 if search_result and search_result.status in (
-                    StandardStatus.ABOLISHED, StandardStatus.REPEALED
+                    StandardStatus.ABOLISHED,
+                    StandardStatus.REPEALED,
                 ):
-                    self.log_queue.put(("WARNING",
-                        f"  → {search_result.status.value}，获取替代信息..."))
+                    self.log_queue.put(
+                        ("WARNING", f"  → {search_result.status.value}，获取替代信息...")
+                    )
                     replacement_info = fetch_replacement_info(
                         search_result.detail_url,
-                        ref.number, ref.name,
-                        session, rate_limiter,
+                        ref.number,
+                        ref.name,
+                        session,
+                        rate_limiter,
                     )
 
                 validated = ValidatedStandard(
@@ -609,6 +627,7 @@ class ProofreadWindowPySide6(QDialog):
         except Exception as e:
             self.log_queue.put(("ERROR", f"校对出错: {e}"))
             import traceback
+
             self.log_queue.put(("ERROR", traceback.format_exc()))
             self._finish_proofread(False)
 
@@ -626,14 +645,22 @@ class ProofreadWindowPySide6(QDialog):
 
         if success:
             self.progress.setValue(1)
-            expired = sum(1 for v in self._validated_results
-                         if v.search_result and v.search_result.status.value in ('作废', '废止'))
-            active = sum(1 for v in self._validated_results
-                        if v.search_result and v.search_result.status.value == '现行')
-            unknown = sum(1 for v in self._validated_results
-                         if v.search_result is None or v.search_result.status.value == '未知')
-            self.stats_label.setText(
-                f"现行: {active}  |  过期: {expired}  |  未确认: {unknown}")
+            expired = sum(
+                1
+                for v in self._validated_results
+                if v.search_result and v.search_result.status.value in ("作废", "废止")
+            )
+            active = sum(
+                1
+                for v in self._validated_results
+                if v.search_result and v.search_result.status.value == "现行"
+            )
+            unknown = sum(
+                1
+                for v in self._validated_results
+                if v.search_result is None or v.search_result.status.value == "未知"
+            )
+            self.stats_label.setText(f"现行: {active}  |  过期: {expired}  |  未确认: {unknown}")
             self.status_label.setText("校对完成")
             self._generate_corrected_text()
         else:
@@ -656,15 +683,15 @@ class ProofreadWindowPySide6(QDialog):
 
             if sr is None:
                 status_tag = "[?] 未确认"
-            elif sr.status.value == '现行':
+            elif sr.status.value == "现行":
                 status_tag = "[✓] 现行"
-            elif sr.status.value in ('作废', '废止'):
+            elif sr.status.value in ("作废", "废止"):
                 status_tag = "[✗] 已过期"
                 if rp and rp.replacement_number:
                     status_tag += f"  → 替代: {rp.replacement_number}"
                     if rp.replacement_name:
                         status_tag += f" {rp.replacement_name}"
-            elif sr.status.value == '即将实施':
+            elif sr.status.value == "即将实施":
                 status_tag = "[~] 即将实施"
             else:
                 status_tag = f"[?] {sr.status.value}"
@@ -682,15 +709,15 @@ class ProofreadWindowPySide6(QDialog):
     def _show_result_text(self, text):
         """在结果文本框中显示带颜色的文本"""
         self.result_box.clear()
-        for line in text.split('\n'):
-            if '[✓] 现行' in line:
-                self._append_colored(self.result_box, line + '\n', self.SUCCESS)
-            elif '[✗] 已过期' in line:
-                self._append_colored(self.result_box, line + '\n', self.DANGER)
-            elif '[~] 即将实施' in line:
-                self._append_colored(self.result_box, line + '\n', self.WARNING)
-            elif '[?]' in line:
-                self._append_colored(self.result_box, line + '\n', self.TEXT_SECONDARY)
+        for line in text.split("\n"):
+            if "[✓] 现行" in line:
+                self._append_colored(self.result_box, line + "\n", self.SUCCESS)
+            elif "[✗] 已过期" in line:
+                self._append_colored(self.result_box, line + "\n", self.DANGER)
+            elif "[~] 即将实施" in line:
+                self._append_colored(self.result_box, line + "\n", self.WARNING)
+            elif "[?]" in line:
+                self._append_colored(self.result_box, line + "\n", self.TEXT_SECONDARY)
             else:
                 self.result_box.append(line)
 
@@ -709,16 +736,24 @@ class ProofreadWindowPySide6(QDialog):
         # 表头
         header = QFrame()
         header.setFixedHeight(32)
-        header.setStyleSheet(f"background-color: #333; border-radius: 4px;")
+        header.setStyleSheet("background-color: #333; border-radius: 4px;")
         h_layout = QHBoxLayout(header)
         h_layout.setContentsMargins(8, 4, 8, 4)
         h_layout.setSpacing(4)
 
-        for name, width in [("序号", 40), ("标准编号", 140), ("名称", 200),
-                            ("状态", 70), ("修正编号", 140), ("来源", 100)]:
+        for name, width in [
+            ("序号", 40),
+            ("标准编号", 140),
+            ("名称", 200),
+            ("状态", 70),
+            ("修正编号", 140),
+            ("来源", 100),
+        ]:
             lbl = QLabel(name)
             lbl.setFixedWidth(width)
-            lbl.setStyleSheet("font-weight: bold; font-size: 12px; background: transparent; border: none;")
+            lbl.setStyleSheet(
+                "font-weight: bold; font-size: 12px; background: transparent; border: none;"
+            )
             h_layout.addWidget(lbl)
 
         self.detail_layout.addWidget(header)
@@ -732,10 +767,10 @@ class ProofreadWindowPySide6(QDialog):
             if sr is None:
                 status_text = "未确认"
                 row_color = self.TEXT_SECONDARY
-            elif sr.status.value == '现行':
+            elif sr.status.value == "现行":
                 status_text = "现行"
                 row_color = self.SUCCESS
-            elif sr.status.value in ('作废', '废止'):
+            elif sr.status.value in ("作废", "废止"):
                 status_text = "已过期"
                 row_color = self.DANGER
             else:
@@ -760,14 +795,21 @@ class ProofreadWindowPySide6(QDialog):
             r_layout.setContentsMargins(8, 2, 8, 2)
             r_layout.setSpacing(4)
 
-            for val, width in [(str(i), 40), (ref.number, 140),
-                               (ref.name or "(无)", 200), (status_text, 70),
-                               (replacement_text, 140), (source, 100)]:
+            for val, width in [
+                (str(i), 40),
+                (ref.number, 140),
+                (ref.name or "(无)", 200),
+                (status_text, 70),
+                (replacement_text, 140),
+                (source, 100),
+            ]:
                 lbl = QLabel(str(val))
                 lbl.setFixedWidth(width)
-                lbl.setStyleSheet(f"font-size: 12px; background: transparent; border: none;")
+                lbl.setStyleSheet("font-size: 12px; background: transparent; border: none;")
                 if val == status_text:
-                    lbl.setStyleSheet(f"color: {row_color}; font-weight: bold; font-size: 12px; background: transparent; border: none;")
+                    lbl.setStyleSheet(
+                        f"color: {row_color}; font-weight: bold; font-size: 12px; background: transparent; border: none;"
+                    )
                 r_layout.addWidget(lbl)
 
             self.detail_layout.addWidget(row)
@@ -803,16 +845,13 @@ class ProofreadWindowPySide6(QDialog):
                         if v.replacement_info and v.replacement_info.replacement_name:
                             new_name = v.replacement_info.replacement_name
                         break
-                correction_log.append(
-                    f"  {old_number} {old_name}  →  {new_number} {new_name}")
+                correction_log.append(f"  {old_number} {old_name}  →  {new_number} {new_name}")
 
         self._corrected_text = corrected
 
         self.corrected_box.clear()
         if correction_log:
-            self.corrected_box.append(
-                f"=== 共纠正 {len(corrections)} 条标准编号 ===\n"
-            )
+            self.corrected_box.append(f"=== 共纠正 {len(corrections)} 条标准编号 ===\n")
             for log_line in correction_log:
                 self.corrected_box.append(log_line)
             self.corrected_box.append("\n" + "=" * 50 + "\n")
@@ -825,6 +864,7 @@ class ProofreadWindowPySide6(QDialog):
             QMessageBox.information(self, "提示", "暂无纠正文本，请先执行校对")
             return
         from PySide6.QtGui import QGuiApplication
+
         QGuiApplication.clipboard().setText(self._corrected_text)
         self.status_label.setText("纠正结果已复制到剪贴板")
 

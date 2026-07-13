@@ -5,22 +5,32 @@
 支持 PyInstaller 打包为 EXE。
 """
 
-import os
-import sys
 import json
-import queue
 import logging
+import os
+import queue
+import sys
 import threading
 
+from PySide6.QtCore import QTimer
+from PySide6.QtGui import QColor, QFont, QTextCursor
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QTextEdit, QLineEdit, QPushButton, QCheckBox,
-    QProgressBar, QTabWidget, QFileDialog, QMessageBox,
-    QFrame, QApplication,
+    QApplication,
+    QCheckBox,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont, QTextCursor, QColor
-
 
 # 确保能导入项目其他模块
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,16 +39,17 @@ if BASE_DIR not in sys.path:
 
 from config import (
     DEFAULT_OUTPUT_DIR,
-    REQUEST_DELAY_MIN, REQUEST_DELAY_MAX,
+    REQUEST_DELAY_MAX,
+    REQUEST_DELAY_MIN,
 )
-from models import ValidatedStandard, StandardStatus
-from utils import setup_logging, RateLimiter
-from standard_parser import parse_standards_from_text
-from web_scraper import search_standard, fetch_replacement_info
+from models import StandardStatus, ValidatedStandard
 from report_generator import generate_report, save_report
-
+from standard_parser import parse_standards_from_text
+from utils import RateLimiter, setup_logging
+from web_scraper import fetch_replacement_info, search_standard
 
 # ==================== 自定义日志 Handler ====================
+
 
 class QueueLogHandler(logging.Handler):
     """将日志消息放入队列，由主线程安全地显示到 UI"""
@@ -54,6 +65,7 @@ class QueueLogHandler(logging.Handler):
 
 
 # ==================== 主窗口 ====================
+
 
 class StandardCheckerMainWindow(QMainWindow):
     """工程建设标准有效性检查工具 - 主窗口"""
@@ -85,7 +97,7 @@ class StandardCheckerMainWindow(QMainWindow):
         self._finish_success = False
 
         # 路径
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             exe_dir = os.path.dirname(sys.executable)
             self._default_output = os.path.join(exe_dir, "output")
         else:
@@ -310,8 +322,7 @@ class StandardCheckerMainWindow(QMainWindow):
 
         # 格式提示
         hint = QLabel(
-            "每行一条：编号 + 名称（如  GB 50016-2014 建筑设计防火规范）"
-            "  支持逗号、空格分隔多条"
+            "每行一条：编号 + 名称（如  GB 50016-2014 建筑设计防火规范）  支持逗号、空格分隔多条"
         )
         hint.setStyleSheet(f"color: {self.TEXT_SECONDARY}; font-size: 11px;")
         hint.setWordWrap(True)
@@ -588,23 +599,22 @@ class StandardCheckerMainWindow(QMainWindow):
     def _on_text_changed(self):
         """文本变化时更新行数统计"""
         text = self.text_input_box.toPlainText()
-        lines = [l for l in text.split('\n') if l.strip()]
+        lines = [l for l in text.split("\n") if l.strip()]
         self.line_count_label.setText(f"{len(lines)} 行有效内容")
 
     def _import_from_file(self):
         """从文本文件导入标准列表"""
         path, _ = QFileDialog.getOpenFileName(
-            self, "选择标准列表文件", "",
-            "文本文件 (*.txt);;所有文件 (*.*)"
+            self, "选择标准列表文件", "", "文本文件 (*.txt);;所有文件 (*.*)"
         )
         if not path:
             return
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except UnicodeDecodeError:
             try:
-                with open(path, 'r', encoding='gbk') as f:
+                with open(path, encoding="gbk") as f:
                     content = f.read()
             except Exception as e:
                 QMessageBox.critical(self, "错误", f"无法读取文件:\n{e}")
@@ -636,6 +646,7 @@ class StandardCheckerMainWindow(QMainWindow):
         """打开规范编号校对窗口"""
         try:
             from proofread_window_pyside6 import ProofreadWindowPySide6
+
             self.proofread_window = ProofreadWindowPySide6(self)
             self.proofread_window.show()
         except ImportError:
@@ -651,10 +662,11 @@ class StandardCheckerMainWindow(QMainWindow):
         standards = parse_standards_from_text(text)
         if not standards:
             QMessageBox.warning(
-                self, "解析结果",
+                self,
+                "解析结果",
                 "未能从文本中解析出任何标准编号。\n\n"
                 "请确保每行至少包含一个标准编号，如:\n"
-                "GB 50016-2014 建筑设计防火规范"
+                "GB 50016-2014 建筑设计防火规范",
             )
             return
 
@@ -663,9 +675,7 @@ class StandardCheckerMainWindow(QMainWindow):
             name_part = f"  {ref.name}" if ref.name else "  (未识别名称)"
             lines.append(f"{i:>3}. {ref.number}{name_part}")
 
-        self.result_text.setPlainText(
-            f"共解析出 {len(standards)} 条标准:\n\n" + "\n".join(lines)
-        )
+        self.result_text.setPlainText(f"共解析出 {len(standards)} 条标准:\n\n" + "\n".join(lines))
         self.tab_widget.setCurrentIndex(1)  # 切换到解析结果 Tab
 
     def _on_start(self):
@@ -697,6 +707,11 @@ class StandardCheckerMainWindow(QMainWindow):
         # 切换到日志 Tab
         self.tab_widget.setCurrentIndex(0)
 
+        # 缓存 UI 控件值（后台线程不可直接读取 Qt 控件）
+        self._debug_checked = self.debug_check.isChecked()
+        self._delay_min_text = self.delay_min_edit.text()
+        self._delay_max_text = self.delay_max_edit.text()
+
         # 后台运行
         thread = threading.Thread(
             target=self._run_pipeline,
@@ -721,18 +736,18 @@ class StandardCheckerMainWindow(QMainWindow):
     def _run_pipeline(self, output_dir, text_input):
         """在后台线程中运行完整检查流程"""
         try:
-            logger = setup_logging(output_dir, self.debug_check.isChecked())
+            logger = setup_logging(output_dir, self._debug_checked)
             log_handler = QueueLogHandler(self.log_queue)
             log_handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
-            log_handler.setLevel(logging.DEBUG if self.debug_check.isChecked() else logging.INFO)
+            log_handler.setLevel(logging.DEBUG if self._debug_checked else logging.INFO)
             logger.addHandler(log_handler)
 
             logger.info("=" * 55)
             logger.info("  工程建设标准有效性检查工具")
             logger.info("=" * 55)
 
-            delay_min = float(self.delay_min_edit.text())
-            delay_max = float(self.delay_max_edit.text())
+            delay_min = float(self._delay_min_text)
+            delay_max = float(self._delay_max_text)
 
             # ===== 阶段1: 解析标准文本 =====
             logger.info("[阶段1/2] 解析标准文本...")
@@ -749,7 +764,7 @@ class StandardCheckerMainWindow(QMainWindow):
             result_lines = []
             for i, ref in enumerate(standards, 1):
                 result_lines.append(f"{i:>3}. {ref.number}  {ref.name}")
-            self.result_text.setPlainText("\n".join(result_lines))
+            QTimer.singleShot(0, lambda: self.result_text.setPlainText("\n".join(result_lines)))
             self._update_stats(f"解析 {len(standards)} 条标准")
 
             # 保存缓存
@@ -758,9 +773,7 @@ class StandardCheckerMainWindow(QMainWindow):
             # ===== 阶段2: 网站查询 =====
             logger.info("[阶段2/2] 查询 csres.com ...")
 
-            validated = self._validate_standards(
-                standards, delay_min, delay_max, logger
-            )
+            validated = self._validate_standards(standards, delay_min, delay_max, logger)
 
             if self._cancel_requested:
                 logger.warning("用户取消")
@@ -774,16 +787,23 @@ class StandardCheckerMainWindow(QMainWindow):
             self.report_path = save_report(report, output_dir)
 
             # 切换到 UI 线程更新报告
-            self.report_text_widget.setPlainText(report)
-            self.tab_widget.setCurrentIndex(2)  # 切换到报告预览 Tab
+            QTimer.singleShot(0, lambda: self.report_text_widget.setPlainText(report))
+            QTimer.singleShot(0, lambda: self.tab_widget.setCurrentIndex(2))  # 切换到报告预览 Tab
 
             # 统计
-            expired = sum(1 for v in validated
-                          if v.search_result and v.search_result.status.value in ('作废', '废止'))
-            active = sum(1 for v in validated
-                         if v.search_result and v.search_result.status.value == '现行')
-            unknown = sum(1 for v in validated
-                          if v.search_result is None or v.search_result.status.value == '未知')
+            expired = sum(
+                1
+                for v in validated
+                if v.search_result and v.search_result.status.value in ("作废", "废止")
+            )
+            active = sum(
+                1 for v in validated if v.search_result and v.search_result.status.value == "现行"
+            )
+            unknown = sum(
+                1
+                for v in validated
+                if v.search_result is None or v.search_result.status.value == "未知"
+            )
 
             logger.info("")
             logger.info("=" * 55)
@@ -791,13 +811,12 @@ class StandardCheckerMainWindow(QMainWindow):
             logger.info(f"  报告: {self.report_path}")
             logger.info(f"  现行有效: {active}  已过期: {expired}  未确认: {unknown}")
             logger.info("=" * 55)
-            self._update_stats(
-                f"完成  |  现行: {active}  过期: {expired}  未知: {unknown}"
-            )
+            self._update_stats(f"完成  |  现行: {active}  过期: {expired}  未知: {unknown}")
             self._finish(True)
 
         except Exception as e:
             import traceback
+
             self.log_queue.put(("ERROR", f"运行出错: {e}"))
             self.log_queue.put(("ERROR", traceback.format_exc()))
             self._finish(False)
@@ -822,20 +841,25 @@ class StandardCheckerMainWindow(QMainWindow):
             replacement_info = None
 
             if search_result and search_result.status in (
-                StandardStatus.ABOLISHED, StandardStatus.REPEALED
+                StandardStatus.ABOLISHED,
+                StandardStatus.REPEALED,
             ):
                 logger.info(f"  -> {search_result.status.value}，获取替代信息...")
                 replacement_info = fetch_replacement_info(
                     search_result.detail_url,
-                    ref.number, ref.name,
-                    session, rate_limiter,
+                    ref.number,
+                    ref.name,
+                    session,
+                    rate_limiter,
                 )
 
-            results.append(ValidatedStandard(
-                standard_ref=ref,
-                search_result=search_result,
-                replacement_info=replacement_info,
-            ))
+            results.append(
+                ValidatedStandard(
+                    standard_ref=ref,
+                    search_result=search_result,
+                    replacement_info=replacement_info,
+                )
+            )
 
         return results
 
@@ -864,14 +888,16 @@ class StandardCheckerMainWindow(QMainWindow):
         cache_path = os.path.join(output_dir, "standards_cache.json")
         data = []
         for ref in standards:
-            data.append({
-                "number": ref.number,
-                "name": ref.name,
-                "source_files": ref.source_files,
-                "confidence": ref.confidence,
-                "raw_text": ref.raw_text,
-            })
-        with open(cache_path, 'w', encoding='utf-8') as f:
+            data.append(
+                {
+                    "number": ref.number,
+                    "name": ref.name,
+                    "source_files": ref.source_files,
+                    "confidence": ref.confidence,
+                    "raw_text": ref.raw_text,
+                }
+            )
+        with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     # ==================== UI 更新辅助 ====================
@@ -889,11 +915,11 @@ class StandardCheckerMainWindow(QMainWindow):
         """向日志文本框追加一行（支持颜色）"""
         # 颜色映射
         color_map = {
-            "INFO":    "#94a3b8",
-            "WARNING":  "#fcd34d",
-            "ERROR":    "#fca5a5",
-            "DEBUG":    "#64748b",
-            "SUCCESS":  "#6ee7b7",
+            "INFO": "#94a3b8",
+            "WARNING": "#fcd34d",
+            "ERROR": "#fca5a5",
+            "DEBUG": "#64748b",
+            "SUCCESS": "#6ee7b7",
         }
         color = QColor(color_map.get(level, "#94a3b8"))
 
@@ -918,6 +944,7 @@ class StandardCheckerMainWindow(QMainWindow):
 
 
 # ==================== 启动入口 ====================
+
 
 def launch():
     """启动 PySide6 GUI"""

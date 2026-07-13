@@ -1,26 +1,27 @@
 """PaddleOCR封装：图片文本识别 + 文本行合并"""
-import logging
-from typing import List
 
-from config import OCR_CONFIDENCE_THRESHOLD, OCR_LANG, MERGE_LINE_DISTANCE
-from models import OcrTextRegion, MergedTextLine
+from __future__ import annotations
+
+import logging
+from typing import Any
+
+from config import MERGE_LINE_DISTANCE, OCR_CONFIDENCE_THRESHOLD, OCR_LANG
+from models import MergedTextLine, OcrTextRegion
 
 logger = logging.getLogger("standard_checker")
 
 # 延迟导入 PaddleOCR，避免模块加载时就报错
-_ocr_instance = None
+_ocr_instance: Any = None  # type: ignore[no-any-expr] # PaddleOCR type unavailable at type-check time
 
 
-def _get_ocr():
+def _get_ocr() -> Any:  # noqa: TYPE_UNKNOWN
     """懒加载 PaddleOCR 实例"""
     global _ocr_instance
     if _ocr_instance is None:
         try:
             from paddleocr import PaddleOCR
         except ImportError:
-            logger.error(
-                "未安装 PaddleOCR，请运行: pip install paddlepaddle paddleocr"
-            )
+            logger.error("未安装 PaddleOCR，请运行: pip install paddlepaddle paddleocr")
             raise
         _ocr_instance = PaddleOCR(
             use_angle_cls=True,
@@ -30,14 +31,14 @@ def _get_ocr():
     return _ocr_instance
 
 
-def extract_text(image_path: str,
-                 confidence_threshold: float = OCR_CONFIDENCE_THRESHOLD
-                 ) -> List[OcrTextRegion]:
+def extract_text(
+    image_path: str, confidence_threshold: float = OCR_CONFIDENCE_THRESHOLD
+) -> list[OcrTextRegion]:
     """对单张图片进行OCR识别，返回文本区域列表"""
     ocr = _get_ocr()
     try:
         result = ocr.ocr(image_path, cls=True)
-    except Exception as e:
+    except Exception as e:  # noqa: BROAD_EXCEPT_OK
         logger.error(f"OCR处理失败 [{image_path}]: {e}")
         return []
 
@@ -47,16 +48,18 @@ def extract_text(image_path: str,
 
     regions = []
     for item in result[0]:
-        bbox = item[0]   # [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
+        bbox = item[0]  # [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
         text = item[1][0]
         confidence = item[1][1]
 
         if confidence >= confidence_threshold:
-            regions.append(OcrTextRegion(
-                bbox=bbox,
-                text=text,
-                confidence=confidence,
-            ))
+            regions.append(
+                OcrTextRegion(
+                    bbox=bbox,
+                    text=text,
+                    confidence=confidence,
+                )
+            )
         else:
             logger.debug(f"低置信度过滤: '{text}' ({confidence:.2f})")
 
@@ -64,7 +67,7 @@ def extract_text(image_path: str,
     return regions
 
 
-def merge_text_regions(regions: List[OcrTextRegion]) -> List[MergedTextLine]:
+def merge_text_regions(regions: list[OcrTextRegion]) -> list[MergedTextLine]:
     """
     将零散的OCR文本区域合并为逻辑文本行。
 
@@ -90,8 +93,8 @@ def merge_text_regions(regions: List[OcrTextRegion]) -> List[MergedTextLine]:
     items.sort(key=lambda x: x[1])
 
     # 按Y中心聚类为行
-    lines: List[List[tuple]] = []
-    current_line: List[tuple] = [items[0]]
+    lines: list[list[tuple]] = []
+    current_line: list[tuple] = [items[0]]
 
     for item in items[1:]:
         if abs(item[1] - current_line[0][1]) < MERGE_LINE_DISTANCE:
@@ -111,18 +114,20 @@ def merge_text_regions(regions: List[OcrTextRegion]) -> List[MergedTextLine]:
         avg_confidence = sum(confidences) / len(confidences)
         y_center = sum(item[1] for item in line) / len(line)
 
-        merged.append(MergedTextLine(
-            text=merged_text,
-            confidence=avg_confidence,
-            y_center=y_center,
-        ))
+        merged.append(
+            MergedTextLine(
+                text=merged_text,
+                confidence=avg_confidence,
+                y_center=y_center,
+            )
+        )
 
     return merged
 
 
-def process_image(image_path: str,
-                  confidence_threshold: float = OCR_CONFIDENCE_THRESHOLD
-                  ) -> List[MergedTextLine]:
+def process_image(
+    image_path: str, confidence_threshold: float = OCR_CONFIDENCE_THRESHOLD
+) -> list[MergedTextLine]:
     """处理单张图片：OCR识别 → 文本行合并"""
     regions = extract_text(image_path, confidence_threshold)
     lines = merge_text_regions(regions)

@@ -4,18 +4,19 @@
 基于 customtkinter 的现代化桌面界面（纯文本输入模式）。
 支持 PyInstaller 打包为 EXE。
 """
-import os
-import sys
+
 import json
-import queue
 import logging
+import os
+import queue
+import sys
 import threading
 from tkinter import filedialog, messagebox
 
 
 def get_base_dir():
     """获取程序根目录（兼容 PyInstaller 打包和开发模式）"""
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, "frozen", False):
         return sys._MEIPASS
     return os.path.dirname(os.path.abspath(__file__))
 
@@ -26,9 +27,9 @@ try:
     import customtkinter as ctk
 except ImportError:
     import tkinter as tk
+
     tk.messagebox.showerror(
-        "缺少依赖",
-        "未安装 customtkinter，请运行:\n\n  pip install customtkinter"
+        "缺少依赖", "未安装 customtkinter，请运行:\n\n  pip install customtkinter"
     )
     sys.exit(1)
 
@@ -37,19 +38,21 @@ sys.path.insert(0, BASE_DIR)
 
 from config import (
     DEFAULT_OUTPUT_DIR,
-    REQUEST_DELAY_MIN, REQUEST_DELAY_MAX,
+    REQUEST_DELAY_MAX,
+    REQUEST_DELAY_MIN,
 )
-from models import ValidatedStandard, StandardStatus
-from utils import setup_logging
-from standard_parser import parse_standards_from_text
-from web_scraper import search_standard, fetch_replacement_info
+from models import StandardStatus, ValidatedStandard
 from report_generator import generate_report, save_report
-
+from standard_parser import parse_standards_from_text
+from utils import setup_logging
+from web_scraper import fetch_replacement_info, search_standard
 
 # ==================== 自定义日志Handler ====================
 
+
 class QueueLogHandler(logging.Handler):
     """将日志消息放入队列，由主线程安全地显示到UI"""
+
     def __init__(self, log_queue: queue.Queue):
         super().__init__()
         self.log_queue = log_queue
@@ -62,14 +65,15 @@ class QueueLogHandler(logging.Handler):
 
 # ==================== 主GUI类 ====================
 
+
 class StandardCheckerApp(ctk.CTk):
     """工程建设标准有效性检查工具 - 主窗口"""
 
     # ---- 配色方案 ----
-    PRIMARY = "#0D9488"          # 主色调 - 青绿
+    PRIMARY = "#0D9488"  # 主色调 - 青绿
     PRIMARY_HOVER = "#0F766E"
     PRIMARY_LIGHT = "#CCFBF1"
-    SURFACE = "gray17"           # 卡片/面板背景
+    SURFACE = "gray17"  # 卡片/面板背景
     SURFACE_LIGHT = "gray85"
     TEXT_PRIMARY = "gray90"
     TEXT_SECONDARY = "gray55"
@@ -79,10 +83,10 @@ class StandardCheckerApp(ctk.CTk):
     DANGER_HOVER = "#DC2626"
     BORDER = "gray25"
     TAG_COLORS = {
-        "INFO":    ("#CBD5E1", "#475569"),
+        "INFO": ("#CBD5E1", "#475569"),
         "WARNING": ("#FCD34D", "#B45309"),
-        "ERROR":   ("#FCA5A5", "#DC2626"),
-        "DEBUG":   ("#64748B", "#94A3B8"),
+        "ERROR": ("#FCA5A5", "#DC2626"),
+        "DEBUG": ("#64748B", "#94A3B8"),
         "SUCCESS": ("#6EE7B7", "#059669"),
     }
 
@@ -99,7 +103,7 @@ class StandardCheckerApp(ctk.CTk):
         ctk.set_default_color_theme("blue")
 
         # 路径
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             exe_dir = os.path.dirname(sys.executable)
             self._default_output = os.path.join(exe_dir, "output")
         else:
@@ -142,8 +146,7 @@ class StandardCheckerApp(ctk.CTk):
     # ---- 标题栏 ----
 
     def _build_header(self):
-        header = ctk.CTkFrame(self, height=68, corner_radius=0,
-                              fg_color="transparent")
+        header = ctk.CTkFrame(self, height=68, corner_radius=0, fg_color="transparent")
         header.pack(fill="x")
         header.pack_propagate(False)
 
@@ -165,7 +168,10 @@ class StandardCheckerApp(ctk.CTk):
 
         # 右侧：主题切换
         self.theme_btn = ctk.CTkButton(
-            header, text="☀", width=38, height=38,
+            header,
+            text="☀",
+            width=38,
+            height=38,
             corner_radius=19,
             fg_color="transparent",
             border_width=1,
@@ -179,8 +185,7 @@ class StandardCheckerApp(ctk.CTk):
     # ---- 文本输入区 ----
 
     def _build_text_input(self, parent):
-        card = ctk.CTkFrame(parent, corner_radius=12,
-                            border_width=1, border_color=self.BORDER)
+        card = ctk.CTkFrame(parent, corner_radius=12, border_width=1, border_color=self.BORDER)
         card.pack(fill="x", pady=(10, 8))
 
         # 标题行
@@ -239,7 +244,8 @@ class StandardCheckerApp(ctk.CTk):
         toolbar.pack(fill="x", padx=18, pady=(0, 14))
 
         btn_kwargs = dict(
-            height=32, corner_radius=6,
+            height=32,
+            corner_radius=6,
             font=ctk.CTkFont(size=12),
             fg_color="gray25",
             hover_color="gray35",
@@ -248,19 +254,28 @@ class StandardCheckerApp(ctk.CTk):
         )
 
         ctk.CTkButton(
-            toolbar, text="从文件导入", width=100,
-            command=self._import_from_file, **btn_kwargs,
+            toolbar,
+            text="从文件导入",
+            width=100,
+            command=self._import_from_file,
+            **btn_kwargs,
         ).pack(side="left", padx=(0, 6))
 
         ctk.CTkButton(
-            toolbar, text="从剪贴板粘贴", width=110,
-            command=self._paste_from_clipboard, **btn_kwargs,
+            toolbar,
+            text="从剪贴板粘贴",
+            width=110,
+            command=self._paste_from_clipboard,
+            **btn_kwargs,
         ).pack(side="left", padx=(0, 6))
 
         ctk.CTkButton(
-            toolbar, text="清空内容", width=85,
+            toolbar,
+            text="清空内容",
+            width=85,
             command=self._clear_text_input,
-            height=32, corner_radius=6,
+            height=32,
+            corner_radius=6,
             font=ctk.CTkFont(size=12),
             fg_color="gray25",
             hover_color="#7F1D1D",
@@ -270,60 +285,79 @@ class StandardCheckerApp(ctk.CTk):
 
         # 右侧：解析预览
         ctk.CTkButton(
-            toolbar, text="解析预览", width=85,
+            toolbar,
+            text="解析预览",
+            width=85,
             font=ctk.CTkFont(size=12, weight="bold"),
             fg_color=self.PRIMARY,
             hover_color=self.PRIMARY_HOVER,
-            corner_radius=6, height=32,
+            corner_radius=6,
+            height=32,
             command=self._preview_parse,
         ).pack(side="right")
 
     # ---- 参数配置 ----
 
     def _build_params(self, parent):
-        card = ctk.CTkFrame(parent, corner_radius=12,
-                            border_width=1, border_color=self.BORDER)
+        card = ctk.CTkFrame(parent, corner_radius=12, border_width=1, border_color=self.BORDER)
         card.pack(fill="x", pady=(0, 4))
 
         inner = ctk.CTkFrame(card, fg_color="transparent")
         inner.pack(fill="x", padx=18, pady=14)
 
         # 输出目录
-        ctk.CTkLabel(inner, text="输出目录:", width=72, anchor="w",
-                     font=ctk.CTkFont(size=13)).pack(side="left")
+        ctk.CTkLabel(inner, text="输出目录:", width=72, anchor="w", font=ctk.CTkFont(size=13)).pack(
+            side="left"
+        )
         self.output_var = ctk.StringVar(value=self._default_output)
         ctk.CTkEntry(
-            inner, textvariable=self.output_var, height=34,
+            inner,
+            textvariable=self.output_var,
+            height=34,
         ).pack(side="left", fill="x", expand=True, padx=(0, 5))
         ctk.CTkButton(
-            inner, text="浏览", width=60, height=34,
+            inner,
+            text="浏览",
+            width=60,
+            height=34,
             corner_radius=6,
-            fg_color="gray25", hover_color="gray35",
-            border_width=1, border_color="gray35",
+            fg_color="gray25",
+            hover_color="gray35",
+            border_width=1,
+            border_color="gray35",
             font=ctk.CTkFont(size=12),
             command=self._browse_output,
         ).pack(side="left", padx=(0, 28))
 
         # 请求间隔
-        ctk.CTkLabel(inner, text="请求间隔:", width=72, anchor="w",
-                     font=ctk.CTkFont(size=13)).pack(side="left")
+        ctk.CTkLabel(inner, text="请求间隔:", width=72, anchor="w", font=ctk.CTkFont(size=13)).pack(
+            side="left"
+        )
         self.delay_min_var = ctk.IntVar(value=int(REQUEST_DELAY_MIN))
         ctk.CTkEntry(
-            inner, textvariable=self.delay_min_var, width=38, height=34,
+            inner,
+            textvariable=self.delay_min_var,
+            width=38,
+            height=34,
         ).pack(side="left", padx=(0, 2))
-        ctk.CTkLabel(inner, text="~", width=14,
-                     font=ctk.CTkFont(size=13)).pack(side="left")
+        ctk.CTkLabel(inner, text="~", width=14, font=ctk.CTkFont(size=13)).pack(side="left")
         self.delay_max_var = ctk.IntVar(value=int(REQUEST_DELAY_MAX))
         ctk.CTkEntry(
-            inner, textvariable=self.delay_max_var, width=38, height=34,
+            inner,
+            textvariable=self.delay_max_var,
+            width=38,
+            height=34,
         ).pack(side="left", padx=(0, 2))
-        ctk.CTkLabel(inner, text="秒", width=22,
-                     font=ctk.CTkFont(size=13)).pack(side="left", padx=(0, 28))
+        ctk.CTkLabel(inner, text="秒", width=22, font=ctk.CTkFont(size=13)).pack(
+            side="left", padx=(0, 28)
+        )
 
         # 调试模式
         self.debug_var = ctk.BooleanVar(value=False)
         ctk.CTkCheckBox(
-            inner, text="调试模式", variable=self.debug_var,
+            inner,
+            text="调试模式",
+            variable=self.debug_var,
             font=ctk.CTkFont(size=13),
         ).pack(side="left")
 
@@ -334,7 +368,10 @@ class StandardCheckerApp(ctk.CTk):
         bar.pack(fill="x", pady=8)
 
         self.run_btn = ctk.CTkButton(
-            bar, text="▶  开始检查", height=46, width=160,
+            bar,
+            text="▶  开始检查",
+            height=46,
+            width=160,
             font=ctk.CTkFont(size=16, weight="bold"),
             corner_radius=10,
             fg_color=self.PRIMARY,
@@ -344,7 +381,10 @@ class StandardCheckerApp(ctk.CTk):
         self.run_btn.pack(side="left", padx=(0, 10))
 
         self.proofread_btn = ctk.CTkButton(
-            bar, text="规范校对", height=46, width=110,
+            bar,
+            text="规范校对",
+            height=46,
+            width=110,
             font=ctk.CTkFont(size=14),
             corner_radius=10,
             fg_color="transparent",
@@ -357,7 +397,10 @@ class StandardCheckerApp(ctk.CTk):
         self.proofread_btn.pack(side="left", padx=(0, 10))
 
         self.stop_btn = ctk.CTkButton(
-            bar, text="■  停止", height=46, width=100,
+            bar,
+            text="■  停止",
+            height=46,
+            width=100,
             font=ctk.CTkFont(size=15, weight="bold"),
             corner_radius=10,
             fg_color=self.DANGER,
@@ -368,12 +411,16 @@ class StandardCheckerApp(ctk.CTk):
         self.stop_btn.pack(side="left", padx=(0, 10))
 
         self.open_btn = ctk.CTkButton(
-            bar, text="打开报告", height=46, width=110,
+            bar,
+            text="打开报告",
+            height=46,
+            width=110,
             font=ctk.CTkFont(size=14),
             corner_radius=10,
             fg_color="gray30",
             hover_color="gray40",
-            border_width=1, border_color="gray40",
+            border_width=1,
+            border_color="gray40",
             command=self._open_report,
             state="disabled",
         )
@@ -381,7 +428,9 @@ class StandardCheckerApp(ctk.CTk):
 
         # 右侧统计标签
         self.stats_label = ctk.CTkLabel(
-            bar, text="就绪", font=ctk.CTkFont(size=13),
+            bar,
+            text="就绪",
+            font=ctk.CTkFont(size=13),
             text_color=self.TEXT_SECONDARY,
         )
         self.stats_label.pack(side="right", padx=5)
@@ -452,7 +501,7 @@ class StandardCheckerApp(ctk.CTk):
         """文本变化时更新行数统计"""
         try:
             text = self.text_input_box.get("1.0", "end-1c")
-            lines = [l for l in text.split('\n') if l.strip()]
+            lines = [l for l in text.split("\n") if l.strip()]
             self.line_count_label.configure(text=f"{len(lines)} 行有效内容")
         except Exception:
             pass
@@ -469,11 +518,11 @@ class StandardCheckerApp(ctk.CTk):
         if not path:
             return
         try:
-            with open(path, 'r', encoding='utf-8') as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except UnicodeDecodeError:
             try:
-                with open(path, 'r', encoding='gbk') as f:
+                with open(path, encoding="gbk") as f:
                     content = f.read()
             except Exception as e:
                 messagebox.showerror("错误", f"无法读取文件:\n{e}")
@@ -510,6 +559,7 @@ class StandardCheckerApp(ctk.CTk):
     def _open_proofread_window(self):
         """打开规范编号校对窗口"""
         from proofread_window import ProofreadWindow
+
         ProofreadWindow(self)
 
     def _preview_parse(self):
@@ -645,11 +695,12 @@ class StandardCheckerApp(ctk.CTk):
             logger.info("[阶段2/2] 查询 csres.com ...")
 
             validated = validate_standards_with_cancel(
-                standards, delay_min, delay_max, logger,
+                standards,
+                delay_min,
+                delay_max,
+                logger,
                 cancel_check=lambda: self._cancel_requested,
-                progress_callback=lambda i, t: self._update_stats(
-                    f"查询: {i}/{t}"
-                ),
+                progress_callback=lambda i, t: self._update_stats(f"查询: {i}/{t}"),
             )
 
             if self._cancel_requested:
@@ -666,12 +717,19 @@ class StandardCheckerApp(ctk.CTk):
             self.tabview.set("报告预览")
 
             # 统计
-            expired = sum(1 for v in validated
-                          if v.search_result and v.search_result.status.value in ('作废', '废止'))
-            active = sum(1 for v in validated
-                         if v.search_result and v.search_result.status.value == '现行')
-            unknown = sum(1 for v in validated
-                          if v.search_result is None or v.search_result.status.value == '未知')
+            expired = sum(
+                1
+                for v in validated
+                if v.search_result and v.search_result.status.value in ("作废", "废止")
+            )
+            active = sum(
+                1 for v in validated if v.search_result and v.search_result.status.value == "现行"
+            )
+            unknown = sum(
+                1
+                for v in validated
+                if v.search_result is None or v.search_result.status.value == "未知"
+            )
 
             logger.info("")
             logger.info("=" * 55)
@@ -679,14 +737,13 @@ class StandardCheckerApp(ctk.CTk):
             logger.info(f"  报告: {self.report_path}")
             logger.info(f"  现行有效: {active}  已过期: {expired}  未确认: {unknown}")
             logger.info("=" * 55)
-            self._update_stats(
-                f"完成  |  现行: {active}  过期: {expired}  未知: {unknown}"
-            )
+            self._update_stats(f"完成  |  现行: {active}  过期: {expired}  未知: {unknown}")
             self._finish(True)
 
         except Exception as e:
             self.log_queue.put(("ERROR", f"运行出错: {e}"))
             import traceback
+
             self.log_queue.put(("ERROR", traceback.format_exc()))
             self._finish(False)
 
@@ -712,14 +769,16 @@ class StandardCheckerApp(ctk.CTk):
         cache_path = os.path.join(output_dir, "standards_cache.json")
         data = []
         for ref in standards:
-            data.append({
-                "number": ref.number,
-                "name": ref.name,
-                "source_files": ref.source_files,
-                "confidence": ref.confidence,
-                "raw_text": ref.raw_text,
-            })
-        with open(cache_path, 'w', encoding='utf-8') as f:
+            data.append(
+                {
+                    "number": ref.number,
+                    "name": ref.name,
+                    "source_files": ref.source_files,
+                    "confidence": ref.confidence,
+                    "raw_text": ref.raw_text,
+                }
+            )
+        with open(cache_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
     # ==================== UI 更新辅助 ====================
@@ -738,9 +797,7 @@ class StandardCheckerApp(ctk.CTk):
         """向日志文本框追加一行"""
         self.log_text.configure(state="normal")
 
-        dark_color, light_color = self.TAG_COLORS.get(
-            level, ("#CBD5E1", "#475569")
-        )
+        dark_color, light_color = self.TAG_COLORS.get(level, ("#CBD5E1", "#475569"))
         color = dark_color if ctk.get_appearance_mode() == "Dark" else light_color
 
         self.log_text.insert("end", msg + "\n", level)
@@ -762,6 +819,7 @@ class StandardCheckerApp(ctk.CTk):
             self.result_text.delete("1.0", "end")
             self.result_text.insert("1.0", text)
             self.result_text.configure(state="disabled")
+
         self.after(0, _do)
 
     def _update_report_text(self, text: str):
@@ -770,17 +828,24 @@ class StandardCheckerApp(ctk.CTk):
             self.report_text.delete("1.0", "end")
             self.report_text.insert("1.0", text)
             self.report_text.configure(state="disabled")
+
         self.after(0, _do)
 
 
 # ==================== 支持取消的validate_standards ====================
 
+
 def validate_standards_with_cancel(
-    standards, delay_min, delay_max, logger,
-    cancel_check=None, progress_callback=None,
+    standards,
+    delay_min,
+    delay_max,
+    logger,
+    cancel_check=None,
+    progress_callback=None,
 ):
     """带取消支持的批量标准验证"""
     import requests as req_lib
+
     from utils import RateLimiter
 
     session = req_lib.Session()
@@ -801,25 +866,31 @@ def validate_standards_with_cancel(
         replacement_info = None
 
         if search_result and search_result.status in (
-            StandardStatus.ABOLISHED, StandardStatus.REPEALED
+            StandardStatus.ABOLISHED,
+            StandardStatus.REPEALED,
         ):
             logger.info(f"  -> {search_result.status.value}, 获取替代信息...")
             replacement_info = fetch_replacement_info(
                 search_result.detail_url,
-                ref.number, ref.name,
-                session, rate_limiter,
+                ref.number,
+                ref.name,
+                session,
+                rate_limiter,
             )
 
-        results.append(ValidatedStandard(
-            standard_ref=ref,
-            search_result=search_result,
-            replacement_info=replacement_info,
-        ))
+        results.append(
+            ValidatedStandard(
+                standard_ref=ref,
+                search_result=search_result,
+                replacement_info=replacement_info,
+            )
+        )
 
     return results
 
 
 # ==================== 启动入口 ====================
+
 
 def launch():
     app = StandardCheckerApp()

@@ -1,19 +1,27 @@
 """csres.com 搜索和详情页抓取"""
+
+from __future__ import annotations
+
 import logging
 import re
-from typing import List, Optional
+from typing import TypedDict
 from urllib.parse import quote
 
 import requests
 from bs4 import BeautifulSoup
 
 from config import (
-    CSRES_BASE_URL, CSRES_SEARCH_URL, STATUS_TEXT_MAP,
+    CSRES_BASE_URL,
+    CSRES_SEARCH_URL,
     STANDARD_NUMBER_PATTERN,
+    STATUS_TEXT_MAP,
 )
 from models import (
-    StandardRef, StandardStatus, SearchResult,
-    ReplacementInfo, ValidatedStandard,
+    ReplacementInfo,
+    SearchResult,
+    StandardRef,
+    StandardStatus,
+    ValidatedStandard,
 )
 from utils import RateLimiter, retry_request
 
@@ -36,9 +44,10 @@ def _match_score(query: str, candidate: str) -> float:
     计算两个标准编号的匹配度（0~1）。
     规范化后做字符级比较。
     """
-    def _norm(s):
-        s = s.lower().replace(' ', '').replace('-', '').replace('—', '')
-        return re.sub(r'[^a-z0-9/]', '', s)
+
+    def _norm(s: str) -> str:
+        s = s.lower().replace(" ", "").replace("-", "").replace("—", "")
+        return re.sub(r"[^a-z0-9/]", "", s)
 
     q = _norm(query)
     c = _norm(candidate)
@@ -57,44 +66,56 @@ def _match_score(query: str, candidate: str) -> float:
     return common / max_len if max_len > 0 else 0.0
 
 
-def parse_search_results(html: str, query_number: str) -> List[dict]:
+class SearchRow(TypedDict):
+    """搜索结果表格中的一行"""
+
+    number: str
+    name: str
+    status_text: str
+    font_color: str
+    detail_url: str
+    department: str
+    date: str
+
+
+def parse_search_results(html: str, query_number: str) -> list[SearchRow]:
     """
     解析csres.com搜索结果页面，提取所有标准条目。
 
     返回: [{"number", "name", "status", "font_color", "detail_url", "department", "date"}, ...]
     """
-    soup = BeautifulSoup(html, 'lxml')
-    table = soup.find('table', class_='heng')
+    soup = BeautifulSoup(html, "lxml")
+    table = soup.find("table", class_="heng")
     if not table:
         logger.debug("未找到搜索结果表 (table.heng)")
         return []
 
-    rows = table.find_all('tr')
+    rows = table.find_all("tr")
     if len(rows) < 2:
         return []
 
     results = []
     for row in rows[1:]:  # 跳过表头
-        tds = row.find_all('td')
+        tds = row.find_all("td")
         if len(tds) < 5:
             continue
 
         # 第1列：标准编号 + 详情链接
         td0 = tds[0]
-        link = td0.find('a')
+        link = td0.find("a")
         detail_url = ""
-        if link and link.get('href'):
-            href = link['href']
-            if href.startswith('/'):
+        if link and link.get("href"):
+            href = link["href"]
+            if href.startswith("/"):
                 detail_url = CSRES_BASE_URL + href
-            elif href.startswith('http'):
+            elif href.startswith("http"):
                 detail_url = href
 
         number_text = td0.get_text(strip=True)
-        font0 = td0.find('font')
+        font0 = td0.find("font")
         font_color = ""
-        if font0 and font0.get('color'):
-            font_color = font0['color']
+        if font0 and font0.get("color"):
+            font_color = font0["color"]
 
         # 第2列：标准名称
         name_text = tds[1].get_text(strip=True)
@@ -108,15 +129,17 @@ def parse_search_results(html: str, query_number: str) -> List[dict]:
         # 第5列：状态
         status_text = tds[4].get_text(strip=True)
 
-        results.append({
-            "number": number_text,
-            "name": name_text,
-            "status_text": status_text,
-            "font_color": font_color,
-            "detail_url": detail_url,
-            "department": dept_text,
-            "date": date_text,
-        })
+        results.append(
+            {
+                "number": number_text,
+                "name": name_text,
+                "status_text": status_text,
+                "font_color": font_color,
+                "detail_url": detail_url,
+                "department": dept_text,
+                "date": date_text,
+            }
+        )
 
     return results
 
@@ -125,7 +148,7 @@ def search_standard(
     standard_ref: StandardRef,
     session: requests.Session,
     rate_limiter: RateLimiter,
-) -> Optional[SearchResult]:
+) -> SearchResult | None:
     """
     在csres.com搜索单条标准，返回最佳匹配结果。
     """
@@ -139,19 +162,19 @@ def search_standard(
         return None
 
     # 尝试检测编码（中文JSP站点可能是 GBK 或 UTF-8）
-    detected = resp.apparent_encoding or resp.encoding or 'utf-8'
+    detected = resp.apparent_encoding or resp.encoding or "utf-8"
     resp.encoding = detected
     html = resp.text
 
     # 如果解析出的内容乱码严重，回退到 GBK
-    if '标准' not in html and '工标网' not in html:
-        for fallback_enc in ('gbk', 'gb2312', 'utf-8'):
+    if "标准" not in html and "工标网" not in html:
+        for fallback_enc in ("gbk", "gb2312", "utf-8"):
             try:
                 resp.encoding = fallback_enc
                 html = resp.text
-                if '标准' in html or '工标网' in html:
+                if "标准" in html or "工标网" in html:
                     break
-            except Exception:
+            except LookupError:
                 continue
 
     candidates = parse_search_results(html, keyword)
@@ -192,7 +215,7 @@ def fetch_replacement_info(
     old_name: str,
     session: requests.Session,
     rate_limiter: RateLimiter,
-) -> Optional[ReplacementInfo]:
+) -> ReplacementInfo | None:
     """
     访问标准详情页，提取替代信息。
     """
@@ -205,19 +228,19 @@ def fetch_replacement_info(
         return None
 
     # 编码检测（同 search_standard）
-    detected = resp.apparent_encoding or resp.encoding or 'utf-8'
+    detected = resp.apparent_encoding or resp.encoding or "utf-8"
     resp.encoding = detected
     html = resp.text
-    if '标准' not in html and '工标网' not in html:
-        for fallback_enc in ('gbk', 'gb2312', 'utf-8'):
+    if "标准" not in html and "工标网" not in html:
+        for fallback_enc in ("gbk", "gb2312", "utf-8"):
             try:
                 resp.encoding = fallback_enc
                 html = resp.text
-                if '标准' in html or '工标网' in html:
+                if "标准" in html or "工标网" in html:
                     break
-            except Exception:
+            except LookupError:
                 continue
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, "lxml")
 
     replacement_number = ""
     replacement_name = ""
@@ -228,10 +251,7 @@ def fetch_replacement_info(
     all_text = soup.get_text()
 
     # 提取替代情况
-    replace_match = re.search(
-        r'替代情况[：:]\s*(.+?)(?:\n|$)',
-        all_text
-    )
+    replace_match = re.search(r"替代情况[：:]\s*(.+?)(?:\n|$)", all_text)
     if replace_match:
         replacement_notes = replace_match.group(1).strip()
         # 从替代说明中提取标准编号
@@ -239,25 +259,24 @@ def fetch_replacement_info(
         if std_match:
             replacement_number = std_match.group(1)
             # 提取编号后的名称
-            after = replacement_notes[std_match.end():]
+            after = replacement_notes[std_match.end() :]
             name_match = re.match(
-                r'[\s ]*([\u4e00-\u9fff][\u4e00-\u9fff\w\s（）()、·/]{1,50})',
-                after
+                r"[\s ]*([\u4e00-\u9fff][\u4e00-\u9fff\w\s（）()、·/]{1,50})", after
             )
             if name_match:
                 replacement_name = name_match.group(1).strip()
 
     # 提取作废日期 / 废止日期
-    date_match = re.search(r'(?:作废|废止)日期[：:]\s*([\d\-/年.]+)', all_text)
+    date_match = re.search(r"(?:作废|废止)日期[：:]\s*([\d\-/年.]+)", all_text)
     if date_match:
         abolished_date = date_match.group(1).strip()
 
     # 策略2：用BeautifulSoup查找table中的字段
     if not replacement_notes:
-        for td in soup.find_all('td'):
+        for td in soup.find_all("td"):
             text = td.get_text(strip=True)
-            if '替代情况' in text:
-                next_td = td.find_next_sibling('td')
+            if "替代情况" in text:
+                next_td = td.find_next_sibling("td")
                 if next_td:
                     replacement_notes = next_td.get_text(strip=True)
                     std_match = STANDARD_NUMBER_PATTERN.search(replacement_notes)
@@ -266,10 +285,10 @@ def fetch_replacement_info(
                 break
 
     if not abolished_date:
-        for td in soup.find_all('td'):
+        for td in soup.find_all("td"):
             text = td.get_text(strip=True)
-            if '作废日期' in text or '废止日期' in text:
-                next_td = td.find_next_sibling('td')
+            if "作废日期" in text or "废止日期" in text:
+                next_td = td.find_next_sibling("td")
                 if next_td:
                     abolished_date = next_td.get_text(strip=True)
                 break
@@ -285,16 +304,16 @@ def fetch_replacement_info(
 
 
 def validate_standards(
-    standards: List[StandardRef],
+    standards: list[StandardRef],
     delay_min: float,
     delay_max: float,
-) -> List[ValidatedStandard]:
+) -> list[ValidatedStandard]:
     """
     批量验证标准有效性：搜索 + 过期标准获取替代信息。
     """
     session = requests.Session()
     rate_limiter = RateLimiter(delay_min, delay_max)
-    results: List[ValidatedStandard] = []
+    results: list[ValidatedStandard] = []
     total = len(standards)
 
     for i, ref in enumerate(standards, 1):
@@ -307,7 +326,8 @@ def validate_standards(
 
         # 如果是过期标准，获取替代信息
         if search_result and search_result.status in (
-            StandardStatus.ABOLISHED, StandardStatus.REPEALED
+            StandardStatus.ABOLISHED,
+            StandardStatus.REPEALED,
         ):
             logger.info(f"  → {search_result.status.value}，获取替代信息...")
             replacement_info = fetch_replacement_info(
@@ -318,10 +338,12 @@ def validate_standards(
                 rate_limiter,
             )
 
-        results.append(ValidatedStandard(
-            standard_ref=ref,
-            search_result=search_result,
-            replacement_info=replacement_info,
-        ))
+        results.append(
+            ValidatedStandard(
+                standard_ref=ref,
+                search_result=search_result,
+                replacement_info=replacement_info,
+            )
+        )
 
     return results

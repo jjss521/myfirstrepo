@@ -1,15 +1,21 @@
 """工具模块：日志、限速器、重试逻辑"""
+
+from __future__ import annotations
+
 import logging
 import os
 import random
 import time
-from typing import Optional
 
 import requests
 
 from config import (
-    MAX_RETRIES, RETRY_BACKOFF_FACTOR, REQUEST_TIMEOUT,
-    USER_AGENT, REQUEST_DELAY_MIN, REQUEST_DELAY_MAX,
+    MAX_RETRIES,
+    REQUEST_DELAY_MAX,
+    REQUEST_DELAY_MIN,
+    REQUEST_TIMEOUT,
+    RETRY_BACKOFF_FACTOR,
+    USER_AGENT,
 )
 
 
@@ -44,8 +50,7 @@ def setup_logging(output_dir: str, debug: bool = False) -> logging.Logger:
 class RateLimiter:
     """请求限速器"""
 
-    def __init__(self, min_delay: float = REQUEST_DELAY_MIN,
-                 max_delay: float = REQUEST_DELAY_MAX):
+    def __init__(self, min_delay: float = REQUEST_DELAY_MIN, max_delay: float = REQUEST_DELAY_MAX):
         self.min_delay = min_delay
         self.max_delay = max_delay
         self.last_request_time: float = 0
@@ -66,8 +71,8 @@ def retry_request(
     session: requests.Session,
     rate_limiter: RateLimiter,
     max_retries: int = MAX_RETRIES,
-    logger: Optional[logging.Logger] = None,
-) -> Optional[requests.Response]:
+    logger: logging.Logger | None = None,
+) -> requests.Response | None:
     """带重试和限速的HTTP GET请求"""
     if logger is None:
         logger = logging.getLogger("standard_checker")
@@ -90,19 +95,19 @@ def retry_request(
             return resp
 
         except requests.exceptions.Timeout:
-            backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR ** attempt)
+            backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR**attempt)
             logger.warning(f"请求超时，{backoff:.1f}秒后重试: {url}")
             time.sleep(backoff)
 
         except requests.exceptions.ConnectionError as e:
-            backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR ** attempt)
+            backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR**attempt)
             logger.warning(f"连接错误: {e}，{backoff:.1f}秒后重试")
             time.sleep(backoff)
 
         except requests.exceptions.HTTPError as e:
             logger.error(f"HTTP错误: {e}，URL: {url}")
             if attempt < max_retries - 1:
-                backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR ** attempt)
+                backoff = REQUEST_DELAY_MIN * (RETRY_BACKOFF_FACTOR**attempt)
                 time.sleep(backoff)
             else:
                 return None
@@ -111,12 +116,12 @@ def retry_request(
     return None
 
 
-def find_screenshots(input_dir: str) -> list:
+def find_screenshots(input_dir: str) -> list[str]:
     """扫描输入目录，返回所有截图文件路径"""
     if not os.path.isdir(input_dir):
         return []
 
-    extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif'}
+    extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"}
     files = []
     for name in sorted(os.listdir(input_dir)):
         ext = os.path.splitext(name)[1].lower()
@@ -128,4 +133,5 @@ def find_screenshots(input_dir: str) -> list:
 def normalize_whitespace(text: str) -> str:
     """压缩多余空白为单个空格"""
     import re
-    return re.sub(r'\s+', ' ', text).strip()
+
+    return re.sub(r"\s+", " ", text).strip()
