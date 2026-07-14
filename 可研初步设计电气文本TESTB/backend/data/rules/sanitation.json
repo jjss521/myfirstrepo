@@ -1,0 +1,329 @@
+{
+  "project_type": "环境卫生工程",
+  "code": "sanitation",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第九篇",
+  "design_stages": {
+    "可行性研究": {
+      "stage_id": "feasibility_study",
+      "regulation_ref": "第九篇第五章 5.3.6-5.3.7",
+      "sections": {
+        "电气": {
+          "section_id": "5.3.6",
+          "title": "电气设计",
+          "items": [
+            {
+              "order": 1,
+              "title": "编制依据及范围",
+              "requirement": "明确编制依据、范围及原则",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "本工程电气设计依据《供配电系统设计规范》GB 50052、《低压配电设计规范》GB 50054等国家现行标准规范，设计范围为XX环境卫生工程场区内供配电系统、照明系统、防雷接地及电缆敷设等内容。"
+            },
+            {
+              "order": 2,
+              "title": "负荷估算与负荷性质",
+              "requirement": "说明负荷估算、负荷性质及负荷班制",
+              "has_calculation": true,
+              "table_required": true,
+              "calc_from_excel": true,
+              "example_text": "本项目主要用电设备包括垃圾焚烧/填埋/转运设备、渗滤液处理设备、通风除臭设备、照明及辅助设施等，总装机容量约XXX kW，计算负荷约XXX kVA。负荷性质：主要生产工艺设备按二级负荷供电，辅助设施按三级负荷供电。"
+            },
+            {
+              "order": 3,
+              "title": "供电电源及供配电系统",
+              "requirement": "论述供电电源及供配电系统（必要时进行方案比选）",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "供电电源引自XX变电站XX kV专线，场区内设置XX kV变电所一座，采用XX kV/XX kV电压等级。供配电系统采用放射式与树干式相结合的方式。"
+            },
+            {
+              "order": 4,
+              "title": "操作电源、继电保护及信号",
+              "requirement": "简述操作电源、继电保护及信号",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "操作电源采用直流220V，配置微机型综合继电保护装置，设置中央信号系统。"
+            },
+            {
+              "order": 5,
+              "title": "变电所与配电方式",
+              "requirement": "论证变电所设置、配电方式、用电设备驱动方式以及控制联锁",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "场区设置10kV变电所一座，变压器容量暂按XXX kVA配置。配电方式采用放射式与树干式结合。主要用电设备采用变频/软启动驱动方式，关键设备设置PLC控制联锁。"
+            },
+            {
+              "order": 6,
+              "title": "电气设备选型及新技术应用",
+              "requirement": "说明电气设备选型原则及新技术应用",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "电气设备选型遵循安全可靠、技术先进、经济合理的原则。高压开关柜选用中置式金属封闭开关柜，低压配电柜选用GGD/GCS型。积极采用节能型变压器、智能配电终端等新技术。"
+            },
+            {
+              "order": 7,
+              "title": "照明、防雷及接地",
+              "requirement": "提出照明设计、防雷、接地及等电位措施，明确场（厂）区电缆敷设方式等",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "场区照明采用LED灯具，防雷按第二类防雷建筑物设计，接地采用TN-S系统。场区电缆主要采用电缆沟与直埋相结合的敷设方式。易燃易爆区域（如填埋气收集区）执行防爆电气设计标准。"
+            }
+          ]
+        },
+        "仪表自控": {
+          "section_id": "5.3.7",
+          "title": "仪表自控设计",
+          "items": [
+            {
+              "order": 1,
+              "title": "编制依据及范围",
+              "requirement": "明确编制依据、范围及原则",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "本工程仪表自控设计依据《自动化仪表工程施工及质量验收规范》GB 50093等标准，设计范围为XX环境卫生工程全场仪表检测、自动控制、视频监控、安防及火灾报警等系统。"
+            },
+            {
+              "order": 2,
+              "title": "需求分析与系统架构",
+              "requirement": "说明需求分析、内容及目标、构成形式及其技术水平、配置（层次）架构、建设规模、功能实现和技术特点",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "自控系统采用'管理级—控制级—现场级'三层架构，管理级设置中控室操作站，控制级采用冗余PLC控制器，现场级配置各类检测仪表和执行机构。系统建设规模覆盖全场工艺单元，实现工艺参数在线检测、设备自动控制、数据采集与远程监控。"
+            },
+            {
+              "order": 3,
+              "title": "视频、安防及火灾报警系统",
+              "requirement": "确定视频、安防、火灾报警等弱电系统内容",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "视频监控系统覆盖场区出入口、主要工艺段、变配电所等重点区域。安防系统包括周界防范、门禁管理。火灾自动报警系统按集中报警系统设计，在场区主要建筑物及重点防火区域设置感烟/感温探测器。"
+            },
+            {
+              "order": 4,
+              "title": "安全体系建设",
+              "requirement": "提出安全体系建设",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "安全体系建设包括网络安全（防火墙、入侵检测）、系统冗余（控制器冗余、通信网络冗余）、操作安全（权限管理、操作日志）及应急手动控制等。"
+            },
+            {
+              "order": 5,
+              "title": "智慧环卫运维体系建设",
+              "requirement": "提出智慧环卫运维体系建设等具体方案（必要时）",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "智慧环卫运维体系包括建立全厂数字化管理平台，实现设备资产管理、预防性维护、能耗管理、环境监测数据统计分析等功能。结合物联网技术，实现运维数据远程传输与移动端管理。"
+            }
+          ]
+        }
+      }
+    },
+    "初步设计": {
+      "stage_id": "preliminary_design",
+      "regulation_ref": "第九篇第二章 1.5.6-1.5.7",
+      "sections": {
+        "电气": {
+          "section_id": "1.5.6",
+          "title": "电气设计",
+          "items": [
+            {
+              "order": 1,
+              "title": "设计依据及范围",
+              "requirement": "明确设计依据、范围及原则",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "本工程电气设计依据《20kV及以下变电所设计规范》GB 50053、《低压配电设计规范》GB 50054等国家现行标准规范，设计范围为XX环境卫生工程场区内10kV及以下供配电系统、照明、防雷接地等。"
+            },
+            {
+              "order": 2,
+              "title": "负荷等级与电源",
+              "requirement": "说明负荷等级、供电电源、保安电源（如需）、电压等级、场（厂）内设备电压选择及用电设备种类、负荷班制，列表说明设备容量、计算负荷、补偿前后功率因数等",
+              "has_calculation": true,
+              "table_required": true,
+              "calc_from_excel": true,
+              "example_text": "本工程主要二级负荷包括渗滤液处理系统、消防系统、中控系统等，保安电源采用柴油发电机组。供电电源由XX变电站10kV专线引来。主要用电设备包括XXX、XXX等，总装机容量XXX kW，计算有功功率XXX kW，无功补偿后功率因数0.95以上。详见负荷计算表。"
+            },
+            {
+              "order": 3,
+              "title": "变配电系统",
+              "requirement": "确定各级电压等级一次系统图、电源运行方式、变配电所设置、变压器容量和数量以及安装形式，继电保护的设置、操作电源、信号以及计量设置，明确无功补偿、谐波保护、变电所过电压及接地保护措施",
+              "has_calculation": true,
+              "table_required": false,
+              "example_text": "场区设10kV变电所一座，变压器按N+1冗余配置，选用SCB13系列节能干式变压器，容量XXX kVA×2台。10kV系统采用单母线分段接线，0.4kV系统采用单母线分段运行方式。设置微机型综合继电保护，无功补偿采用低压集中自动补偿，配置有源滤波器。"
+            },
+            {
+              "order": 4,
+              "title": "配电系统",
+              "requirement": "说明配电电压等级、配电系统形式、配电方式及保证供电可靠性的措施",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "配电电压等级为380/220V，配电系统采用TN-S系统，配电方式采用放射式与树干式相结合。重要负荷采用双回路供电末端切换，保证供电可靠性。"
+            },
+            {
+              "order": 5,
+              "title": "设备选择与控制",
+              "requirement": "提出环境特征及配电设备选择、电机启动及调速方式、维修电源设备、导体选择及敷设方式、控制与连锁等",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "考虑场区腐蚀性环境，配电设备选用防腐型或采取防腐措施。电机功率≥30kW采用软启动或变频启动。导体选用铜芯电缆，按载流量和电压降校验。填埋气收集区域执行防爆电气设计。"
+            },
+            {
+              "order": 6,
+              "title": "照明系统",
+              "requirement": "说明各单体照明及应急照明系统，场（厂）区照明等",
+              "has_calculation": true,
+              "table_required": false,
+              "example_text": "各单体建筑按现行照明标准照度设计，选用高效LED灯具。变配电所、中控室、疏散通道等场所设置应急照明和疏散指示，应急电源采用集中EPS电源，持续供电时间≥90min。场区道路照明采用太阳能+LED智能照明方案。"
+            },
+            {
+              "order": 7,
+              "title": "防雷与接地",
+              "requirement": "明确防雷、接地及等电位措施、导体选择及电缆敷设方式、防火、防爆及建筑机电抗震措施",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "建（构）筑物按第二类防雷设计，设置接闪带或接闪杆。接地系统采用共用接地装置，接地电阻≤1Ω。场区电缆采用电缆沟、桥架及直埋相结合方式。穿越防火分区设置防火封堵，爆炸危险区域电气设备按防爆等级选型并设置防静电接地。"
+            }
+          ]
+        },
+        "仪表自控": {
+          "section_id": "1.5.7",
+          "title": "仪表自控设计",
+          "items": [
+            {
+              "order": 1,
+              "title": "设计依据及范围",
+              "requirement": "明确设计依据、范围及原则",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "本工程仪表自控设计依据《自动化仪表工程施工及质量验收规范》GB 50093、《安全防范工程技术标准》GB 50348等标准，设计范围包括全场仪表检测、PLC自控、工业电视监控、安防、通信及火灾自动报警系统。"
+            },
+            {
+              "order": 2,
+              "title": "自控系统",
+              "requirement": "说明自控系统形式组成、安装场所、系统配置、通信网络及功能实现等",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "自控系统采用PLC+SCADA架构，设中央控制室一座。PLC选用冗余控制系统，通信网络采用工业以太网（环形冗余拓扑）。实现全场工艺过程自动控制、参数在线监测、报警管理、历史数据记录及报表生成等功能。"
+            },
+            {
+              "order": 3,
+              "title": "仪表系统",
+              "requirement": "提出仪表系统的设计原则、仪表设置、检测功能",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "仪表选型遵循可靠、适用、经济、便于维护的原则。主要检测参数包括流量、液位、压力、温度、pH值、气体浓度（甲烷、硫化氢、氨气等）、烟气排放指标等。关键仪表采用进口品牌，常规仪表采用国产品牌。"
+            },
+            {
+              "order": 4,
+              "title": "工业电视系统",
+              "requirement": "工业电视系统的设计原则、系统配置、信号传输及功能实现",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "工业电视系统采用高清网络摄像机+网络硬盘录像机架构。监控点位覆盖场区出入口、卸料平台、焚烧车间、填埋作业区、渗滤液处理站、变配电所等。传输采用光纤主干+网线末端的网络架构，存储时间≥30天。"
+            },
+            {
+              "order": 5,
+              "title": "安防系统",
+              "requirement": "安防系统的设计原则、系统配置、信号传输及功能实现",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "安防系统包括周界入侵报警（脉冲电子围栏/红外对射）、门禁控制系统（刷卡+人脸识别）、电子巡更系统。中控室设置安防管理平台，实现各子系统联动及报警信息集中管理。"
+            },
+            {
+              "order": 6,
+              "title": "通信系统",
+              "requirement": "通信系统的设计原则、系统规模、综合布线及功能实现",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "通信系统包括行政电话系统和生产调度电话系统。综合布线采用六类非屏蔽双绞线+光纤到桌面方案，各单体建筑设置弱电设备间，数据主干采用万兆光纤。设置广播及对讲系统，生产区域设置防爆型对讲话站。"
+            },
+            {
+              "order": 7,
+              "title": "火灾自动报警系统",
+              "requirement": "火灾自动报警系统的设计原则、系统配置、探测选型、信号传输、应急通信及功能实现等",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "火灾自动报警系统采用集中报警系统，消防控制室与中控室合并设置。探测选型：一般场所设置感烟探测器，厨房设置感温探测器，电缆夹层设置线型感温电缆。系统与消防水泵、防排烟风机、防火阀等联动控制。"
+            },
+            {
+              "order": 8,
+              "title": "防护与防腐等级",
+              "requirement": "确定设备的防护等级、防腐等级",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "室内设备防护等级不低于IP42，室外设备防护等级不低于IP65。腐蚀性环境区域（如渗滤液处理区、加药间）选用防腐型仪表及设备，防腐等级不低于WF2。"
+            },
+            {
+              "order": 9,
+              "title": "设备选型与布置",
+              "requirement": "设备的技术水平、选型要求、布置安装",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "PLC选用国际主流品牌冗余控制系统，操作站选用工业级计算机。现场仪表根据介质特性选用：腐蚀性介质选用耐腐蚀材质，含固介质选用耐磨型，爆炸危险区域选用本安型或隔爆型。"},
+            {
+              "order": 10,
+              "title": "电缆及管缆敷设",
+              "requirement": "电缆敷设方式",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "控制电缆及仪表信号电缆采用阻燃屏蔽电缆，沿电缆桥架敷设，室外部分采用电缆沟或直埋敷设。仪表管缆沿工艺管道布置，采用镀锌钢管或尼龙管缆。"
+            },
+            {
+              "order": 11,
+              "title": "防雷及接地",
+              "requirement": "防雷及接地系统",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "仪表自控系统设置独立的防雷及接地系统，信号电缆设置SPD浪涌保护器。PLC/DCS系统单独设置接地装置，接地电阻≤1Ω。屏蔽电缆的屏蔽层单端接地。"
+            },
+            {
+              "order": 12,
+              "title": "仪表配管设计",
+              "requirement": "生产（单元）过程配管及仪表设计等",
+              "has_calculation": false,
+              "table_required": false,
+              "example_text": "工艺管道的仪表取源部件按规范设置，包括温度计套管、压力取源管、流量计前后直管段、液位计接管等。仪表根部阀、排污阀及取样管路按P&ID图完整配置。"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "reference_projects": [
+    {
+      "name": "国内生活垃圾焚烧发电项目",
+      "scale": "日处理能力600-3000t/d",
+      "features": ["全厂智能化控制", "焚烧炉燃烧控制", "烟气在线监测", "汽轮发电机保护"],
+      "applicable_sections": ["初步设计-电气", "初步设计-仪表自控", "可行性研究-电气"]
+    },
+    {
+      "name": "国内生活垃圾卫生填埋场工程",
+      "scale": "日处理能力200-2000t/d",
+      "features": ["填埋气收集及防爆电气设计", "渗滤液处理自控", "环境监测系统", "填埋作业区照明"],
+      "applicable_sections": ["初步设计-电气", "初步设计-仪表自控", "可行性研究-电气", "可行性研究-仪表自控"]
+    },
+    {
+      "name": "国内餐厨垃圾处理项目",
+      "scale": "日处理能力50-400t/d",
+      "features": ["厌氧消化过程控制", "沼气利用电气系统", "除臭系统自控", "油脂分离在线检测"],
+      "applicable_sections": ["初步设计-仪表自控", "初步设计-电气"]
+    },
+    {
+      "name": "国内建筑垃圾资源化处理项目",
+      "scale": "年处理能力50-300万吨",
+      "features": ["破碎筛分生产线控制", "粉尘监测与抑尘控制", "再生骨料在线检测", "厂区智能管理系统"],
+      "applicable_sections": ["初步设计-电气", "初步设计-仪表自控"]
+    }
+  ],
+  "sanitation_specific_notes": {
+    "智慧环卫": "智慧环卫运维体系建设是环境卫生工程的特色要求，应在可行性研究阶段即纳入自控设计方案，初步设计阶段进一步深化智慧化管理平台的功能架构设计。",
+    "防爆要求": "涉及填埋气体、沼气等易燃易爆场所的电气及自控设备，应严格执行《爆炸危险环境电力装置设计规范》GB 50058，按爆炸危险区域划分选择相应防爆等级的电气设备及仪表。",
+    "腐蚀环境": "渗滤液处理、加药间等强腐蚀性区域，电气及自控设备应选择防腐型产品或采取有效防腐措施，防护等级和防腐等级应符合环境特征要求。",
+    "能源管理": "环境卫生工程应注重能耗监测与管理，可研阶段提出节能技术应用方向，初设阶段明确能耗监测系统方案，实现全场水、电、气等能源数据的在线采集与分析。"
+  },
+  "equipment_material_table": {
+    "title": "主要设备材料表",
+    "requirement": "提供建设项目主要工程量及各相关专业主要设备、材料统计清单（应明确工程量内容、设备及材料名称、所属工程部位、规格、单位和数量等）",
+    "columns": ["序号", "名称", "规格型号", "单位", "数量", "所属工程部位", "备注"]
+  }
+}

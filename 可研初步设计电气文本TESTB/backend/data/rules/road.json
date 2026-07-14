@@ -1,0 +1,106 @@
+{
+  "project_type": "道路交通工程",
+  "code": "road",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第三篇",
+  "design_stages": {
+    "可行性研究": {
+      "regulation_ref": "第三篇第一章 道路交通工程可行性研究报告文件编制深度",
+      "电气": {
+        "section_id": "5.2.6",
+        "title": "照明、电气工程",
+        "description": "道路工程（含广场、公共停车场）照明、电气工程可行性研究阶段编制内容。快速公交（BRT）工程和城市综合客运交通枢纽工程的电气内容按项目需要编制。",
+        "items": [
+          {"order": 1, "title": "设计依据及标准", "requirement": "确定照明工程设计依据及设计标准", "has_calculation": false, "table_required": false},
+          {"order": 2, "title": "电源及供电方式", "requirement": "确定电源来源及供配电方式", "has_calculation": false, "table_required": false},
+          {"order": 3, "title": "低压配电系统", "requirement": "确定低压配电系统方案", "has_calculation": false, "table_required": false},
+          {"order": 4, "title": "照明光源及照明方式", "requirement": "确定照明光源选型及照明方式", "has_calculation": false, "table_required": false},
+          {"order": 5, "title": "路灯控制方式", "requirement": "确定路灯控制方式", "has_calculation": false, "table_required": false},
+          {"order": 6, "title": "节能措施", "requirement": "提出节能措施", "has_calculation": false, "table_required": false},
+          {"order": 7, "title": "电缆及电缆敷设", "requirement": "确定电缆选型及敷设方式", "has_calculation": false, "table_required": false},
+          {"order": 8, "title": "防雷与接地", "requirement": "确定防雷与接地保护措施", "has_calculation": false, "table_required": false},
+          {"order": 9, "title": "停车场机电设施电气工程", "requirement": "公共停车场各类机电设施等电气工程（如有）", "has_calculation": false, "table_required": false},
+          {"order": 10, "title": "BRT电气工程", "requirement": "调度与控制系统、运营设备系统、自动售检票系统等电气工程（如有）", "has_calculation": false, "table_required": false},
+          {"order": 11, "title": "枢纽电气工程", "requirement": "智能系统总体构架、通信系统、监控系统、管理平台及各类机电设施等电气工程（如有）", "has_calculation": false, "table_required": false}
+        ]
+      },
+      "自控": {
+        "section_id": "5.2.4",
+        "title": "交通安全与管理设施",
+        "description": "交通安全设施、交通管理设施及智慧交通设施可行性研究阶段编制内容。根据项目需要编制智慧交通设施相关内容。",
+        "items": [
+          {"order": 1, "title": "交通安全设施", "requirement": "确定交通安全设施设计方案，包括标志、标线、防护（护栏、分隔设施等）等设施", "has_calculation": false, "table_required": false},
+          {"order": 2, "title": "交通管理设施", "requirement": "确定交通管理设施设计方案，包括监控系统、通信系统、信号灯系统、智能交通等设施", "has_calculation": false, "table_required": false},
+          {"order": 3, "title": "智慧交通设施", "requirement": "根据项目需要编制智慧交通设施相关内容", "has_calculation": false, "table_required": false}
+        ]
+      }
+    },
+    "初步设计": {
+      "regulation_ref": "第三篇第二章 道路交通工程初步设计文件编制深度",
+      "电气": {
+        "section_id": "1.4.18",
+        "title": "道路照明工程",
+        "description": "确定功能性照明的设计范围、设计依据及标准、电源负荷等级、电源及供配电方式、照明光源及照明方式、路灯控制方式及节能措施等。道路景观照明另行委托设计。",
+        "items": [
+          {"order": 1, "title": "设计范围", "requirement": "确定功能性照明的设计范围", "has_calculation": false, "table_required": false},
+          {"order": 2, "title": "设计依据及标准", "requirement": "明确设计依据及设计标准", "has_calculation": false, "table_required": false},
+          {"order": 3, "title": "电源负荷等级", "requirement": "确定电源负荷等级", "has_calculation": false, "table_required": false},
+          {"order": 4, "title": "电源及供配电方式", "requirement": "确定电源来源及供配电方式", "has_calculation": false, "table_required": false},
+          {"order": 5, "title": "照明光源及照明方式", "requirement": "确定照明光源选型及照明方式", "has_calculation": false, "table_required": false},
+          {"order": 6, "title": "路灯控制方式", "requirement": "确定路灯控制方式", "has_calculation": false, "table_required": false},
+          {"order": 7, "title": "节能措施", "requirement": "提出节能措施", "has_calculation": false, "table_required": false},
+          {"order": 8, "title": "电缆敷设", "requirement": "确定电缆选型及敷设方式", "has_calculation": false, "table_required": false},
+          {"order": 9, "title": "防雷与接地", "requirement": "确定防雷与接地保护措施", "has_calculation": false, "table_required": false}
+        ]
+      },
+      "自控": {
+        "section_id": "1.4.13",
+        "title": "交通管理设施设计及智能系统",
+        "description": "包括道路工程交通监控、通信、信号灯、智能交通设施设计，快速公交（BRT）调度与控制系统、运营设备系统，以及城市综合客运交通枢纽智能系统设计。",
+        "交通管理设施": {
+          "section_id": "1.4.13",
+          "title": "交通管理设施设计",
+          "items": [
+            {"order": 1, "title": "监控系统", "requirement": "交通监控系统设计", "has_calculation": false, "table_required": false},
+            {"order": 2, "title": "通信系统", "requirement": "通信系统设计", "has_calculation": false, "table_required": false},
+            {"order": 3, "title": "信号灯系统", "requirement": "交通信号灯设计", "has_calculation": false, "table_required": false},
+            {"order": 4, "title": "智能交通设施", "requirement": "智能交通等设施设计", "has_calculation": false, "table_required": false}
+          ]
+        },
+        "智慧枢纽智能系统": {
+          "section_id": "1.4.11",
+          "title": "城市综合客运交通枢纽智能系统（如有）",
+          "optional": true,
+          "description": "针对枢纽集散道路及市政配套设施，明确智能系统总体构架、通信系统、监控系统、管理平台及各类机电设施等设计",
+          "items": [
+            {"order": 1, "title": "智能系统总体构架", "requirement": "明确智能系统总体构架", "has_calculation": false, "table_required": false},
+            {"order": 2, "title": "通信系统", "requirement": "通信系统设计", "has_calculation": false, "table_required": false},
+            {"order": 3, "title": "监控系统", "requirement": "枢纽监控系统设计", "has_calculation": false, "table_required": false},
+            {"order": 4, "title": "管理平台", "requirement": "综合交通一体化运行监测、公共交通监控及应急调度、交通运力综合协调指挥调度、安全事件自动检测与报警等信息化管理平台设计", "has_calculation": false, "table_required": false},
+            {"order": 5, "title": "机电设施", "requirement": "各类机电设施设计", "has_calculation": false, "table_required": false}
+          ]
+        },
+        "BRT调度与控制系统": {
+          "section_id": "1.4.9",
+          "title": "快速公交（BRT）调度与控制系统及运营设备系统（如有）",
+          "optional": true,
+          "description": "BRT调度与控制系统包含运营调度、信号控制、乘客信息服务、车辆定位等。运营设备系统包含供配电系统、通信系统、站台屏蔽门、自动售检票系统及其他设备等。",
+          "items": [
+            {"order": 1, "title": "运营调度系统", "requirement": "运营调度系统设计", "has_calculation": false, "table_required": false},
+            {"order": 2, "title": "信号控制系统", "requirement": "信号控制系统设计", "has_calculation": false, "table_required": false},
+            {"order": 3, "title": "乘客信息服务", "requirement": "乘客信息服务系统设计", "has_calculation": false, "table_required": false},
+            {"order": 4, "title": "车辆定位系统", "requirement": "车辆定位系统设计", "has_calculation": false, "table_required": false},
+            {"order": 5, "title": "供配电系统", "requirement": "供配电系统设计", "has_calculation": true, "table_required": false},
+            {"order": 6, "title": "通信系统", "requirement": "通信系统设计", "has_calculation": false, "table_required": false},
+            {"order": 7, "title": "自动售检票系统", "requirement": "自动售检票系统设计", "has_calculation": false, "table_required": false}
+          ]
+        }
+      }
+    }
+  },
+  "equipment_material_table": {
+    "title": "主要设备材料表",
+    "requirement": "提出主要设备材料的名称、规格（型号）、数量等",
+    "columns": ["序号", "名称", "规格型号", "单位", "数量", "备注"]
+  },
+  "notes": "道路交通工程的电气设计深度侧重照明和交通管理设施。广场、停车场应增加各类机电设施电气工程内容。城市综合客运交通枢纽和快速公交（BRT）工程电气/自控内容依据《建筑工程设计文件编制深度规定》执行。"
+}
