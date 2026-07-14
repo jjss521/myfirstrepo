@@ -22,5 +22,12 @@ venv/
 .venv/
 
 # Output reports & cache
-**/output/*.txt
-**/output/*.json
+**/output/**/*.txt
+**/output/**/*.json
+**/output/**/*.docx
+**/output/**/*.doc
+
+# Large binary source reference documents
+**/source/*.doc
+**/source/*.docx
+**/source/~$*
