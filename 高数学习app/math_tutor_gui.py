@@ -497,7 +497,14 @@ class MathTutorApp(CTk):
 
         # 根据章节号分发内容
         if chapter_num == "1":
-            self._render_chapter1(content)
+            self._render_chapter_demos(content, get_vector_algebra_sections(), {
+                "1.1 向量的概念":            (demos.demo_vector_concept, "📐 向量概念演示", MacColors.CH1),
+                "1.1.1 向量几何意义详解 ⭐": (demos.demo_vector_meaning, "📐 向量几何意义详解", MacColors.CH1),
+                "1.2 向量的表示法":          (demos.demo_vector_decompose, "📐 向量分解表示", MacColors.CH1),
+                "1.3 向量的线性运算":        (demos.demo_vector_add, "📐 向量加法演示", MacColors.CH1),
+                "1.4 数量积（点积）":        (demos.demo_vector_dot, "📐 点积几何意义", MacColors.CH1),
+                "1.5 向量积（叉积）":        (demos.demo_vector_cross, "📐 叉积几何意义", MacColors.CH1),
+            })
         elif chapter_num == "2":
             self._render_chapter_demos(content, get_surfaces_sections(), {
                 "2.1 旋转曲面":        (demos.demo_surface_rotation, "🌐 旋转曲面生成", MacColors.CH2),
