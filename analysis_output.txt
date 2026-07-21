@@ -1,0 +1,162 @@
+=== FILE STATS ===
+排水工程 (drainage.json):
+  sub_module_count: 154
+  unique_sm_names: 67
+  item_count: 52
+  avg_sm_length: 106.4
+  min_sm_length: 85
+  max_sm_length: 144
+  avg_item_length: 43.2
+
+道路交通工程 (road.json):
+  sub_module_count: 115
+  unique_sm_names: 35
+  item_count: 39
+  avg_sm_length: 101.9
+  min_sm_length: 91
+  max_sm_length: 144
+  avg_item_length: 31.3
+
+环境卫生工程 (sanitation.json):
+  sub_module_count: 93
+  unique_sm_names: 54
+  item_count: 31
+  avg_sm_length: 109.0
+  min_sm_length: 85
+  max_sm_length: 144
+  avg_item_length: 88.1
+
+给水工程 (water_supply.json):
+  sub_module_count: 98
+  unique_sm_names: 67
+  item_count: 33
+  avg_sm_length: 109.5
+  min_sm_length: 85
+  max_sm_length: 144
+  avg_item_length: 49.9
+
+=== ALL SUB-MODULES ===
+Total occurrences: 460
+Total unique names: 78
+
+Name frequencies (sorted):
+  [25] 设计内容说明
+  [25] 技术方案确定
+  [25] 参数指标说明
+  [15] 设计范围描述
+  [15] 编制依据说明
+  [15] 设计原则概述
+  [11] 电源来源及电压等级
+  [11] 供电方案说明
+  [11] 备用电源设置
+  [10] 防雷等级确定
+  [10] 接地系统设计
+  [10] 等电位联结
+  [ 9] 设备选型原则
+  [ 9] 主要设备参数
+  [ 9] 技术性能要求
+  [ 8] 电缆选型原则
+  [ 8] 敷设方式确定
+  [ 8] 防火封堵措施
+  [ 7] 系统架构设计
+  [ 7] 区域划分
+  [ 7] 设备选型要求
+  [ 7] 防护等级确定
+  [ 6] 通信方式选择
+  [ 6] 综合布线方案
+  [ 6] 设备配置
+  [ 5] 系统接线方案
+  [ 5] 运行方式说明
+  [ 5] 配电方式选择
+  [ 5] 照明标准确定
+  [ 5] 光源选型方案
+  [ 5] 应急照明设置
+  [ 5] 摄像机点位布置
+  [ 5] 传输存储方案
+  [ 5] 显示控制方案
+  [ 4] 监控点位设置
+  [ 4] 信号传输方案
+  [ 4] 负荷等级划分
+  [ 4] 计算参数说明
+  [ 4] 计算结果分析
+  [ 4] 变电所位置设置
+  [ 4] 变压器容量选择
+  [ 4] 设备布置方案
+  [ 4] 仪表选型原则
+  [ 4] 检测参数确定
+  [ 4] 仪表布置方案
+  [ 4] 系统形式确定
+  [ 4] 探测选型方案
+  [ 4] 联动控制设计
+  [ 4] 平台架构设计
+  [ 4] 功能模块说明
+  [ 4] 数据集成方案
+  [ 3] 业务需求梳理
+  [ 3] 功能需求确定
+  [ 3] 性能指标要求
+  [ 3] 继电保护配置
+  [ 3] 操作电源选择
+  [ 3] 控制方式说明
+  [ 3] 计量方式确定
+  [ 3] 计量装置配置
+  [ 3] 硬件配置方案
+  [ 3] 软件功能实现
+  [ 3] 系统组成确定
+  [ 3] 防范区域划分
+  [ 3] 管理平台设计
+  [ 3] 抗震设防标准
+  [ 3] 支架固定方案
+  [ 3] 设备加固措施
+  [ 3] 控制策略确定
+  [ 3] 控制设备配置
+  [ 3] 节能运行方案
+  [ 2] 节能措施说明
+  [ 2] 能效指标确定
+  [ 1] 系统类型确定
+  [ 1] 功能配置方案
+  [ 1] 建设规模说明
+  [ 1] 系统配置方案
+  [ 1] 信号传输方式
+  [ 1] 功能实现说明
+
+=== LENGTH DISTRIBUTION ===
+Total entries: 460
+Min length: 85 chars
+Max length: 144 chars
+Median: 106 chars
+Avg: 106.5 chars
+Unique template_content values: 32
+
+Distribution:
+  85 chars: 4 entries
+  91 chars: 25 entries
+  92 chars: 50 entries
+  95 chars: 3 entries
+  96 chars: 5 entries
+  97 chars: 11 entries
+  98 chars: 3 entries
+  99 chars: 40 entries
+  100 chars: 14 entries
+  101 chars: 15 entries
+  102 chars: 4 entries
+  103 chars: 20 entries
+  104 chars: 13 entries
+  105 chars: 19 entries
+  106 chars: 35 entries
+  107 chars: 18 entries
+  108 chars: 16 entries
+  109 chars: 16 entries
+  110 chars: 27 entries
+  111 chars: 7 entries
+  112 chars: 5 entries
+  113 chars: 10 entries
+  114 chars: 18 entries
+  117 chars: 10 entries
+  118 chars: 6 entries
+  119 chars: 24 entries
+  121 chars: 5 entries
+  124 chars: 4 entries
+  125 chars: 7 entries
+  134 chars: 9 entries
+  137 chars: 2 entries
+  144 chars: 15 entries
