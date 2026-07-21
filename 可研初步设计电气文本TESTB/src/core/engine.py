@@ -39,16 +39,31 @@ class GenerateEngine:
 
     DESIGN_STAGES = ['可行性研究', '初步设计']
 
+    # Numbering constants — stage name → numeric key
+    STAGE_NUM_MAP = {'可行性研究': 1, '初步设计': 2}
+
+    # Default numbering config written when no config file exists
+    DEFAULT_NUMBERING_CONFIG = {
+        'enabled': True,
+        'show_in_tree': True,
+        'format': 'decimal',
+        'updated_at': '2026-07-14T00:00:00',
+    }
+
     def __init__(self, project_root: str = None):
         self.project_root = project_root or os.path.dirname(os.path.dirname(_BACKEND_DIR))
         self.rules_dir = os.path.join(self.project_root, 'backend', 'data', 'rules')
         self.output_dir = os.path.join(self.project_root, 'output')
+        self.numbering_config_path = os.path.join(
+            self.project_root, 'backend', 'data', 'numbering_config.json')
 
         os.makedirs(self.output_dir, exist_ok=True)
 
         self._rules_cache = {}
         self._excel_parser = None
         self._docx_generator = None
+        self._template_manager = None
+        self._numbering_config = None  # lazy-loaded on first access
 
     # ── 规则文件操作 ──
 
@@ -135,6 +150,68 @@ class GenerateEngine:
                 })
         return summary
 
+    # ── 编号配置 ──────────────────────────────────────────────────────────
+
+    def _load_numbering_config(self) -> dict:
+        """Load numbering config from JSON file. Returns defaults if file missing/invalid."""
+        if not os.path.exists(self.numbering_config_path):
+            return dict(self.DEFAULT_NUMBERING_CONFIG)
+        try:
+            with open(self.numbering_config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            traceback.print_exc()
+            return dict(self.DEFAULT_NUMBERING_CONFIG)
+
+    def get_numbering_config(self) -> Dict[str, Any]:
+        """Return the current numbering configuration dict (lazy-loads from file)."""
+        if self._numbering_config is None:
+            self._numbering_config = self._load_numbering_config()
+        return self._numbering_config
+
+    def set_numbering_config(self, config_dict: Dict[str, Any]) -> bool:
+        """Save numbering configuration to JSON file. Returns True on success."""
+        try:
+            os.makedirs(os.path.dirname(self.numbering_config_path), exist_ok=True)
+            with open(self.numbering_config_path, 'w', encoding='utf-8') as f:
+                json.dump(config_dict, f, ensure_ascii=False, indent=2)
+            self._numbering_config = config_dict
+            return True
+        except Exception:
+            traceback.print_exc()
+            return False
+
+    def get_numbered_title(self, stage_name: str, cat_order: int,
+                           item_order: int, title: str) -> str:
+        """Return a hierarchically-numbered display title.
+
+        Args:
+            stage_name: Design stage name ("可行性研究" or "初步设计").
+            cat_order:  1-based category order within the stage.
+            item_order: 1-based item order (``item.order`` in JSON).
+            title:      Clean item title (without number prefix).
+
+        Returns:
+            ``"1.1.1 标题内容"`` when numbering is enabled, otherwise the raw title.
+            For intermediate levels (cat_order or item_order == 0) a shorter
+            prefix is produced: ``"1 可行性研究"`` or ``"1.1 电气设计"``.
+        """
+        if not self.get_numbering_config().get('enabled', True):
+            return title
+
+        stage_num = self.STAGE_NUM_MAP.get(stage_name, 0)
+        if stage_num == 0:
+            return title
+
+        if cat_order <= 0:
+            # Stage-only level: "1 可行性研究"
+            return f'{stage_num} {title}'
+        if item_order <= 0:
+            # Category level: "1.1 电气设计"
+            return f'{stage_num}.{cat_order} {title}'
+        # Item level: "1.1.1 设计范围及内容"
+        return f'{stage_num}.{cat_order}.{item_order} {title}'
+
     # ── Excel 操作 ──
 
     def parse_excel(self, excel_path: str) -> Dict[str, Any]:
@@ -197,3 +274,27 @@ class GenerateEngine:
         checks.append(('输出目录', '[OK]' if os.path.isdir(self.output_dir) else '[FAIL]'))
 
         return {'all_pass': all('[OK]' in msg for _, msg in checks), 'checks': checks}
+
+    # ── 自定义模板管理 ──
+
+    @property
+    def template_manager(self):
+        """懒加载自定义模板管理器实例。"""
+        if self._template_manager is None:
+            from app.services.custom_template_manager import CustomTemplateManager
+            self._template_manager = CustomTemplateManager(
+                os.path.join(self.project_root, 'backend', 'data', 'custom_templates')
+            )
+        return self._template_manager
+
+    def list_custom_templates(self, **filters) -> list:
+        """列出自定义模板，支持与 list_templates() 相同的过滤参数。"""
+        return self.template_manager.list_templates(**filters)
+
+    def save_custom_template(self, template: dict) -> dict:
+        """保存一个自定义模板，返回完整模板记录。"""
+        return self.template_manager.save_template(template)
+
+    def delete_custom_template(self, template_id: str) -> bool:
+        """删除指定 ID 的自定义模板，返回是否删除成功。"""
+        return self.template_manager.delete_template(template_id)

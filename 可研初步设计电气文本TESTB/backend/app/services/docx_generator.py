@@ -13,12 +13,16 @@ Word 文档生成器（python-docx 版，支持多模板）
 
 输出：格式化的 .docx Word 文档
 """
+from __future__ import annotations
+
 import json
 import os
 import math
 import re
 from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
+
+from app.services.custom_template_manager import CustomTemplateManager
 
 from docx import Document
 from docx.shared import Pt, Inches, Cm, RGBColor
@@ -27,6 +31,7 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from app.services.equipment_table_generator import EquipmentTableGenerator
+from app.services.custom_template_manager import CustomTemplateManager
 
 # ───────────────────────────────────────────────────────────
 # 模板定义
@@ -108,6 +113,18 @@ def cn_num(n: int) -> str:
         tens, ones = n // 10, n % 10
         return digits[tens] + '十' + (digits[ones] if ones else '')
     return str(n)
+
+
+# Numbering constants — stage name → numeric key
+STAGE_NUM_MAP = {'可行性研究': 1, '初步设计': 2}
+
+# Default numbering config written when no config file exists
+DEFAULT_NUMBERING_CONFIG = {
+    'enabled': True,
+    'show_in_tree': True,
+    'format': 'decimal',
+    'updated_at': '2026-07-14T00:00:00',
+}
 
 
 # ───────────────────────────────────────────────────────────
@@ -480,13 +497,21 @@ def _iter_categories(categories: dict):
 class DocxGenerator:
     """Word 文档生成引擎（多模板 + 预览）"""
 
-    def __init__(self, rules_dir: str, output_dir: str, template: str = 'standard'):
+    def __init__(self, rules_dir: str, output_dir: str, template: str = 'standard',
+                 numbering_config=None):
         self.rules_dir = rules_dir
         self.output_dir = os.path.join(output_dir, 'generated')
         os.makedirs(self.output_dir, exist_ok=True)
         self.template = template
         self.t = TEMPLATES.get(template, TEMPLATES['standard'])
         self.blocks: List[Any] = []
+        # Numbering config: dict → use directly, str → load file path, None → derive from rules_dir
+        if isinstance(numbering_config, dict):
+            self.numbering_config = numbering_config
+        else:
+            config_path = (numbering_config if isinstance(numbering_config, str)
+                           else os.path.join(os.path.dirname(rules_dir), 'numbering_config.json'))
+            self.numbering_config = self._load_numbering_config(config_path)
         self._load_rules()
 
     def _load_rules(self):
@@ -496,6 +521,47 @@ class DocxGenerator:
             if os.path.exists(path):
                 with open(path, 'r', encoding='utf-8') as f:
                     self.rules[code] = json.load(f)
+
+    def _load_numbering_config(self, config_path: str) -> dict:
+        """Load numbering config from JSON file. Returns defaults if file missing/invalid."""
+        if not os.path.exists(config_path):
+            return dict(DEFAULT_NUMBERING_CONFIG)
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return dict(DEFAULT_NUMBERING_CONFIG)
+
+    def _get_numbered_title(self, stage_name: str, cat_order: int,
+                            item_order: int, title: str) -> str:
+        """Return a hierarchically-numbered display title.
+
+        Args:
+            stage_name: Design stage name ("可行性研究" or "初步设计").
+            cat_order:  1-based category order within the stage.
+            item_order: 1-based item order (``item.order`` in JSON).
+            title:      Clean item title (without number prefix).
+
+        Returns:
+            ``"1.1.1 标题内容"`` when numbering is enabled, otherwise the raw title.
+            For intermediate levels (cat_order or item_order == 0) a shorter
+            prefix is produced: ``"1 可行性研究"`` or ``"1.1 电气设计"``.
+        """
+        if not self.numbering_config.get('enabled', True):
+            return title
+
+        stage_num = STAGE_NUM_MAP.get(stage_name, 0)
+        if stage_num == 0:
+            return title
+
+        if cat_order <= 0:
+            # Stage-only level: "1 可行性研究"
+            return f'{stage_num} {title}'
+        if item_order <= 0:
+            # Category level: "1.1 电气设计"
+            return f'{stage_num}.{cat_order} {title}'
+        # Item level: "1.1.1 设计范围及内容"
+        return f'{stage_num}.{cat_order}.{item_order} {title}'
 
     def set_template(self, template: str):
         if template in TEMPLATES:
@@ -553,34 +619,71 @@ class DocxGenerator:
         self._add_para(doc, '')
 
         cat_ordinal = 2
+        cat_order = 1  # 1‑based position within the design stage (for decimal numbering)
         # 获取当前设计阶段下的分类（电气/自控）
         stage_data = rule.get('design_stages', {}).get(design_stage, {})
         # 环卫工程(sanitation)使用嵌套 sections 结构
         categories = stage_data.get('sections', stage_data) if isinstance(stage_data, dict) else {}
         for category_name, category_data in _iter_categories(categories):
             params['category_name'] = category_name
-            self._add_heading(doc, f'{cn_num(cat_ordinal)}、{category_data["title"]}', level=2)
+            self._add_heading(doc,
+                self._get_numbered_title(design_stage, cat_order, 0, category_data['title']),
+                level=2)
             cat_ordinal += 1
 
             for item in category_data.get('items', []):
                 if item.get('optional', False):
                     continue
                 title = item['title']
-                requirement = item['requirement']
+                requirement = item.get('requirement', '')
                 has_calc = item.get('has_calculation', False)
                 calc_from_excel = item.get('calc_from_excel', False)
 
-                self._add_heading(doc, f'{item["order"]}. {title}', level=3)
+                self._add_heading(doc,
+                    self._get_numbered_title(design_stage, cat_order, item['order'], title),
+                    level=3)
 
                 if calc_from_excel and has_calc:
                     self._add_load_calculation_section(doc, summary, area_summaries, voltage, load_level)
                 elif has_calc and not calc_from_excel:
                     self._add_calc_section(doc, title, summary, voltage, load_level)
                 else:
-                    self._add_text_section(doc, title, requirement, category_name, params, summary)
-            self._add_para(doc, '')
+                    sub_modules = item.get('sub_modules', [])
+                    has_content = any(sm.get('template_content', '').strip() for sm in sub_modules)
+                    if has_content:
+                        for sm in sub_modules:
+                            # Check for selected variant first
+                            variant_id = sm.get('selected_variant_id', '')
+                            sm_content = sm.get('template_content', '').strip()
+                            if variant_id:
+                                try:
+                                    ctm_dir = os.path.join(os.path.dirname(os.path.dirname(self.rules_dir)), 'data', 'custom_templates')
+                                    mgr = CustomTemplateManager(ctm_dir)
+                                    variant = mgr.get_template(variant_id)
+                                    if variant and variant.get('content', '').strip():
+                                        sm_content = variant['content']
+                                except Exception:
+                                    pass  # Fall back to template_content on error
 
-        self._add_heading(doc, f'{cn_num(cat_ordinal)}、主要设备材料表', level=2)
+                            if sm_content:
+                                sm_name = sm.get('name', '')
+                                # Add block markers for preview differentiation
+                                self.blocks.append(('sm_start', sm_name))
+                                # Write sub-module content as paragraphs
+                                paragraphs = [p.strip() for p in re.split(r'\n\s*\n', sm_content) if p.strip()]
+                                for para_text in paragraphs:
+                                    if para_text:
+                                        para_text = self._apply_placeholders(para_text, params, summary)
+                                        self._add_para(doc, para_text)
+                                self.blocks.append(('sm_end', sm_name))
+                    else:
+                        self._add_text_section(doc, title, requirement, category_name, params, summary)
+            self._add_para(doc, '')
+            cat_order += 1
+
+        self._add_heading(doc,
+            self._get_numbered_title(design_stage, cat_order, 0, '主要设备材料表'),
+            level=2)
         cat_ordinal += 1
         self._add_equipment_table(doc, summary, area_summaries, rule, design_stage)
 
@@ -618,6 +721,7 @@ class DocxGenerator:
     def _fallback_content(self, category, title, params, summary) -> List[Tuple[str, str]]:
         scope = cn_scope(category)
         req = ''
+        template_content = ''
         rule = self.rules.get(params.get('project_type', ''), {})
         for stage_data in rule.get('design_stages', {}).values():
             categories = stage_data.get('sections', stage_data) if isinstance(stage_data, dict) else {}
@@ -625,12 +729,15 @@ class DocxGenerator:
                 for it in cat_data.get('items', []):
                     if it['title'] == title:
                         req = it.get('requirement', '')
+                        template_content = it.get('template_content', '')
                         break
                 if req:
                     break
             if req:
                 break
-        if req:
+        if template_content:
+            text = template_content
+        elif req:
             text = (
                 f'本工程{scope}的"{title}"应按相关规定及本工程特点进行设计：{req}。'
                 f'具体方案结合工艺布置、负荷分布及当地供电与智能化管理要求综合确定。'
@@ -639,9 +746,100 @@ class DocxGenerator:
             text = f'本工程{scope}的"{title}"按国家及行业现行标准、规范进行设计，满足使用功能及安全可靠性要求。'
         return [('p', text)]
 
+    # ─── 自定义模板集成 ───
+    def _get_custom_template_content(self, title: str, category: str, params: Dict[str, Any]) -> Optional[List[str]]:
+        """Check for custom templates. Returns list of content paragraphs or None."""
+        project_type = params.get('project_type', '')
+        design_stage = params.get('design_stage', '')
+
+        try:
+            mgr = CustomTemplateManager(
+                os.path.join(os.path.dirname(self.rules_dir), 'data', 'custom_templates')
+            )
+            templates = mgr.list_templates(
+                project_type=project_type,
+                design_stage=design_stage,
+                category=category,
+                item_title=title,
+            )
+        except Exception:
+            return None
+
+        if not templates:
+            return None
+
+        # Use the most recently updated template
+        templates.sort(key=lambda t: t.get('updated_at', ''), reverse=True)
+        best = templates[0]
+        content = best.get('content', '')
+
+        # Also check for sub-module templates and concatenate them
+        # Sub-module templates have sub_module_name set
+        try:
+            sub_templates = mgr.list_templates(
+                project_type=project_type,
+                design_stage=design_stage,
+                category=category,
+                item_title=title,
+            )
+            # Filter to only those with sub_module_name
+            sub_templates = [t for t in sub_templates if t.get('sub_module_name')]
+            if sub_templates:
+                sub_templates.sort(key=lambda t: t.get('updated_at', ''), reverse=True)
+                # Group by sub_module_name and take latest for each
+                seen = {}
+                for t in sub_templates:
+                    name = t.get('sub_module_name', '')
+                    if name and name not in seen:
+                        seen[name] = t
+                for name in sorted(seen.keys()):
+                    sub_content = seen[name].get('content', '').strip()
+                    if sub_content:
+                        content += '\n\n' + sub_content
+        except Exception:
+            pass
+
+        # Split into paragraphs by double newline
+        paragraphs = [p.strip() for p in re.split(r'\n\s*\n', content) if p.strip()]
+        return paragraphs if paragraphs else ([content] if content.strip() else None)
+
+    def _apply_placeholders(self, text: str, params: Dict[str, Any], summary: Dict[str, Any]) -> str:
+        """Replace placeholders like {project_name} with actual values."""
+        replacements = {
+            '{project_name}': params.get('project_name', ''),
+            '{category_name}': params.get('category_name', ''),
+            '{voltage_level}': params.get('voltage_level', '10kV'),
+            '{load_level}': params.get('load_level', '二级'),
+            '{power_source}': params.get('power_source', '一路'),
+            '{standby_desc}': params.get('standby_desc', ''),
+            '{tx_config}': params.get('tx_config', ''),
+            '{tx_count}': str(params.get('tx_count', '1')),
+            '{tx_location}': params.get('tx_location', '变配电间内'),
+            '{project_date}': params.get('project_date', ''),
+            '{total_power}': f"{summary.get('total_equip_power', 0):.0f}",
+            '{total_pc}': f"{summary.get('total_pc', 0):.1f}",
+            '{total_sc}': f"{summary.get('total_sc', 0):.1f}",
+        }
+        for placeholder, value in replacements.items():
+            if placeholder in text:
+                text = text.replace(placeholder, value)
+        return text
+
     def _add_text_section(self, doc, title, requirement, category, params, summary):
+        """Add a text section to the document, checking custom templates first."""
+        # Try custom template first
+        custom_content = self._get_custom_template_content(title, category, params)
+        if custom_content:
+            for text in custom_content:
+                # Apply placeholder substitution
+                text = self._apply_placeholders(text, params, summary)
+                self._add_para(doc, text)
+            return
+
+        # Fall back to default resolution
         type_code = params.get('project_type', '')
         for kind, text in self._resolve_content(type_code, title, category, params, summary):
+            text = self._apply_placeholders(text, params, summary)
             if kind == 'b':
                 self._add_bullet_para(doc, text)
             else:
@@ -663,11 +861,23 @@ class DocxGenerator:
         sp = summary.get('simultaneous_coeff', {})
         total_devices = summary.get('total_devices', 0)
 
-        self._add_para(doc, f'本工程用电设备总安装容量为 {total_equip:.1f} kW，用电设备总台数 {total_devices} 台。')
-        self._add_para(doc, f'用电负荷等级为{load_level}负荷，供电电压等级为{voltage}。')
-        self._add_para(doc, '负荷计算采用需要系数法，计算过程及结果如下：')
-        self._add_para(doc, '表1  各区域用电负荷汇总表', bold=True)
+        # ── 1. Introductory text (keep with next so it flows into the table) ──
+        p1 = self._add_para(doc, f'本工程用电设备总安装容量为 {total_equip:.1f} kW，用电设备总台数 {total_devices} 台。')
+        p1.paragraph_format.keep_with_next = True
+        p2 = self._add_para(doc, f'用电负荷等级为{load_level}负荷，供电电压等级为{voltage}。')
+        p2.paragraph_format.keep_with_next = True
+        p3 = self._add_para(doc, '负荷计算采用需要系数法，各区域逐项计算后汇总如下：')
+        p3.paragraph_format.keep_with_next = True
 
+        # ── 2. Table caption (centered, bold, keep with next so it stays with table) ──
+        cap = self._add_para(doc, '表1  各区域用电负荷汇总表', bold=True)
+        cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        cap.paragraph_format.keep_with_next = True
+        # Make caption slightly larger for prominence
+        for run in cap.runs:
+            run.font.size = Pt(self.t['body_size'] + 1)
+
+        # ── 3. Build and insert the load summary table ──
         headers = ['序号', '区域名称', '设备数量', '设备容量(kW)',
                    '计算有功(kW)', '计算无功(kvar)', '视在功率(kVA)']
         rows = []
@@ -685,10 +895,12 @@ class DocxGenerator:
         ])
         self._add_table(doc, headers, rows)
 
-        self._add_para(doc, '')
+        # ── 4. Transitional / analysis text after the table ──
         ksp = sp.get('KΣP', 0.9)
         ksq = sp.get('KΣq', 0.95)
-        self._add_para(doc, f'考虑同时系数 KΣp={ksp}、KΣq={ksq} 后：')
+        self._add_para(doc,
+            f'由上表汇总结果，计及同时系数 KΣp={ksp}、KΣq={ksq}'
+            f'后，各区域计算负荷折合至{voltage}母线侧的合计值为：')
         self._add_bullet_para(doc, f'有功计算负荷 Pjs = KΣp × ∑Pc = {ksp} × {total_pc:.1f} = {total_pc_k:.1f} kW')
         self._add_bullet_para(doc, f'无功计算负荷 Qjs = KΣq × ∑Qc = {ksq} × {summary.get("total_qc", 0):.1f} = {total_qc_k:.1f} kvar')
         self._add_bullet_para(doc, f'视在计算负荷 Sjs = √(Pjs² + Qjs²) = {total_sc_k:.1f} kVA')
@@ -822,6 +1034,15 @@ class DocxGenerator:
         table = doc.add_table(rows=1, cols=len(headers))
         table.style = 'Table Grid'
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
+        # Prevent table from splitting across pages
+        tbl_pr = table._tbl.tblPr
+        if tbl_pr is None:
+            tbl_pr = OxmlElement('w:tblPr')
+            table._tbl.insert(0, tbl_pr)
+        if tbl_pr.find(qn('w:cantSplit')) is None:
+            cant_split_el = OxmlElement('w:cantSplit')
+            cant_split_el.set(qn('w:val'), 'true')
+            tbl_pr.append(cant_split_el)
         shade = self.t.get('table_header_shade')
         for i, h in enumerate(headers):
             cell = table.rows[0].cells[i]
@@ -831,17 +1052,24 @@ class DocxGenerator:
                 for run in p.runs:
                     run.bold = True
                     run.font.size = Pt(9)
+                # Keep-with-next on header row paragraphs so header stays with rows
+                p.paragraph_format.keep_with_next = True
             if shade:
                 self._shade_cell(table.rows[0].cells[i], shade)
-        for row in rows:
+        for row_idx, row in enumerate(rows):
             r = table.add_row()
+            is_last_row = (row_idx == len(rows) - 1)
             for i, v in enumerate(row):
                 r.cells[i].text = str(v)
                 for p in r.cells[i].paragraphs:
                     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     for run in p.runs:
                         run.font.size = Pt(9)
+                    # Keep rows together except the last row
+                    if not is_last_row:
+                        p.paragraph_format.keep_with_next = True
         self.blocks.append(('table', '', list(headers), [list(x) for x in rows]))
+        return table
 
     def _add_sign_block(self, doc):
         self._add_para(doc, '')
