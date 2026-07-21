@@ -1,0 +1,92 @@
+{
+  "project_type": "道路工程",
+  "design_stage": "可研",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）道路交通工程可行性研究报告文件编制深度 1.5.8/1.5.9",
+  "categories": {
+    "仪表自控弱电设计": [
+      {
+        "order": 1,
+        "title": "设计原则与标准",
+        "requirement": "简述自控系统、仪表的设计原则和标准。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "控制系统",
+        "requirement": "确定控制系统功能层次、控制系统工作方式、各系统的数据采集、控制系统硬件配置、数据通信网络类型、控制站功能。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "仪表系统",
+        "requirement": "确定仪表的类型、设置位置、作用等。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "设备与通信",
+        "requirement": "确定主要自控设备、仪表的选型等；确定通信方式、调度系统；确定安防系统。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "电气设计": [
+      {
+        "order": 1,
+        "title": "设计范围及负荷",
+        "requirement": "说明设计依据及原则；说明设计范围、确定负荷等级、运行方式、确定用电负荷统计成果。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "供电电源",
+        "requirement": "确定供电电源、电压等级、备用电源情况。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "变电所与接线",
+        "requirement": "确定变电所布置及变压器选择；确定电气主接线方案、主要电气设备选型。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "保护与计量",
+        "requirement": "确定主要设备驱动控制、保护方式；计量、补偿设计。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "照明与防雷",
+        "requirement": "照明、节能、抗震设计；防雷、接地与防爆等。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ]
+  }
+}

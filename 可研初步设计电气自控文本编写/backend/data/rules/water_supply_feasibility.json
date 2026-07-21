@@ -1,0 +1,74 @@
+{
+  "project_type": "给水工程",
+  "design_stage": "可研",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第一篇第一章 给水工程可行性研究报告文件编制深度 5.2",
+  "categories": {
+    "仪表自控弱电设计": [
+      {
+        "order": 1,
+        "title": "设计范围及依据",
+        "requirement": "设计范围、设计依据及原则。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "自控系统",
+        "requirement": "需求分析、内容及目标、技术特点及创新；监控系统形式、配置（层次）架构、建设规模、功能实现、设施建设等。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "弱电系统",
+        "requirement": "弱电系统的类型、功能配置、建设规模等。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "设备配置及智慧平台",
+        "requirement": "设备配置及布置、防护安全系统（含人员定位）、智慧给水（厂）管控平台、防雷接地、防爆及防损坏、机电抗震。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "电气设计": [
+      {
+        "order": 1,
+        "title": "设计范围及内容",
+        "requirement": "设计范围、设计依据。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "用电负荷及等级",
+        "requirement": "供电电源、用电负荷及等级。",
+        "has_calculation": true,
+        "table_required": true,
+        "calc_from_excel": true,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "供配电系统",
+        "requirement": "供配电系统、计量及测量、功率因数补偿、操作电源、继电保护设置、电机启动及保护方式、变配电设置及布置、电缆敷设方式、照明及应急照明、防雷与接地、防爆要求。",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ]
+  }
+}

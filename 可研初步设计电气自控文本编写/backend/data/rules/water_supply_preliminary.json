@@ -1,0 +1,236 @@
+{
+  "project_type": "给水工程",
+  "design_stage": "初步设计",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第一篇第二章",
+  "categories": {
+    "仪表自控弱电设计": [
+      {
+        "order": 1,
+        "title": "设计范围及依据",
+        "requirement": "设计范围、内容及依据",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "自控系统",
+        "requirement": "自控系统的设计原则、建设规模、安装场所、系统配置（硬件及软件）、通信网络及功能实现等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "仪表系统",
+        "requirement": "仪表系统的设计原则、仪表设置、检测功能",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "工业电视系统",
+        "requirement": "工业电视系统的设计原则、系统配置、信号传输及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "安防系统",
+        "requirement": "安防系统的设计原则、系统配置、信号传输及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "通信系统",
+        "requirement": "通信（综合布线）系统的设计原则、系统规模、综合布线及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "火灾自动报警系统",
+        "requirement": "火灾自动报警系统的设计原则、系统配置、探测选型、信号传输、应急通信及功能实现等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 8,
+        "title": "有线电视系统",
+        "requirement": "有线电视系统的设计原则、系统配置及功能实现等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 9,
+        "title": "防护等级",
+        "requirement": "设备的防护等级、防腐等级",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 10,
+        "title": "防爆及防损坏",
+        "requirement": "防爆及防损坏设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 11,
+        "title": "设备选型与布置",
+        "requirement": "设备的技术水平、选型要求、布置安装等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 12,
+        "title": "管缆敷设",
+        "requirement": "管缆及其敷设说明",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 13,
+        "title": "防雷及接地",
+        "requirement": "防雷及接地系统",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 14,
+        "title": "机电抗震",
+        "requirement": "机电抗震",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "电气设计": [
+      {
+        "order": 1,
+        "title": "设计范围及内容",
+        "requirement": "说明设计范围及内容",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "电源",
+        "requirement": "供电电源来源、电压等级、备用电源设置等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "用电负荷",
+        "requirement": "说明用电负荷等级、种类，采用需要系数法以表格方式列出设备容量、需要系数、计算负荷、功率因数补偿值、变压器容量、计算负荷汇总等",
+        "has_calculation": true,
+        "table_required": true,
+        "calc_from_excel": true,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "供配电系统",
+        "requirement": "根据负荷性质及可靠性要求，确定厂内高、低压一次系统图接线形式，说明各系统（包括备用电源）运行方式，高、低压出线配电方式等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "变电所布置",
+        "requirement": "根据用电负荷及平面布置确定厂内变电所的设置、平面布置、变压器容量和数量的选定及其布置安装方式",
+        "has_calculation": true,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "保护和控制",
+        "requirement": "高压系统继电保护的设高压系统操作电源类型的选择、电机设备的启动及控制方式、低压配电线路保护等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "计量",
+        "requirement": "说明水厂商业用电的计量方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 8,
+        "title": "管线敷设",
+        "requirement": "说明室内外电气管线敷设方式原则，包括电缆隧道、电缆沟、电缆管井、照明等的敷设方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 9,
+        "title": "照明及应急照明",
+        "requirement": "各主要房间照度标准，灯具设置原则，光源选择等；应急照明需明确哪些房间需设置及设置标准等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 10,
+        "title": "设备选型",
+        "requirement": "高、低压配电设备、变压器、电气箱柜、电缆等主要设备材料选型要求",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 11,
+        "title": "防雷与接地",
+        "requirement": "防雷、接地、防爆及等电位联结、抗震等的说明",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ]
+  }
+}

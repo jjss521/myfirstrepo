@@ -1,0 +1,175 @@
+{
+  "project_type": "道路交通工程",
+  "design_stage": "初步设计",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第三篇第二章",
+  "categories": {
+    "BRT调度与控制系统": [
+      {
+        "order": 1,
+        "title": "运营调度系统",
+        "requirement": "运营调度系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "信号控制系统",
+        "requirement": "信号控制系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "乘客信息服务",
+        "requirement": "乘客信息服务系统",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "车辆定位系统",
+        "requirement": "车辆定位系统",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "供配电系统",
+        "requirement": "供配电系统设计",
+        "has_calculation": true,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "通信系统",
+        "requirement": "通信系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "自动售检票系统",
+        "requirement": "自动售检票系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "交通管理设施": [
+      {
+        "order": 1,
+        "title": "监控系统",
+        "requirement": "交通监控系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "通信系统",
+        "requirement": "通信系统设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "信号灯系统",
+        "requirement": "交通信号灯设计",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "智能交通设施",
+        "requirement": "智能交通等设施",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "照明工程": [
+      {
+        "order": 1,
+        "title": "设计范围",
+        "requirement": "确定功能性照明的设计范围",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "设计依据及标准",
+        "requirement": "设计依据及标准",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "电源负荷等级",
+        "requirement": "电源负荷等级",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "电源及供配电方式",
+        "requirement": "电源及供配电方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "照明光源及方式",
+        "requirement": "照明光源及照明方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "路灯控制方式",
+        "requirement": "路灯控制方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "节能措施",
+        "requirement": "节能措施等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ]
+  }
+}

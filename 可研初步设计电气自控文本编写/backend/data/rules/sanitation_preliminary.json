@@ -1,0 +1,182 @@
+{
+  "project_type": "环境卫生工程",
+  "design_stage": "初步设计",
+  "regulation_ref": "《市政公用工程设计文件编制深度规定》（2025年版）第九篇第二章",
+  "categories": {
+    "仪表自控设计": [
+      {
+        "order": 1,
+        "title": "设计依据及范围",
+        "requirement": "明确设计依据、范围及原则",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "自控系统",
+        "requirement": "说明自控系统形式组成、安装场所、系统配置、通信网络及功能实现等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "仪表系统",
+        "requirement": "提出仪表系统的设计原则、仪表设置、检测功能",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "工业电视系统",
+        "requirement": "工业电视系统的设计原则、系统配置、信号传输及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "安防系统",
+        "requirement": "安防系统的设计原则、系统配置、信号传输及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "通信系统",
+        "requirement": "通信系统的设计原则、系统规模、综合布线及功能实现",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "火灾自动报警系统",
+        "requirement": "火灾自动报警系统的设计原则、系统配置、探测选型、信号传输、应急通信及功能实现等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 8,
+        "title": "防护与防腐等级",
+        "requirement": "确定设备的防护等级、防腐等级",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 9,
+        "title": "设备选型与布置",
+        "requirement": "设备的技术水平、选型要求、布置安装",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 10,
+        "title": "电缆敷设",
+        "requirement": "电缆敷设方式",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 11,
+        "title": "防雷及接地",
+        "requirement": "防雷及接地系统",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 12,
+        "title": "仪表配管设计",
+        "requirement": "生产（单元）过程配管及仪表设计等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ],
+    "电气设计": [
+      {
+        "order": 1,
+        "title": "设计依据及范围",
+        "requirement": "明确设计依据、范围及原则",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 2,
+        "title": "负荷等级与电源",
+        "requirement": "说明负荷等级、供电电源、保安电源（如需）、电压等级、场内设备电压选择及用电设备种类、负荷班制，列表说明设备容量、计算负荷、补偿前后功率因数等",
+        "has_calculation": true,
+        "table_required": true,
+        "calc_from_excel": true,
+        "optional": false
+      },
+      {
+        "order": 3,
+        "title": "变配电系统",
+        "requirement": "确定各级电压等级一次系统图、电源运行方式、变配电所设置、变压器容量和数量以及安装形式，继电保护的设置、操作电源、信号以及计量设置，明确无功补偿、谐波保护、变电所过电压及接地保护措施",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 4,
+        "title": "配电系统",
+        "requirement": "说明配电电压等级、配电系统形式、配电方式及保证供电可靠性的措施",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 5,
+        "title": "设备选择与控制",
+        "requirement": "提出环境特征及配电设备选择、电机启动及调速方式、维修电源设备、导体选择及敷设方式、控制与连锁等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 6,
+        "title": "照明系统",
+        "requirement": "说明各单体照明及应急照明系统，场（厂）区照明等",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      },
+      {
+        "order": 7,
+        "title": "防雷与接地",
+        "requirement": "明确防雷、接地及等电位措施、导体选择及电缆敷设方式、防火、防爆及建筑机电抗震措施",
+        "has_calculation": false,
+        "table_required": false,
+        "calc_from_excel": false,
+        "optional": false
+      }
+    ]
+  }
+}
